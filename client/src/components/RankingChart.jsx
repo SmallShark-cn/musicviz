@@ -16,7 +16,6 @@ export default function RankingChart({ data }) {
     );
 
     const rankedData = [...data].sort((a, b) => b.plays - a.plays);
-    // y轴使用富文本：歌曲名在上，歌手名在下（字体小、透明度低）
     const names = rankedData
       .map((d) => {
         const song = d.name?.length > 10 ? d.name.slice(0, 10) + "..." : d.name;
@@ -29,7 +28,6 @@ export default function RankingChart({ data }) {
 
     const maxValue = Math.max(...values);
 
-    // 格式化大数字
     const formatNumber = (num) => {
       if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
       if (num >= 1000) return (num / 1000).toFixed(0) + "K";
@@ -66,7 +64,7 @@ export default function RankingChart({ data }) {
             color: (value, index) => {
               const originalIndex = rankedData.length - 1 - index;
               if (originalIndex === 0) return "#ffd700";
-              if (originalIndex === 1) return "#c0c0c0";
+              if (originalIndex === 1) return "#00d4ff"; // 青色，更亮
               if (originalIndex === 2) return "#cd7f32";
               return theme === "dark" ? "#aaa" : "#666";
             },
@@ -75,7 +73,6 @@ export default function RankingChart({ data }) {
               const originalIndex = rankedData.length - 1 - index;
               const rank = ["🥇", "🥈", "🥉"][originalIndex];
               const rankPrefix = rank ? `${rank} ` : "";
-              // 上下排列：歌曲名在上，歌手名在下
               return `{title|${rankPrefix}${song}}\n{sub|${artist}}`;
             },
             rich: {
@@ -104,8 +101,8 @@ export default function RankingChart({ data }) {
                 color: new echarts.graphic.LinearGradient(
                   0, 0, 1, 0,
                   [
-                    { offset: 0, color: i === rankedData.length - 1 ? "#ffd700" : i === rankedData.length - 2 ? "#c0c0c0" : i === rankedData.length - 3 ? "#cd7f32" : "#ec4141" },
-                    { offset: 1, color: i === rankedData.length - 1 ? "#ffb700" : i === rankedData.length - 2 ? "#a0a0a0" : i === rankedData.length - 3 ? "#ad5f12" : "#ff6b6b" },
+                    { offset: 0, color: i === rankedData.length - 1 ? "#ffd700" : i === rankedData.length - 2 ? "#00d4ff" : i === rankedData.length - 3 ? "#cd7f32" : "#ec4141" },
+                    { offset: 1, color: i === rankedData.length - 1 ? "#ffb700" : i === rankedData.length - 2 ? "#00a8cc" : i === rankedData.length - 3 ? "#ad5f12" : "#ff6b6b" },
                   ],
                 ),
               },

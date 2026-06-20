@@ -618,11 +618,12 @@ router.get("/hotsongs", async (req, res) => {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
     } catch { }
 
-    // 清空旧数据并重新爬取（热歌榜每天更新）
+    // 清空旧数据并重新爬取所有排行榜
     await pool.execute("DELETE FROM hot_songs");
-    await hotSongs.crawlAndSaveHotSongs();
+    const chartsData = await hotSongs.crawlAndSaveAllCharts();
+    await hotSongs.saveChartsToDB(chartsData);
     const [songs] = await pool.execute(
-      "SELECT * FROM hot_songs ORDER BY ranking ASC LIMIT 50",
+      "SELECT * FROM hot_songs ORDER BY chart_type, ranking ASC LIMIT 100",
     );
     const data = songs.map((s) => ({
       ...s,
@@ -778,22 +779,46 @@ router.get("/compare/charts", async (req, res) => {
       },
     }));
 
-    // 热歌榜统计：计算对比歌手在热歌榜中的出现次数
-    const [hotSongsData] = await pool.execute("SELECT artists FROM hot_songs");
-    const hotSongCounts = {};
-    for (const row of hotSongsData) {
+    // 多排行榜统计：计算对比歌手在各排行榜中的出现次数
+    // 先重新爬取最新排行榜数据，确保数据是最新的
+    try {
+      const chartsData = await hotSongs.crawlAndSaveAllCharts();
+      await hotSongs.saveChartsToDB(chartsData);
+    } catch (e) {
+      console.log(`[Compare] 爬取排行榜失败: ${e.message}`);
+    }
+
+    const [chartsData] = await pool.execute("SELECT chart_type, artists FROM hot_songs");
+    const chartCounts = {
+      hot: {},      // 热歌榜
+      rising: {},   // 飙升榜
+      new: {},      // 新歌榜
+      original: {}, // 原创榜
+    };
+
+    for (const row of chartsData) {
       try {
         const artists = JSON.parse(row.artists || "[]");
+        const chartType = row.chart_type || "hot";
+        if (!chartCounts[chartType]) chartCounts[chartType] = {};
+
         for (const artist of artists) {
           if (artistIds.includes(artist.id)) {
-            hotSongCounts[artist.id] = (hotSongCounts[artist.id] || 0) + 1;
+            chartCounts[chartType][artist.id] = (chartCounts[chartType][artist.id] || 0) + 1;
           }
         }
       } catch { }
     }
-    data.hotSongCounts = data.artists.map((a) => ({
+
+    // 汇总各歌手在所有排行榜的总次数
+    data.chartCounts = data.artists.map((a) => ({
       name: a.name,
-      count: hotSongCounts[a.id] || 0,
+      total: (chartCounts.hot[a.id] || 0) + (chartCounts.rising[a.id] || 0) +
+        (chartCounts.new[a.id] || 0) + (chartCounts.original[a.id] || 0),
+      hot: chartCounts.hot[a.id] || 0,
+      rising: chartCounts.rising[a.id] || 0,
+      new: chartCounts.new[a.id] || 0,
+      original: chartCounts.original[a.id] || 0,
     }));
 
     res.json({ code: 200, data });

@@ -15,29 +15,51 @@ export default function HotSongCountChart({ data }) {
       theme === "dark" ? "dark" : undefined,
     );
 
-    const sortedData = [...data].sort((a, b) => b.count - a.count);
+    const sortedData = [...data].sort((a, b) => b.total - a.total);
     const names = sortedData.map((d) => d.name);
-    const values = sortedData.map((d) => d.count);
-    const total = values.reduce((sum, v) => sum + v, 0);
 
-    const colors = ["#ec4141", "#3b82f6", "#10b981", "#f59e0b"];
+    // 各排行榜颜色
+    const chartColors = {
+      hot: "#ec4141",      // 红色 - 热歌榜
+      rising: "#3b82f6",   // 蓝色 - 飙升榜
+      new: "#10b981",      // 绿色 - 新歌榜
+      original: "#f59e0b", // 橙色 - 原创榜
+    };
+
+    const chartNames = {
+      hot: "热歌榜",
+      rising: "飙升榜",
+      new: "新歌榜",
+      original: "原创榜",
+    };
 
     chartRef.current.setOption(
       {
         tooltip: {
           trigger: "axis",
           axisPointer: { type: "shadow" },
-          formatter: (p) => {
-            const d = sortedData[p[0].dataIndex];
-            const percentage = total > 0 ? ((d.count / total) * 100).toFixed(1) : 0;
-            return `${d.name}<br/>热歌榜上榜次数: ${d.count}<br/>占比: ${percentage}%`;
+          formatter: (params) => {
+            const d = sortedData[params[0].dataIndex];
+            let result = `${d.name}<br/>`;
+            let total = 0;
+            params.forEach((p) => {
+              result += `${p.marker} ${p.seriesName}: ${p.value}首<br/>`;
+              total += p.value;
+            });
+            result += `合计: ${total}首`;
+            return result;
           },
         },
-        grid: { left: 100, right: 60, top: 20, bottom: 30 },
+        legend: {
+          data: ["热歌榜", "飙升榜", "新歌榜", "原创榜"],
+          bottom: 0,
+          textStyle: { fontSize: 10 },
+        },
+        grid: { left: 90, right: 20, top: 15, bottom: 45 },
         xAxis: {
           type: "value",
-          max: Math.max(...values, 1),
-          axisLabel: { fontSize: 11 },
+          axisLabel: { fontSize: 10 },
+          splitLine: { lineStyle: { color: "rgba(0,0,0,0.05)" } },
         },
         yAxis: {
           type: "category",
@@ -48,25 +70,33 @@ export default function HotSongCountChart({ data }) {
         },
         series: [
           {
+            name: "热歌榜",
             type: "bar",
-            data: values.map((v, i) => ({
-              value: v,
-              itemStyle: {
-                borderRadius: [0, 4, 4, 0],
-                color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                  { offset: 0, color: colors[i % colors.length] },
-                  { offset: 1, color: colors[i % colors.length] + "80" },
-                ]),
-              },
-            })),
-            barWidth: 20,
-            label: {
-              show: true,
-              position: "right",
-              formatter: (p) => `${p.value}首`,
-              fontSize: 12,
-              color: theme === "dark" ? "#ccc" : "#333",
-            },
+            stack: "total",
+            data: sortedData.map((d) => d.hot),
+            itemStyle: { color: chartColors.hot },
+            barWidth: 24,
+          },
+          {
+            name: "飙升榜",
+            type: "bar",
+            stack: "total",
+            data: sortedData.map((d) => d.rising),
+            itemStyle: { color: chartColors.rising },
+          },
+          {
+            name: "新歌榜",
+            type: "bar",
+            stack: "total",
+            data: sortedData.map((d) => d.new),
+            itemStyle: { color: chartColors.new },
+          },
+          {
+            name: "原创榜",
+            type: "bar",
+            stack: "total",
+            data: sortedData.map((d) => d.original),
+            itemStyle: { color: chartColors.original },
           },
         ],
       },

@@ -27,8 +27,13 @@ export default function LoadingPage({ artists, currentArtist, progress, status }
         <div className="artist-list">
           <div className="artist-list-title">待处理歌手 ({artists.length})</div>
           {artists.map((artist, index) => {
-            const isComplete = index < artists.indexOf(currentArtist);
-            const isCurrent = artist === currentArtist;
+            // 支持两种格式：对象数组和字符串数组
+            const name = artist.name || artist;
+            const artistStatus = artist.status || (index === 0 ? "processing" : "pending");
+
+            const isComplete = artistStatus === "done";
+            const isCurrent = artistStatus === "processing";
+
             return (
               <div
                 key={index}
@@ -37,7 +42,7 @@ export default function LoadingPage({ artists, currentArtist, progress, status }
                 <span className="artist-icon">
                   {isComplete ? "✅" : isCurrent ? "⏳" : "⭕"}
                 </span>
-                <span className="artist-name">{artist}</span>
+                <span className="artist-name">{name}</span>
               </div>
             );
           })}

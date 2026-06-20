@@ -120,20 +120,9 @@ router.get("/artist/:id", async (req, res) => {
       [id],
     );
 
-    // 获取相似歌手
-    const [similar] = await pool.execute(
-      `SELECT a.id, a.name, a.avatar_url, a.followers, sa.similarity_score
-       FROM similar_artists sa
-       JOIN artists a ON sa.similar_artist_id = a.id
-       WHERE sa.artist_id = ?
-       ORDER BY sa.similarity_score DESC
-       LIMIT 5`,
-      [id],
-    );
-
     res.json({
       code: 200,
-      data: { ...artist, ...stats, styles, similar_artists: similar },
+      data: { ...artist, ...stats, styles },
     });
   } catch (err) {
     res.status(500).json({ code: 500, msg: err.message });
@@ -605,34 +594,10 @@ router.get("/crawl/details", async (req, res) => {
   }
 });
 
-// ML: 计算歌手相似度推荐
-const recommender = require("../recommender");
-const hotSongs = require("../hot_songs");
-router.get("/ml/similar/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    await recommender.computeSimilarArtists(parseInt(id));
-    // 返回相似歌手
-    const [rows] = await pool.execute(
-      `SELECT a.id, a.name, a.avatar_url, sa.similarity_score
-       FROM similar_artists sa JOIN artists a ON sa.similar_artist_id = a.id
-       WHERE sa.artist_id = ? ORDER BY sa.similarity_score DESC LIMIT 5`,
-      [id],
-    );
-    res.json({ code: 200, data: rows });
-  } catch (err) {
-    res.json({ code: 200, data: [], msg: err.message });
-  }
-});
-
-router.get("/ml/compute-all", async (req, res) => {
-  try {
-    await recommender.computeAllSimilarities();
-    res.json({ code: 200, data: { msg: "计算完成" } });
-  } catch (err) {
-    res.json({ code: 500, msg: err.message });
-  }
-});
+// ML: 计算歌手相似度推荐（已禁用，保留供后续使用）
+// const recommender = require("../recommender");
+// router.get("/ml/similar/:id", async (req, res) => { ... });
+// router.get("/ml/compute-all", async (req, res) => { ... });
 
 // 热歌榜
 router.get("/hotsongs", async (req, res) => {
@@ -651,7 +616,7 @@ router.get("/hotsongs", async (req, res) => {
       ranking INT DEFAULT 0,
       last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
-    } catch {}
+    } catch { }
 
     // 清空旧数据并重新爬取（热歌榜每天更新）
     await pool.execute("DELETE FROM hot_songs");
@@ -688,7 +653,7 @@ router.get("/compare/charts", async (req, res) => {
 
     // 2. 获取每个歌手的歌曲
     const [allSongs] = await pool.execute(
-      `SELECT id, name, artist_id, album_name, plays, duration, publish_year, ranking
+      `SELECT id, name, artist_id, album_name, plays, duration, publish_year, ranking, comments_count
        FROM songs WHERE artist_id IN (${placeholders}) ORDER BY artist_id, plays DESC`,
       artistIds,
     );
@@ -724,10 +689,13 @@ router.get("/compare/charts", async (req, res) => {
             ? Math.round(pops.reduce((a, b) => a + b, 0) / pops.length)
             : 0,
         max_pop: pops.length > 0 ? Math.max(...pops) : 0,
+        // 计算总评论数
+        total_comments: songs.reduce((sum, s) => sum + (s.comments_count || 0), 0),
         top10: songs.slice(0, 10).map((s, i) => ({
           rank: i + 1,
           name: s.name,
           pop: s.plays,
+          comments: s.comments_count || 0,
           album: s.album_name,
           year: s.publish_year,
         })),
@@ -770,14 +738,16 @@ router.get("/compare/charts", async (req, res) => {
       else eraGroups["2020及以后"]++;
     }
 
-    // 所有歌手歌曲热度降序
+    // 所有歌手歌曲按评论数降序（热度值都是100-95，评论数差异更大更有意义）
     const allTopSongs = allArtistSongs
-      .sort((a, b) => b.plays - a.plays)
+      .sort((a, b) => (b.comments_count || 0) - (a.comments_count || 0))
       .slice(0, 50)
       .map((s, i) => ({
         rank: i + 1,
         name: s.name,
-        pop: s.plays,
+        pop: s.plays,  // 热度值（0-100）
+        plays: s.plays,
+        comments: s.comments_count || 0,  // 评论数
         artist_id: s.artist_id,
       }));
 
@@ -785,11 +755,45 @@ router.get("/compare/charts", async (req, res) => {
       .filter(([, v]) => v > 0)
       .map(([name, value]) => ({ name, value }));
     data.all_top50 = allTopSongs;
+
+    // 雷达图数据归一化处理
+    const maxSongCount = Math.max(...data.artists.map((a) => a.song_count), 1);
+    const maxAlbumSize = Math.max(...data.artists.map((a) => a.album_size), 1);
+    const maxAvgPop = Math.max(...data.artists.map((a) => a.avg_pop), 1);
+    const maxComments = Math.max(...data.artists.map((a) => a.total_comments), 1);
+
     data.radar = data.artists.map((a) => ({
       name: a.name,
-      歌曲数: a.song_count,
-      专辑数: a.album_size,
-      平均热度: a.avg_pop,
+      // 归一化到 0-100 范围
+      歌曲数: Math.round((a.song_count / maxSongCount) * 100),
+      专辑数: Math.round((a.album_size / maxAlbumSize) * 100),
+      平均热度: maxAvgPop > 0 ? Math.round((a.avg_pop / maxAvgPop) * 100) : 0,
+      评论数: maxComments > 0 ? Math.round((a.total_comments / maxComments) * 100) : 0,
+      // 原始数据也保留，供前端使用
+      _raw: {
+        song_count: a.song_count,
+        album_size: a.album_size,
+        avg_pop: a.avg_pop,
+        total_comments: a.total_comments,
+      },
+    }));
+
+    // 热歌榜统计：计算对比歌手在热歌榜中的出现次数
+    const [hotSongsData] = await pool.execute("SELECT artists FROM hot_songs");
+    const hotSongCounts = {};
+    for (const row of hotSongsData) {
+      try {
+        const artists = JSON.parse(row.artists || "[]");
+        for (const artist of artists) {
+          if (artistIds.includes(artist.id)) {
+            hotSongCounts[artist.id] = (hotSongCounts[artist.id] || 0) + 1;
+          }
+        }
+      } catch { }
+    }
+    data.hotSongCounts = data.artists.map((a) => ({
+      name: a.name,
+      count: hotSongCounts[a.id] || 0,
     }));
 
     res.json({ code: 200, data });

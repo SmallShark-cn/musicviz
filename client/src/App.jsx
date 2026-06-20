@@ -8,6 +8,10 @@ import RadarChart from "./components/RadarChart";
 import BubbleChart from "./components/BubbleChart";
 import GroupedBarChart from "./components/GroupedBarChart";
 import MapChart from "./components/MapChart";
+import RankingChart from "./components/RankingChart";
+import TrendAnalysisChart from "./components/TrendAnalysisChart";
+import HotSongCountChart from "./components/HotSongCountChart";
+import LoadingPage from "./components/LoadingPage";
 import { formatLargeNumber } from "./utils";
 import * as api from "./api";
 
@@ -25,7 +29,7 @@ function loadState(key, fallback) {
 function saveState(key, val) {
   try {
     localStorage.setItem("mv_" + key, JSON.stringify(val));
-  } catch {}
+  } catch { }
 }
 
 export default function App() {
@@ -48,7 +52,17 @@ export default function App() {
 
   // 图表数据
   const [compareData, setCompareData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [regionMap, setRegionMap] = useState(loadState("regionMap", {}));
+
+  // 整体加载页面状态
+  const [showLoadingPage, setShowLoadingPage] = useState(false);
+  const [loadingPageData, setLoadingPageData] = useState({
+    artists: [],
+    currentArtist: "",
+    progress: 0,
+    status: "准备中...",
+  });
 
   const updateRegion = (artistId, region) => {
     setRegionMap((prev) => {
@@ -79,27 +93,81 @@ export default function App() {
     if (entered && selectedArtists.length === 0) setEntered(false);
   }, [selectedArtists, entered]);
 
-  // 当选中的歌手变化时，获取对比图表数据
+  // 当选中的歌手变化时，获取对比图表数据（仅在已进入页面后自动刷新）
   useEffect(() => {
-    if (selectedArtists.length > 0) {
+    if (entered && selectedArtists.length > 0 && !showLoadingPage) {
+      setIsLoading(true);
+
       api
         .getCompareCharts(selectedArtists.map((a) => a.id))
-        .then(setCompareData)
-        .catch(() => {});
-    } else {
+        .then((data) => {
+          setCompareData(data);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
+    } else if (selectedArtists.length === 0) {
       setCompareData(null);
     }
-  }, [selectedArtists]);
+  }, [selectedArtists, entered, showLoadingPage]);
 
   // 进入可视化时自动抓取热歌榜
   useEffect(() => {
-    if (!isLanding && hotSongs.length === 0) {
+    if (entered && !isLanding && !showLoadingPage && hotSongs.length === 0) {
       api
         .getHotSongs()
         .then(setHotSongs)
-        .catch(() => {});
+        .catch(() => { });
     }
-  }, [isLanding]);
+  }, [entered, isLanding, showLoadingPage]);
+
+  // 处理进入可视化
+  const handleEnterVisualization = async () => {
+    const artistNames = selectedArtists.map((a) => artistDetails[a.id]?.name || a.name);
+
+    // 显示全屏加载页面
+    setShowLoadingPage(true);
+    setLoadingPageData({
+      artists: artistNames,
+      currentArtist: artistNames[0] || "",
+      progress: 10,
+      status: "正在抓取数据...",
+    });
+
+    setIsLoading(true);
+
+    try {
+      const data = await api.getCompareCharts(selectedArtists.map((a) => a.id));
+
+      // 更新进度
+      setLoadingPageData(prev => ({
+        ...prev,
+        progress: 80,
+        status: "正在分析数据...",
+      }));
+
+      setCompareData(data);
+
+      // 完成后
+      setLoadingPageData(prev => ({
+        ...prev,
+        progress: 100,
+        status: "加载完成!",
+      }));
+
+      // 延迟关闭加载页面
+      setTimeout(() => {
+        setShowLoadingPage(false);
+        setEntered(true);
+        setIsLoading(false);
+      }, 800);
+    } catch (error) {
+      setShowLoadingPage(false);
+      setEntered(true);
+      setIsLoading(false);
+    }
+  };
 
   // Search handler
   useEffect(() => {
@@ -154,6 +222,15 @@ export default function App() {
     setShowResults(false);
     setKeyword("");
 
+    // 立即显示全屏加载页面
+    setShowLoadingPage(true);
+    setLoadingPageData({
+      artists: [...selectedArtists.map((a) => artistDetails[a.id]?.name || a.name), artist.name],
+      currentArtist: artist.name,
+      progress: 10,
+      status: "正在抓取歌手信息...",
+    });
+
     // 先用搜索结果构建基本信息
     setArtistDetails((prev) => ({
       ...prev,
@@ -167,7 +244,6 @@ export default function App() {
         total_plays: 0,
         total_comments: 0,
         styles: (artist.identity || []).map((i) => ({ name: i.showName || i })),
-        similar_artists: [],
       },
     }));
 
@@ -190,6 +266,7 @@ export default function App() {
           },
         }));
       }
+      setLoadingPageData(prev => ({ ...prev, progress: 30, status: "正在获取歌曲数据..." }));
     } catch {
       // 抓取失败，尝试本地数据库
       try {
@@ -201,8 +278,12 @@ export default function App() {
             ...detail,
           },
         }));
-      } catch {}
+      } catch { }
+      setLoadingPageData(prev => ({ ...prev, progress: 30, status: "正在获取歌曲数据..." }));
     }
+
+    // 模拟加载延迟，让用户看到进度
+    await new Promise(r => setTimeout(r, 800));
 
     // 加载热度数据
     try {
@@ -219,32 +300,67 @@ export default function App() {
       // 无热度数据
     }
 
-    // 机器学习：获取相似歌手推荐（不阻塞）
-    api
-      .getMLSimilar(artist.id)
-      .then((similar) => {
-        if (similar?.length > 0) {
-          setArtistDetails((prev) => ({
-            ...prev,
-            [artist.id]: {
-              ...prev[artist.id],
-              similar_artists: similar,
-            },
-          }));
-        }
-      })
-      .catch(() => {});
+    setLoadingPageData(prev => ({ ...prev, progress: 50, status: "正在分析数据..." }));
+
+    // 模拟加载延迟
+    await new Promise(r => setTimeout(r, 600));
+
+    // 获取图表数据
+    const allArtistIds = [...selectedArtists.map((a) => a.id), artist.id];
+    setLoadingPageData(prev => ({ ...prev, progress: 70, status: "正在刷新图表..." }));
+
+    try {
+      const data = await api.getCompareCharts(allArtistIds);
+      setCompareData(data);
+      setLoadingPageData(prev => ({ ...prev, progress: 100, status: "加载完成!" }));
+      await new Promise(r => setTimeout(r, 500));
+      setShowLoadingPage(false);
+    } catch {
+      setShowLoadingPage(false);
+    }
 
     setLoading(false);
   };
 
-  const removeArtist = (id) => {
-    setSelectedArtists((prev) => prev.filter((a) => a.id !== id));
+  const removeArtist = async (id) => {
+    const remaining = selectedArtists.filter((a) => a.id !== id);
+
+    // 显示全屏加载页面
+    const artistNames = remaining.map((a) => artistDetails[a.id]?.name || a.name);
+    setShowLoadingPage(true);
+    setLoadingPageData({
+      artists: artistNames.length > 0 ? artistNames : ["无歌手"],
+      currentArtist: artistNames[0] || "",
+      progress: 30,
+      status: "正在刷新图表...",
+    });
+
+    setSelectedArtists(remaining);
     setArtistDetails((prev) => {
       const next = { ...prev };
       delete next[id];
       return next;
     });
+
+    if (remaining.length > 0) {
+      setIsLoading(true);
+
+      try {
+        const data = await api.getCompareCharts(remaining.map((a) => a.id));
+        setCompareData(data);
+        setLoadingPageData(prev => ({ ...prev, progress: 100, status: "完成!" }));
+        setTimeout(() => {
+          setShowLoadingPage(false);
+          setIsLoading(false);
+        }, 500);
+      } catch {
+        setShowLoadingPage(false);
+        setIsLoading(false);
+      }
+    } else {
+      setCompareData(null);
+      setShowLoadingPage(false);
+    }
   };
 
   // ==================== 搜索下拉组件 ====================
@@ -305,6 +421,16 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* 整体加载页面 */}
+      {showLoadingPage && (
+        <LoadingPage
+          artists={loadingPageData.artists}
+          currentArtist={loadingPageData.currentArtist}
+          progress={loadingPageData.progress}
+          status={loadingPageData.status}
+        />
+      )}
+
       {/* ====== Header ====== */}
       <header className="header">
         <div className="header-left">
@@ -441,7 +567,7 @@ export default function App() {
                 {selectedArtists.length > 0 && (
                   <button
                     className="landing-go-btn"
-                    onClick={() => setEntered(true)}
+                    onClick={handleEnterVisualization}
                   >
                     进入可视化 →
                   </button>
@@ -596,89 +722,13 @@ export default function App() {
                         </div>
                       </div>
                     </div>
-
-                    {/* 相似歌手推荐 */}
-                    {d.similar_artists?.length > 0 && (
-                      <div
-                        style={{
-                          marginTop: 16,
-                          borderTop: "1px solid var(--border-color)",
-                          paddingTop: 12,
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: 12,
-                            color: "var(--text-muted)",
-                            marginBottom: 8,
-                          }}
-                        >
-                          🤖 相似歌手
-                        </div>
-                        <div
-                          style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
-                        >
-                          {d.similar_artists.slice(0, 4).map((sa) => (
-                            <div
-                              key={sa.id}
-                              onClick={() =>
-                                selectArtist({
-                                  id: sa.id,
-                                  name: sa.name,
-                                  avatar_url: sa.avatar_url,
-                                })
-                              }
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 6,
-                                padding: "6px 10px",
-                                borderRadius: 8,
-                                background: "var(--bg-card-hover)",
-                                border: "1px solid var(--border-color)",
-                                cursor: "pointer",
-                                transition: "all 0.2s",
-                                fontSize: 12,
-                              }}
-                            >
-                              <img
-                                src={
-                                  sa.avatar_url ||
-                                  `https://ui-avatars.com/api/?name=${encodeURIComponent(sa.name)}&background=8b5cf6&color=fff&size=40`
-                                }
-                                style={{
-                                  width: 24,
-                                  height: 24,
-                                  borderRadius: "50%",
-                                  objectFit: "cover",
-                                }}
-                                alt=""
-                              />
-                              <span
-                                style={{
-                                  fontWeight: 600,
-                                  color: "var(--text-primary)",
-                                }}
-                              >
-                                {sa.name}
-                              </span>
-                              <span
-                                style={{ color: "var(--accent)", fontSize: 11 }}
-                              >
-                                {(sa.similarity_score * 100).toFixed(0)}%
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Chart Grid — 基于爬虫数据的9张对比图表 */}
+          {/* Chart Grid — 基于爬虫数据的对比图表 */}
           <div className="main-grid">
             <Panel icon="📋" title="多歌手指标对比 (雷达图)">
               {compareData?.radar?.length > 0 ? (
@@ -691,13 +741,14 @@ export default function App() {
               )}
             </Panel>
 
-            <Panel icon="🏆" title="Top10 歌曲热度排名">
+            <Panel icon="🏆" title="Top10 歌曲评论数排名">
               {compareData?.all_top50?.length > 0 ? (
-                <BarChart
+                <RankingChart
                   data={compareData.all_top50.slice(0, 10).map((s, i) => ({
                     rank: i + 1,
                     name: s.name,
-                    plays: s.pop,
+                    plays: s.comments,
+                    comments: s.comments,
                     artist_name:
                       compareData.artists.find((a) => a.id === s.artist_id)
                         ?.name || "",
@@ -711,23 +762,18 @@ export default function App() {
               )}
             </Panel>
 
-            <Panel icon="📈" title="歌曲热度随排名下降趋势">
-              {compareData?.all_top50?.length > 0 ? (
-                <LineChart
-                  data={compareData.all_top50.slice(0, 20).map((s) => ({
-                    name: s.name,
-                    value: s.pop,
-                    rank: s.rank,
-                  }))}
-                />
+            <Panel icon="🔥" title="对比歌手热歌榜上榜次数">
+              {compareData?.hotSongCounts?.length > 0 ? (
+                <HotSongCountChart data={compareData.hotSongCounts} />
               ) : (
                 <div className="empty-state">
-                  <div className="empty-state-icon">📈</div>
-                  <p>暂无数据</p>
+                  <div className="empty-state-icon">🔥</div>
+                  <p>暂无热歌榜数据</p>
                 </div>
               )}
             </Panel>
 
+            {/* 
             <Panel icon="🥧" title="歌曲年代分布占比">
               {compareData?.era_pie?.length > 0 ? (
                 <PieChart data={compareData.era_pie} />
@@ -738,7 +784,9 @@ export default function App() {
                 </div>
               )}
             </Panel>
+*/}
 
+            {/* 
             <Panel icon="📈" title="各歌手年代趋势">
               {compareData?.artists?.length > 0 ? (
                 <LineChart
@@ -757,7 +805,9 @@ export default function App() {
                 </div>
               )}
             </Panel>
+            */}
 
+            {/* 
             <Panel icon="📊" title="歌手核心指标分组对比">
               {compareData?.artists?.length > 0 ? (
                 <GroupedBarChart
@@ -775,7 +825,9 @@ export default function App() {
                 </div>
               )}
             </Panel>
+            */}
 
+            {/* 
             <Panel icon="🎯" title="歌曲数 vs 专辑数 (散点图)">
               {compareData?.artists?.length > 1 ? (
                 <ScatterChart
@@ -797,7 +849,9 @@ export default function App() {
                 </div>
               )}
             </Panel>
+            */}
 
+            {/* 
             <Panel icon="🔥" title="热歌榜 Top20">
               {hotSongs.length > 0 ? (
                 <BarChart
@@ -847,6 +901,7 @@ export default function App() {
                 </div>
               )}
             </Panel>
+            */}
 
             <Panel
               icon="🗺️"

@@ -231,7 +231,7 @@ async function getArtistDetail(artistId) {
     if (introRes && introRes.code === 200 && introRes.briefDesc) {
       briefDesc = introRes.briefDesc;
     }
-  } catch {}
+  } catch { }
 
   return {
     id: a.id || artistId,
@@ -298,6 +298,73 @@ async function getSimilarArtists(artistId) {
   }));
 }
 
+/**
+ * 获取歌曲评论数
+ * @param {number} songId 歌曲ID
+ * @returns {Promise<number>} 评论总数
+ */
+async function getSongCommentCount(songId) {
+  const url = `https://music.163.com/api/v1/resource/comments/R_SO_4_${songId}?limit=1&offset=0`;
+  try {
+    const data = await request(url);
+    if (data.code !== 200) {
+      return 0;
+    }
+    return data.total || 0;
+  } catch (e) {
+    return 0;
+  }
+}
+
+/**
+ * 批量获取歌曲评论数
+ * @param {number[]} songIds 歌曲ID数组
+ * @returns {Promise<Object>} { songId: commentCount }
+ */
+async function getBatchCommentCounts(songIds) {
+  const result = {};
+  // 并发请求，但限制并发数
+  const BATCH_SIZE = 5;
+  for (let i = 0; i < songIds.length; i += BATCH_SIZE) {
+    const batch = songIds.slice(i, i + BATCH_SIZE);
+    const promises = batch.map(async (id) => {
+      const count = await getSongCommentCount(id);
+      return { id, count };
+    });
+    const results = await Promise.all(promises);
+    for (const { id, count } of results) {
+      result[id] = count;
+    }
+    // 避免请求过快
+    if (i + BATCH_SIZE < songIds.length) {
+      await new Promise((r) => setTimeout(r, 200));
+    }
+  }
+  return result;
+}
+
+/**
+ * 获取歌手粉丝数（需要登录态，公开API不返回）
+ * 尝试从歌手详情页获取
+ */
+async function getArtistFollowers(artistId) {
+  // 网易云公开API不返回粉丝数，尝试从其他接口获取
+  const url = `https://music.163.com/api/artist/detail?id=${artistId}&csrf_token=${csrfToken}`;
+  try {
+    const data = await request(url);
+    if (data.code === 200 && data.data?.artist) {
+      // 尝试多个可能的字段
+      return (
+        data.data.artist.followers ||
+        data.data.artist.fansSize ||
+        data.data.artist.followeds ||
+        0
+      );
+    }
+  } catch (e) { }
+  return 0;
+}
+
 module.exports = {
   initSession,
   searchSuggest,
@@ -305,6 +372,9 @@ module.exports = {
   getArtistDetail,
   getArtistTopSongs,
   getSimilarArtists,
+  getSongCommentCount,
+  getBatchCommentCounts,
+  getArtistFollowers,
   getCookie: () => cookieJar,
   getCsrf: () => csrfToken,
 };

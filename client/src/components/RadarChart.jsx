@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
 
-const DIMS = ["粉丝数", "热歌数", "风格丰富度", "评论活跃度"];
+const DIMS = ["歌曲数", "专辑数", "平均热度", "评论数"];
 
 export default function RadarChart({ data }) {
   const { theme } = useTheme();
@@ -17,17 +17,22 @@ export default function RadarChart({ data }) {
       theme === "dark" ? "dark" : undefined,
     );
 
-    const maxVals = [
-      Math.max(...data.map((d) => d.followers || 0)),
-      Math.max(...data.map((d) => d.hot_songs || 0)),
-      Math.max(...data.map((d) => d.style_count || 0)),
-      Math.max(...data.map((d) => d.total_comments || 0)),
-    ];
-
     const colors = ["#ec4141", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"];
 
     chartRef.current.setOption(
       {
+        tooltip: {
+          trigger: "item",
+          formatter: (p) => {
+            const d = data[p.dataIndex];
+            const raw = d._raw || {};
+            return `${d.name}<br/>` +
+              `歌曲数: ${raw.song_count || d["歌曲数"]}<br/>` +
+              `专辑数: ${raw.album_size || d["专辑数"]}<br/>` +
+              `平均热度: ${raw.avg_pop || d["平均热度"]}<br/>` +
+              `评论数: ${(raw.total_comments || d["评论数"]).toLocaleString()}`;
+          },
+        },
         legend: {
           data: data.map((d) => d.name),
           bottom: 0,
@@ -36,8 +41,10 @@ export default function RadarChart({ data }) {
         radar: {
           center: ["50%", "45%"],
           radius: "65%",
-          indicator: DIMS.map((name, i) => ({ name, max: maxVals[i] || 1 })),
+          indicator: DIMS.map((name) => ({ name, max: 100 })),
           axisName: { fontSize: 11 },
+          splitLine: { lineStyle: { color: "rgba(0,0,0,0.1)" } },
+          splitArea: { show: true, areaStyle: { color: ["rgba(255,255,255,0.05)", "rgba(255,255,255,0.1)"] } },
         },
         series: [
           {
@@ -45,14 +52,15 @@ export default function RadarChart({ data }) {
             data: data.map((d, i) => ({
               name: d.name,
               value: [
-                d.followers || 0,
-                d.hot_songs || 0,
-                d.style_count || 0,
-                d.total_comments || 0,
+                d["歌曲数"] || 0,
+                d["专辑数"] || 0,
+                d["平均热度"] || 0,
+                d["评论数"] || 0,
               ],
-              lineStyle: { color: colors[i % colors.length] },
-              areaStyle: { color: colors[i % colors.length] + "20" },
+              lineStyle: { color: colors[i % colors.length], width: 2 },
+              areaStyle: { color: colors[i % colors.length] + "30" },
               itemStyle: { color: colors[i % colors.length] },
+              symbolSize: 6,
             })),
           },
         ],

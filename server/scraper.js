@@ -56,6 +56,23 @@ async function crawlAndSaveArtist(artistId) {
     console.error(`[Scraper] 抓取歌曲失败: ${e.message}`);
   }
 
+  // 2.1 获取歌曲评论数（只获取前20首的评论数，避免请求过多）
+  if (songs.length > 0) {
+    console.log(`[Scraper] 开始获取歌曲评论数...`);
+    const topSongIds = songs.slice(0, 20).map((s) => s.id);
+    try {
+      const commentCounts = await crawler.getBatchCommentCounts(topSongIds);
+      for (const s of songs) {
+        if (commentCounts[s.id] !== undefined) {
+          s.comments_count = commentCounts[s.id];
+        }
+      }
+      console.log(`[Scraper] 评论数获取完成`);
+    } catch (e) {
+      console.error(`[Scraper] 获取评论数失败: ${e.message}`);
+    }
+  }
+
   // 2.5 抓取专辑列表
   let albums = [];
   try {
@@ -128,6 +145,7 @@ async function crawlAndSaveArtist(artistId) {
           name = VALUES(name),
           album_name = VALUES(album_name),
           plays = VALUES(plays),
+          comments_count = VALUES(comments_count),
           duration = VALUES(duration),
           publish_year = VALUES(publish_year),
           ranking = VALUES(ranking)`;

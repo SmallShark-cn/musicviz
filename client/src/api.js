@@ -24,7 +24,6 @@ export const getArtistPopularity = (id) => fetchApi(`/artist/${id}/popularity`);
 export const crawlArtist = (id) => fetchApi(`/artist/${id}/crawl`);
 export const getCompareCharts = (ids) =>
   fetchApi(`/compare/charts?ids=${ids.join(",")}`);
-export const getMLSimilar = (id) => fetchApi(`/ml/similar/${id}`);
 export const getHotSongs = () => fetchApi("/hotsongs");
 
 // 图表

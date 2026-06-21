@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const router = express.Router();
 const { pool } = require("../db");
 const crawler = require("../crawler");
@@ -835,10 +836,11 @@ router.get("/analysis/sentiment/:songId", async (req, res) => {
     const { limit = 50 } = req.query;
 
     const { exec } = require('child_process');
-    const scriptPath = '/Users/smallshark/Desktop/works/Data Visualization/期末/server/comment_analyzer.py';
+    const scriptPath = path.join(__dirname, '..', 'comment_analyzer.py');
+    const serverDir = path.join(__dirname, '..');
 
-    exec(`python3 "${scriptPath}" --analyze ${songId} ${limit}`, {
-      cwd: '/Users/smallshark/Desktop/works/Data Visualization/期末/server'
+    exec(`python "${scriptPath}" --analyze ${songId} ${limit}`, {
+      cwd: serverDir
     }, (error, stdout, stderr) => {
       if (error) {
         console.error(`[Sentiment Analysis] 执行错误: ${error.message}`);
@@ -887,10 +889,11 @@ router.get("/analysis/topics/:songId", async (req, res) => {
     const { limit = 50 } = req.query;
 
     const { exec } = require('child_process');
-    const scriptPath = '/Users/smallshark/Desktop/works/Data Visualization/期末/server/comment_analyzer.py';
+    const scriptPath = path.join(__dirname, '..', 'comment_analyzer.py');
+    const serverDir = path.join(__dirname, '..');
 
-    exec(`python3 "${scriptPath}" --topics ${songId} ${limit}`, {
-      cwd: '/Users/smallshark/Desktop/works/Data Visualization/期末/server'
+    exec(`python "${scriptPath}" --topics ${songId} ${limit}`, {
+      cwd: serverDir
     }, (error, stdout, stderr) => {
       if (error) {
         console.error(`[Topic Analysis] 执行错误: ${error.message}`);
@@ -939,10 +942,11 @@ router.get("/analysis/combined/:songId", async (req, res) => {
     const { limit = 50 } = req.query;
 
     const { exec } = require('child_process');
-    const scriptPath = '/Users/smallshark/Desktop/works/Data Visualization/期末/server/comment_analyzer.py';
+    const scriptPath = path.join(__dirname, '..', 'comment_analyzer.py');
+    const serverDir = path.join(__dirname, '..');
 
-    exec(`python3 "${scriptPath}" --combined ${songId} ${limit}`, {
-      cwd: '/Users/smallshark/Desktop/works/Data Visualization/期末/server'
+    exec(`python "${scriptPath}" --combined ${songId} ${limit}`, {
+      cwd: serverDir
     }, (error, stdout, stderr) => {
       if (error) {
         console.error(`[Combined Analysis] 执行错误: ${error.message}`);

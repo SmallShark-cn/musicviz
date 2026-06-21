@@ -9,10 +9,14 @@ export const CHART_TYPES = {
   SENTIMENT: 'sentiment',
   TOPIC: 'topic',
   ERA_PIE: 'era_pie',
-  ERA_TREND: 'era_trend',
+  YEARLY_TREND: 'yearly_trend',
   GROUPED_BAR: 'grouped_bar',
+  PLAYS_TREND: 'plays_trend',
+  STYLE_PIE: 'style_pie',
+  STYLE_HEATMAP: 'style_heatmap',
+  ALBUM_DONUT: 'album_donut',
+  STACKED_ERA: 'stacked_era',
   SCATTER: 'scatter',
-  BUBBLE: 'bubble',
 };
 
 // 图表配置信息
@@ -24,23 +28,39 @@ export const CHART_CONFIG = {
   [CHART_TYPES.SENTIMENT]: { icon: '😊', title: '评论情感分析', span: 1 },
   [CHART_TYPES.TOPIC]: { icon: '🏷️', title: '评论主题聚类', span: 2 },
   [CHART_TYPES.ERA_PIE]: { icon: '🥧', title: '歌曲年代分布占比', span: 1 },
-  [CHART_TYPES.ERA_TREND]: { icon: '📈', title: '各歌手年代趋势', span: 1 },
-  [CHART_TYPES.GROUPED_BAR]: { icon: '📊', title: '歌手核心指标分组对比', span: 1 },
-  [CHART_TYPES.SCATTER]: { icon: '🎯', title: '歌曲数 vs 专辑数 (散点图)', span: 1 },
-  [CHART_TYPES.BUBBLE]: { icon: '🎯', title: '歌曲数 × 热度 (气泡图)', span: 2 },
+  [CHART_TYPES.YEARLY_TREND]: { icon: '📈', title: '各歌手年度产出趋势', span: 2 },
+  [CHART_TYPES.GROUPED_BAR]: { icon: '📊', title: '歌手核心指标分组对比', span: 2 },
+  [CHART_TYPES.PLAYS_TREND]: { icon: '📉', title: '播放量排名衰减曲线', span: 1 },
+  [CHART_TYPES.STYLE_PIE]: { icon: '🎵', title: '风格标签分布占比', span: 1 },
+  [CHART_TYPES.STYLE_HEATMAP]: { icon: '🌡️', title: '风格-粉丝数相关性热力图', span: 2 },
+  [CHART_TYPES.ALBUM_DONUT]: { icon: '💿', title: '热门专辑评论占比', span: 1 },
+  [CHART_TYPES.STACKED_ERA]: { icon: '📚', title: '不同时期音乐风格演变', span: 2 },
+  [CHART_TYPES.SCATTER]: { icon: '🎯', title: '粉丝数 vs 评论数 (散点图)', span: 1 },
 };
+
+// 默认布局：15张图
+const DEFAULT_LAYOUT = [
+  CHART_TYPES.RADAR,
+  CHART_TYPES.RANKING,
+  CHART_TYPES.GROUPED_BAR,
+  CHART_TYPES.YEARLY_TREND,
+  CHART_TYPES.LYRIC_WORDCLOUD,
+  CHART_TYPES.ERA_PIE,
+  CHART_TYPES.PLAYS_TREND,
+  CHART_TYPES.SCATTER,
+  CHART_TYPES.MAP,
+  CHART_TYPES.STYLE_PIE,
+  CHART_TYPES.STYLE_HEATMAP,
+  CHART_TYPES.ALBUM_DONUT,
+  CHART_TYPES.STACKED_ERA,
+  CHART_TYPES.SENTIMENT,
+  CHART_TYPES.TOPIC,
+];
 
 export function useDragDrop() {
   const [activePanelId, setActivePanelId] = useState(null);
   const [dragOverPanelId, setDragOverPanelId] = useState(null);
-  const [panelOrder, setPanelOrder] = useState([
-    CHART_TYPES.RADAR,
-    CHART_TYPES.RANKING,
-    CHART_TYPES.LYRIC_WORDCLOUD,
-    CHART_TYPES.MAP,
-    CHART_TYPES.SENTIMENT,
-    CHART_TYPES.TOPIC,
-  ]);
+  const [panelOrder, setPanelOrder] = useState([...DEFAULT_LAYOUT]);
 
   // 开始拖拽
   const handleDragStart = useCallback((e, panelId) => {
@@ -66,7 +86,6 @@ export function useDragDrop() {
 
   // 拖拽离开
   const handleDragLeave = useCallback((e) => {
-    // 只有真正离开面板区域才清除
     const relatedTarget = e.relatedTarget;
     if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
       setDragOverPanelId(null);
@@ -88,29 +107,22 @@ export function useDragDrop() {
       const newOrder = [...prev];
       const sourceIndex = newOrder.indexOf(sourcePanelId);
 
-      // 如果拖拽到网格空白区域（targetPanelId === 'grid'）
       if (targetPanelId === 'grid') {
-        // 如果图表不在网格中，添加到末尾
         if (sourceIndex === -1) {
           newOrder.push(sourcePanelId);
         }
-        // 如果图表已在网格中，不做任何操作（已经在网格里了）
         return newOrder;
       }
 
-      // 拖拽到某个面板上
       const targetIndex = newOrder.indexOf(targetPanelId);
 
       if (sourceIndex === -1) {
-        // 新图表，插入到目标位置
         if (targetIndex !== -1) {
           newOrder.splice(targetIndex, 0, sourcePanelId);
         } else {
-          // 目标不存在，添加到末尾
           newOrder.push(sourcePanelId);
         }
       } else if (targetIndex !== -1 && sourceIndex !== targetIndex) {
-        // 已有图表重排序
         newOrder.splice(sourceIndex, 1);
         const newTargetIndex = newOrder.indexOf(targetPanelId);
         newOrder.splice(newTargetIndex, 0, sourcePanelId);
@@ -138,14 +150,7 @@ export function useDragDrop() {
 
   // 重置到默认布局
   const handleResetLayout = useCallback(() => {
-    setPanelOrder([
-      CHART_TYPES.RADAR,
-      CHART_TYPES.RANKING,
-      CHART_TYPES.LYRIC_WORDCLOUD,
-      CHART_TYPES.MAP,
-      CHART_TYPES.SENTIMENT,
-      CHART_TYPES.TOPIC,
-    ]);
+    setPanelOrder([...DEFAULT_LAYOUT]);
   }, []);
 
   return {

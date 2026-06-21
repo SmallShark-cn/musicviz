@@ -13,6 +13,10 @@ import TrendAnalysisChart from "./components/TrendAnalysisChart";
 import SentimentAnalysisCard from "./components/SentimentAnalysisCard";
 import TopicClusterCard from "./components/TopicClusterCard";
 import LyricWordCloud from "./components/LyricWordCloud";
+import MultiLineChart from "./components/MultiLineChart";
+import StackedBarChart from "./components/StackedBarChart";
+import DonutChart from "./components/DonutChart";
+import HeatmapChart from "./components/HeatmapChart";
 import LoadingPage from "./components/LoadingPage";
 import ChartMenu from "./components/ChartMenu";
 import { formatLargeNumber } from "./utils";
@@ -88,6 +92,13 @@ export default function App() {
 
   // 歌词词云数据
   const [lyricWordCloudData, setLyricWordCloudData] = useState(null);
+
+  // 全局图表数据（独立API获取）
+  const [stylePieData, setStylePieData] = useState(null);
+  const [styleHeatmapData, setStyleHeatmapData] = useState(null);
+  const [albumDonutData, setAlbumDonutData] = useState(null);
+  const [stackedEraData, setStackedEraData] = useState(null);
+  const [globalScatterData, setGlobalScatterData] = useState(null);
 
   // 图表菜单状态
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -254,6 +265,16 @@ export default function App() {
       }
     });
   }, [entered, selectedArtists]);
+
+  // 获取全局图表数据（风格分布、热力图、专辑、年代风格演变、散点）
+  useEffect(() => {
+    if (!entered) return;
+    api.getStylePie().then(setStylePieData).catch(() => {});
+    api.getStyleHeatmap().then(setStyleHeatmapData).catch(() => {});
+    api.getAlbumDonut().then(setAlbumDonutData).catch(() => {});
+    api.getStackedEra().then(setStackedEraData).catch(() => {});
+    api.getScatter().then(setGlobalScatterData).catch(() => {});
+  }, [entered]);
 
   // 获取热搜数据
   useEffect(() => {
@@ -584,6 +605,53 @@ export default function App() {
       )}
     </div>
   );
+
+  // ==================== 可拖拽面板封装 ====================
+  const DraggablePanel = ({ chartType, className, bodyClassName, children }) => {
+    const isInOrder = panelOrder.includes(chartType);
+    if (!isInOrder) return null;
+    return (
+      <div
+        draggable
+        onDragStart={(e) => handleDragStart(e, chartType)}
+        onDragEnd={handleDragEnd}
+        onDragOver={(e) => handleDragOver(e, chartType)}
+        onDragLeave={handleDragLeave}
+        onDrop={(e) => handleDrop(e, chartType)}
+        className={`panel ${className || ''} ${dragOverPanelId === chartType ? 'drag-over' : ''} ${activePanelId === chartType ? 'dragging' : ''}`}
+      >
+        <div className="panel-header">
+          <span className="panel-title">
+            {CHART_CONFIG_DRAG[chartType]?.icon} {CHART_CONFIG_DRAG[chartType]?.title}
+          </span>
+          <button
+            className="panel-remove-btn"
+            onClick={() => handleRemoveFromGrid(chartType)}
+            title="从布局移除"
+          >×</button>
+        </div>
+        <div className={`panel-body ${bodyClassName || ''}`}>{children}</div>
+      </div>
+    );
+  };
+
+  const CHART_CONFIG_DRAG = {
+    radar: { icon: '📋', title: '多歌手指标对比 (雷达图)' },
+    ranking: { icon: '🔥', title: 'Top10 歌曲评论数排名' },
+    lyric_wordcloud: { icon: '☁️', title: 'Top10歌曲歌词词云' },
+    map: { icon: '🗺️', title: '歌手归属地热力地图' },
+    sentiment: { icon: '😊', title: '评论情感分析' },
+    topic: { icon: '🏷️', title: '评论主题聚类' },
+    era_pie: { icon: '🥧', title: '歌曲年代分布占比' },
+    yearly_trend: { icon: '📈', title: '各歌手年度产出趋势' },
+    grouped_bar: { icon: '📊', title: '歌手核心指标分组对比' },
+    plays_trend: { icon: '📉', title: '播放量排名衰减曲线' },
+    style_pie: { icon: '🎵', title: '风格标签分布占比' },
+    style_heatmap: { icon: '🌡️', title: '风格-粉丝数相关性热力图' },
+    album_donut: { icon: '💿', title: '热门专辑评论占比' },
+    stacked_era: { icon: '📚', title: '不同时期音乐风格演变' },
+    scatter: { icon: '🎯', title: '粉丝数 vs 评论数 (散点图)' },
+  };
 
   // ==================== Panel 组件 ====================
   const Panel = ({ icon, title, children, className, bodyClassName }) => (
@@ -1054,471 +1122,181 @@ export default function App() {
             </div>
           )}
 
-          {/* Chart Grid — 基于爬虫数据的对比图表 */}
+          {/* Chart Grid — 15张可视化图表 */}
           <div
             className={`main-grid ${dragOverPanelId === 'grid' ? 'drag-over' : ''}`}
             onDragOver={(e) => handleDragOver(e, 'grid')}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, 'grid')}
           >
-            {/* 雷达图 */}
-            {panelOrder.includes(CHART_TYPES.RADAR) && (
-              <div
-                draggable
-                onDragStart={(e) => handleDragStart(e, CHART_TYPES.RADAR)}
-                onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, CHART_TYPES.RADAR)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, CHART_TYPES.RADAR)}
-                className={`panel ${dragOverPanelId === CHART_TYPES.RADAR ? 'drag-over' : ''} ${activePanelId === CHART_TYPES.RADAR ? 'dragging' : ''}`}
-              >
-                <div className="panel-header">
-                  <span className="panel-title">📋 多歌手指标对比 (雷达图)</span>
-                  <button
-                    className="panel-remove-btn"
-                    onClick={() => handleRemoveFromGrid(CHART_TYPES.RADAR)}
-                    title="从布局移除"
-                  >
-                    ×
-                  </button>
-                </div>
-                <div className="panel-body">
-                  {compareData?.radar?.length > 0 ? (
-                    <RadarChart data={compareData.radar} />
-                  ) : (
-                    <div className="empty-state">
-                      <div className="empty-state-icon">📋</div>
-                      <p>暂无数据</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* 1. 雷达图 — 多歌手指标对比 */}
+            <DraggablePanel chartType={CHART_TYPES.RADAR}>
+              {compareData?.radar?.length > 0 ? (
+                <RadarChart data={compareData.radar} />
+              ) : <div className="empty-state"><div className="empty-state-icon">📋</div><p>暂无数据</p></div>}
+            </DraggablePanel>
 
-            {/* Top10 歌曲评论数排名 */}
-            {panelOrder.includes(CHART_TYPES.RANKING) && (
-              <div
-                draggable
-                onDragStart={(e) => handleDragStart(e, CHART_TYPES.RANKING)}
-                onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, CHART_TYPES.RANKING)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, CHART_TYPES.RANKING)}
-                className={`panel ${dragOverPanelId === CHART_TYPES.RANKING ? 'drag-over' : ''} ${activePanelId === CHART_TYPES.RANKING ? 'dragging' : ''}`}
-              >
-                <div className="panel-header">
-                  <span className="panel-title">🔥 Top10 歌曲评论数排名</span>
-                  <button
-                    className="panel-remove-btn"
-                    onClick={() => handleRemoveFromGrid(CHART_TYPES.RANKING)}
-                    title="从布局移除"
-                  >
-                    ×
-                  </button>
-                </div>
-                <div className="panel-body">
-                  {compareData?.all_top50?.length > 0 ? (
-                    <RankingChart
-                      data={compareData.all_top50.slice(0, 10).map((s, i) => ({
-                        rank: i + 1,
-                        name: s.name,
-                        plays: s.comments,
-                        comments: s.comments,
-                        artist_name:
-                          compareData.artists.find((a) => a.id === s.artist_id)
-                            ?.name || "",
-                      }))}
-                    />
-                  ) : (
-                    <div className="empty-state">
-                      <div className="empty-state-icon">🏆</div>
-                      <p>暂无数据</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* 歌词词云 */}
-            {panelOrder.includes(CHART_TYPES.LYRIC_WORDCLOUD) && (
-              <div
-                draggable
-                onDragStart={(e) => handleDragStart(e, CHART_TYPES.LYRIC_WORDCLOUD)}
-                onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, CHART_TYPES.LYRIC_WORDCLOUD)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, CHART_TYPES.LYRIC_WORDCLOUD)}
-                className={`panel grid-col-span-2 ${dragOverPanelId === CHART_TYPES.LYRIC_WORDCLOUD ? 'drag-over' : ''} ${activePanelId === CHART_TYPES.LYRIC_WORDCLOUD ? 'dragging' : ''}`}
-              >
-                <div className="panel-header">
-                  <span className="panel-title">☁️ Top10歌曲歌词词云</span>
-                  <button
-                    className="panel-remove-btn"
-                    onClick={() => handleRemoveFromGrid(CHART_TYPES.LYRIC_WORDCLOUD)}
-                    title="从布局移除"
-                  >
-                    ×
-                  </button>
-                </div>
-                <div className="panel-body">
-                  {lyricWordCloudData?.words?.length > 0 ? (
-                    <LyricWordCloud data={lyricWordCloudData} />
-                  ) : (
-                    <div className="empty-state">
-                      <div className="empty-state-icon">☁️</div>
-                      <p>暂无歌词数据</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/*
-            <Panel icon="🥧" title="歌曲年代分布占比">
-              {compareData?.era_pie?.length > 0 ? (
-                <PieChart data={compareData.era_pie} />
-              ) : (
-                <div className="empty-state">
-                  <div className="empty-state-icon">🥧</div>
-                  <p>暂无数据</p>
-                </div>
-              )}
-            </Panel>
-*/}
-
-            {/*
-            <Panel icon="📈" title="各歌手年代趋势">
-              {compareData?.artists?.length > 0 ? (
-                <LineChart
-                  data={compareData.artists.flatMap((a) =>
-                    (a.yearly_trend || []).map((y) => ({
-                      name: y.year.toString(),
-                      value: y.count,
-                      artist: a.name,
-                    })),
-                  )}
+            {/* 2. Top10 歌曲评论数排名 */}
+            <DraggablePanel chartType={CHART_TYPES.RANKING}>
+              {compareData?.all_top50?.length > 0 ? (
+                <RankingChart
+                  data={compareData.all_top50.slice(0, 10).map((s, i) => ({
+                    rank: i + 1, name: s.name, plays: s.comments, comments: s.comments,
+                    artist_name: compareData.artists.find((a) => a.id === s.artist_id)?.name || "",
+                  }))}
                 />
-              ) : (
-                <div className="empty-state">
-                  <div className="empty-state-icon">📈</div>
-                  <p>暂无数据</p>
-                </div>
-              )}
-            </Panel>
-            */}
+              ) : <div className="empty-state"><div className="empty-state-icon">🏆</div><p>暂无数据</p></div>}
+            </DraggablePanel>
 
-            {/*
-            <Panel icon="📊" title="歌手核心指标分组对比">
+            {/* 3. 歌手核心指标分组对比 */}
+            <DraggablePanel chartType={CHART_TYPES.GROUPED_BAR} className="grid-col-span-2">
               {compareData?.artists?.length > 0 ? (
                 <GroupedBarChart
                   data={compareData.artists.map((a) => ({
-                    name: a.name,
-                    songs: a.song_count,
-                    albums: a.album_size,
-                    avg_pop: a.avg_pop,
+                    name: a.name, song_count: a.song_count, total_plays: a.avg_pop * (a.song_count || 1),
+                    total_comments: a.total_comments,
                   }))}
                 />
-              ) : (
-                <div className="empty-state">
-                  <div className="empty-state-icon">📊</div>
-                  <p>暂无数据</p>
-                </div>
-              )}
-            </Panel>
-            */}
+              ) : <div className="empty-state"><div className="empty-state-icon">📊</div><p>暂无数据</p></div>}
+            </DraggablePanel>
 
-            {/*
-            <Panel icon="🎯" title="歌曲数 vs 专辑数 (散点图)">
-              {compareData?.artists?.length > 1 ? (
-                <ScatterChart
-                  data={compareData.artists.map((a) => ({
-                    name: a.name,
-                    x: a.song_count,
-                    y: a.album_size,
-                  }))}
-                />
-              ) : compareData?.artists?.length === 1 ? (
-                <div className="empty-state">
-                  <div className="empty-state-icon">🎯</div>
-                  <p>至少需要2位歌手才能展示散点对比</p>
-                </div>
-              ) : (
-                <div className="empty-state">
-                  <div className="empty-state-icon">🎯</div>
-                  <p>暂无数据</p>
-                </div>
-              )}
-            </Panel>
-            */}
-
-            {/*
-            <Panel icon="🔥" title="热歌榜 Top20">
-              {hotSongs.length > 0 ? (
-                <BarChart
-                  data={hotSongs.slice(0, 20).map((s, i) => ({
-                    rank: i + 1,
-                    name:
-                      (s.name || "").length > 10
-                        ? s.name.slice(0, 10) + "..."
-                        : s.name,
-                    plays: s.popularity || 0,
-                    artist_name: Array.isArray(s.artists)
-                      ? s.artists.map((a) => a.name).join("/")
-                      : "",
-                  }))}
-                />
-              ) : (
-                <div className="empty-state">
-                  <div className="empty-state-icon">🔥</div>
-                  <p>正在加载热歌榜...</p>
-                </div>
-              )}
-            </Panel>
-
-            <Panel
-              icon="🎯"
-              title="歌曲数 × 热度 (气泡图)"
-              className="grid-col-span-2"
-            >
-              {compareData?.artists?.length > 1 ? (
-                <BubbleChart
-                  data={compareData.artists.map((a) => ({
-                    name: a.name,
-                    x: a.song_count,
-                    y: a.avg_pop,
-                    z: a.album_size,
-                  }))}
-                />
-              ) : compareData?.artists?.length === 1 ? (
-                <div className="empty-state">
-                  <div className="empty-state-icon">🎯</div>
-                  <p>至少需要2位歌手</p>
-                </div>
-              ) : (
-                <div className="empty-state">
-                  <div className="empty-state-icon">🎯</div>
-                  <p>暂无数据</p>
-                </div>
-              )}
-            </Panel>
-            */}
-
-            {/* 歌手归属地热力地图 */}
-            {panelOrder.includes(CHART_TYPES.MAP) && (
-              <div
-                draggable
-                onDragStart={(e) => handleDragStart(e, CHART_TYPES.MAP)}
-                onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, CHART_TYPES.MAP)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, CHART_TYPES.MAP)}
-                className={`panel grid-col-span-3 ${dragOverPanelId === CHART_TYPES.MAP ? 'drag-over' : ''} ${activePanelId === CHART_TYPES.MAP ? 'dragging' : ''}`}
-              >
-                <div className="panel-header">
-                  <span className="panel-title">🗺️ 歌手归属地热力地图</span>
-                  <button
-                    className="panel-remove-btn"
-                    onClick={() => handleRemoveFromGrid(CHART_TYPES.MAP)}
-                    title="从布局移除"
-                  >
-                    ×
-                  </button>
-                </div>
-                <div className="panel-body">
-                  {selectedArtists.length > 0 ? (
-                    <MapChart
-                      artists={
-                        compareData?.artists ||
-                        selectedArtists.map((a) => ({
-                          ...a,
-                          avg_pop: 0,
-                          song_count: artistDetails[a.id]?.song_count || 0,
-                        }))
-                      }
-                      regionMap={regionMap}
-                      onUpdateRegion={updateRegion}
-                    />
-                  ) : (
-                    <div className="empty-state">
-                      <div className="empty-state-icon">🗺️</div>
-                      <p>选择歌手后展示地区分布</p>
-                    </div>
+            {/* 4. 各歌手年度产出趋势 */}
+            <DraggablePanel chartType={CHART_TYPES.YEARLY_TREND} className="grid-col-span-2">
+              {compareData?.artists?.some(a => a.yearly_trend?.length > 0) ? (
+                <MultiLineChart
+                  data={compareData.artists.flatMap(a =>
+                    (a.yearly_trend || []).map(y => ({ artist: a.name, year: y.year, count: y.count }))
                   )}
-                </div>
-              </div>
-            )}
+                />
+              ) : <div className="empty-state"><div className="empty-state-icon">📈</div><p>暂无数据</p></div>}
+            </DraggablePanel>
 
-            {/* 评论情感分析 */}
-            {panelOrder.includes(CHART_TYPES.SENTIMENT) && (
-              <div
-                draggable
-                onDragStart={(e) => handleDragStart(e, CHART_TYPES.SENTIMENT)}
-                onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, CHART_TYPES.SENTIMENT)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, CHART_TYPES.SENTIMENT)}
-                className={`panel ${dragOverPanelId === CHART_TYPES.SENTIMENT ? 'drag-over' : ''} ${activePanelId === CHART_TYPES.SENTIMENT ? 'dragging' : ''}`}
-              >
-                <div className="panel-header">
-                  <span className="panel-title">😊 评论情感分析</span>
-                  <button
-                    className="panel-remove-btn"
-                    onClick={() => handleRemoveFromGrid(CHART_TYPES.SENTIMENT)}
-                    title="从布局移除"
-                  >
-                    ×
-                  </button>
-                </div>
-                <div className="panel-body panel-body-tall">
-                  <div style={{
-                    marginBottom: '16px',
-                    padding: '12px',
-                    background: 'var(--bg-secondary)',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border-color)'
-                  }}>
-                    <label style={{
-                      fontSize: '12px',
-                      color: 'var(--text-muted)',
-                      marginBottom: '8px',
-                      display: 'block'
-                    }}>
-                      选择分析歌曲
-                    </label>
-                    <select
-                      value={analysisSong?.id || ''}
-                      onChange={(e) => {
-                        const allSongs = selectedArtists.flatMap(a =>
-                          (artistTopSongs[a.id] || []).map(s => ({ ...s, artistName: a.name }))
-                        );
-                        const selected = allSongs.find(s => s.id === parseInt(e.target.value));
-                        if (selected) {
-                          setAnalysisSong({
-                            id: selected.id,
-                            name: selected.name,
-                            artist: selected.artistName
-                          });
-                        }
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '10px 12px',
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border-light)',
-                        borderRadius: '6px',
-                        color: 'var(--text-primary)',
-                        fontSize: '13px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {selectedArtists.map(a => {
-                        const songs = artistTopSongs[a.id] || [];
-                        if (songs.length === 0) return null;
-                        return (
-                          <optgroup key={a.id} label={`🎵 ${a.name} 的热门歌曲`}>
-                            {songs.slice(0, 5).map(song => (
-                              <option key={song.id} value={song.id}>
-                                {song.name}
-                              </option>
-                            ))}
-                          </optgroup>
-                        );
-                      })}
-                    </select>
-                  </div>
-                  <SentimentAnalysisCard
-                    songId={analysisSong?.id || ''}
-                    songName={analysisSong ? `${analysisSong.name} - ${analysisSong.artist}` : ''}
-                  />
-                </div>
-              </div>
-            )}
+            {/* 5. 歌词词云 */}
+            <DraggablePanel chartType={CHART_TYPES.LYRIC_WORDCLOUD} className="grid-col-span-2">
+              {lyricWordCloudData?.words?.length > 0 ? (
+                <LyricWordCloud data={lyricWordCloudData} />
+              ) : <div className="empty-state"><div className="empty-state-icon">☁️</div><p>暂无歌词数据</p></div>}
+            </DraggablePanel>
 
-            {/* 评论主题聚类 */}
-            {panelOrder.includes(CHART_TYPES.TOPIC) && (
-              <div
-                draggable
-                onDragStart={(e) => handleDragStart(e, CHART_TYPES.TOPIC)}
-                onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, CHART_TYPES.TOPIC)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, CHART_TYPES.TOPIC)}
-                className={`panel grid-col-span-2 ${dragOverPanelId === CHART_TYPES.TOPIC ? 'drag-over' : ''} ${activePanelId === CHART_TYPES.TOPIC ? 'dragging' : ''}`}
-              >
-                <div className="panel-header">
-                  <span className="panel-title">🏷️ 评论主题聚类</span>
-                  <button
-                    className="panel-remove-btn"
-                    onClick={() => handleRemoveFromGrid(CHART_TYPES.TOPIC)}
-                    title="从布局移除"
-                  >
-                    ×
-                  </button>
-                </div>
-                <div className="panel-body panel-body-tall">
-                  <div style={{
-                    marginBottom: '16px',
-                    padding: '12px',
-                    background: 'var(--bg-secondary)',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border-color)'
-                  }}>
-                    <label style={{
-                      fontSize: '12px',
-                      color: 'var(--text-muted)',
-                      marginBottom: '8px',
-                      display: 'block'
-                    }}>
-                      选择分析歌曲
-                    </label>
-                    <select
-                      value={analysisSong?.id || ''}
-                      onChange={(e) => {
-                        const allSongs = selectedArtists.flatMap(a =>
-                          (artistTopSongs[a.id] || []).map(s => ({ ...s, artistName: a.name }))
-                        );
-                        const selected = allSongs.find(s => s.id === parseInt(e.target.value));
-                        if (selected) {
-                          setAnalysisSong({
-                            id: selected.id,
-                            name: selected.name,
-                            artist: selected.artistName
-                          });
-                        }
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '10px 12px',
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border-light)',
-                        borderRadius: '6px',
-                        color: 'var(--text-primary)',
-                        fontSize: '13px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {selectedArtists.map(a => {
-                        const songs = artistTopSongs[a.id] || [];
-                        if (songs.length === 0) return null;
-                        return (
-                          <optgroup key={a.id} label={`🎵 ${a.name} 的热门歌曲`}>
-                            {songs.slice(0, 5).map(song => (
-                              <option key={song.id} value={song.id}>
-                                {song.name}
-                              </option>
-                            ))}
-                          </optgroup>
-                        );
-                      })}
-                    </select>
-                  </div>
-                  <TopicClusterCard
-                    songId={analysisSong?.id || ''}
-                    songName={analysisSong ? `${analysisSong.name} - ${analysisSong.artist}` : ''}
-                  />
-                </div>
+            {/* 6. 歌曲年代分布占比 */}
+            <DraggablePanel chartType={CHART_TYPES.ERA_PIE}>
+              {compareData?.era_pie?.length > 0 ? (
+                <PieChart data={compareData.era_pie.map(d => ({ name: d.name, count: d.value }))} />
+              ) : <div className="empty-state"><div className="empty-state-icon">🥧</div><p>暂无数据</p></div>}
+            </DraggablePanel>
+
+            {/* 7. 播放量排名衰减曲线 */}
+            <DraggablePanel chartType={CHART_TYPES.PLAYS_TREND}>
+              {compareData?.artists?.[0]?.top10?.length > 0 ? (
+                <LineChart
+                  data={compareData.artists.flatMap(a =>
+                    (a.top10 || []).map(s => ({
+                      ranking: s.rank, plays: s.pop, name: s.name,
+                    }))
+                  )}
+                />
+              ) : <div className="empty-state"><div className="empty-state-icon">📉</div><p>暂无数据</p></div>}
+            </DraggablePanel>
+
+            {/* 8. 粉丝数 vs 评论数散点图 */}
+            <DraggablePanel chartType={CHART_TYPES.SCATTER}>
+              {globalScatterData?.length > 0 ? (
+                <ScatterChart data={globalScatterData} />
+              ) : <div className="empty-state"><div className="empty-state-icon">🎯</div><p>暂无数据</p></div>}
+            </DraggablePanel>
+
+            {/* 9. 歌手归属地热力地图 */}
+            <DraggablePanel chartType={CHART_TYPES.MAP} className="grid-col-span-3">
+              {selectedArtists.length > 0 ? (
+                <MapChart
+                  artists={compareData?.artists || selectedArtists.map(a => ({ ...a, avg_pop: 0, song_count: artistDetails[a.id]?.song_count || 0 }))}
+                  regionMap={regionMap}
+                  onUpdateRegion={updateRegion}
+                />
+              ) : <div className="empty-state"><div className="empty-state-icon">🗺️</div><p>选择歌手后展示地区分布</p></div>}
+            </DraggablePanel>
+
+            {/* 10. 风格标签分布占比 */}
+            <DraggablePanel chartType={CHART_TYPES.STYLE_PIE}>
+              {stylePieData?.length > 0 ? (
+                <PieChart data={stylePieData} />
+              ) : <div className="empty-state"><div className="empty-state-icon">🎵</div><p>暂无数据</p></div>}
+            </DraggablePanel>
+
+            {/* 11. 风格-粉丝数相关性热力图 */}
+            <DraggablePanel chartType={CHART_TYPES.STYLE_HEATMAP} className="grid-col-span-2">
+              {styleHeatmapData?.length > 0 ? (
+                <HeatmapChart data={styleHeatmapData} />
+              ) : <div className="empty-state"><div className="empty-state-icon">🌡️</div><p>暂无数据</p></div>}
+            </DraggablePanel>
+
+            {/* 12. 热门专辑评论占比 */}
+            <DraggablePanel chartType={CHART_TYPES.ALBUM_DONUT}>
+              {albumDonutData?.length > 0 ? (
+                <DonutChart data={albumDonutData} />
+              ) : <div className="empty-state"><div className="empty-state-icon">💿</div><p>暂无数据</p></div>}
+            </DraggablePanel>
+
+            {/* 13. 不同时期音乐风格演变 */}
+            <DraggablePanel chartType={CHART_TYPES.STACKED_ERA} className="grid-col-span-2">
+              {stackedEraData?.length > 0 ? (
+                <StackedBarChart data={stackedEraData} />
+              ) : <div className="empty-state"><div className="empty-state-icon">📚</div><p>暂无数据</p></div>}
+            </DraggablePanel>
+
+            {/* 14. 评论情感分析 */}
+            <DraggablePanel chartType={CHART_TYPES.SENTIMENT} bodyClassName="panel-body-tall">
+              <div style={{ marginBottom: '16px', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', display: 'block' }}>选择分析歌曲</label>
+                <select
+                  value={analysisSong?.id || ''}
+                  onChange={(e) => {
+                    const allSongs = selectedArtists.flatMap(a => (artistTopSongs[a.id] || []).map(s => ({ ...s, artistName: a.name })));
+                    const selected = allSongs.find(s => s.id === parseInt(e.target.value));
+                    if (selected) setAnalysisSong({ id: selected.id, name: selected.name, artist: selected.artistName });
+                  }}
+                  style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '13px', cursor: 'pointer' }}
+                >
+                  {selectedArtists.map(a => {
+                    const songs = artistTopSongs[a.id] || [];
+                    if (songs.length === 0) return null;
+                    return (
+                      <optgroup key={a.id} label={`🎵 ${a.name} 的热门歌曲`}>
+                        {songs.slice(0, 5).map(song => <option key={song.id} value={song.id}>{song.name}</option>)}
+                      </optgroup>
+                    );
+                  })}
+                </select>
               </div>
-            )}
+              <SentimentAnalysisCard songId={analysisSong?.id || ''} songName={analysisSong ? `${analysisSong.name} - ${analysisSong.artist}` : ''} />
+            </DraggablePanel>
+
+            {/* 15. 评论主题聚类 */}
+            <DraggablePanel chartType={CHART_TYPES.TOPIC} className="grid-col-span-2" bodyClassName="panel-body-tall">
+              <div style={{ marginBottom: '16px', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', display: 'block' }}>选择分析歌曲</label>
+                <select
+                  value={analysisSong?.id || ''}
+                  onChange={(e) => {
+                    const allSongs = selectedArtists.flatMap(a => (artistTopSongs[a.id] || []).map(s => ({ ...s, artistName: a.name })));
+                    const selected = allSongs.find(s => s.id === parseInt(e.target.value));
+                    if (selected) setAnalysisSong({ id: selected.id, name: selected.name, artist: selected.artistName });
+                  }}
+                  style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '13px', cursor: 'pointer' }}
+                >
+                  {selectedArtists.map(a => {
+                    const songs = artistTopSongs[a.id] || [];
+                    if (songs.length === 0) return null;
+                    return (
+                      <optgroup key={a.id} label={`🎵 ${a.name} 的热门歌曲`}>
+                        {songs.slice(0, 5).map(song => <option key={song.id} value={song.id}>{song.name}</option>)}
+                      </optgroup>
+                    );
+                  })}
+                </select>
+              </div>
+              <TopicClusterCard songId={analysisSong?.id || ''} songName={analysisSong ? `${analysisSong.name} - ${analysisSong.artist}` : ''} />
+            </DraggablePanel>
           </div>
 
           <footer className="footer">

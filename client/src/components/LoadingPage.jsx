@@ -25,9 +25,8 @@ export default function LoadingPage({ artists, currentArtist, progress, status }
         <div className="status-text">{status}</div>
 
         <div className="artist-list">
-          <div className="artist-list-title">待处理歌手 ({artists.length})</div>
+          <div className="artist-list-title">待处理任务 ({artists.length})</div>
           {artists.map((artist, index) => {
-            // 支持两种格式：对象数组和字符串数组
             const name = artist.name || artist;
             const artistStatus = artist.status || (index === 0 ? "processing" : "pending");
 

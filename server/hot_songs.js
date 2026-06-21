@@ -19,17 +19,29 @@ const HEADERS = {
   Referer: "https://music.163.com/",
 };
 
+// 请求延迟，避免被限流
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function getCookie() {
-  const r = await axios
-    .get("https://music.163.com/", { headers: HEADERS, timeout: 5000 })
-    .catch(() => ({ headers: {} }));
-  return (r.headers["set-cookie"] || []).map((c) => c.split(";")[0]).join("; ");
+  try {
+    const r = await axios.get("https://music.163.com/", {
+      headers: HEADERS,
+      timeout: 5000
+    });
+    const cookies = r.headers["set-cookie"] || [];
+    return cookies.map((c) => c.split(";")[0]).join("; ");
+  } catch (e) {
+    console.log("[Cookie] 获取失败:", e.message);
+    return "";
+  }
 }
 
 /**
  * 爬取单个排行榜Top N歌曲并返回
  */
-async function crawlChart(chartType = "hot", topN = 100) {
+async function crawlChart(chartType = "hot", topN = 50) {
   const chart = CHARTS[chartType];
   if (!chart) {
     console.log(`[排行榜] 未知排行榜类型: ${chartType}`);
@@ -37,64 +49,91 @@ async function crawlChart(chartType = "hot", topN = 100) {
   }
 
   console.log(`[${chart.name}] 开始爬取...`);
-  const ck = await getCookie();
 
-  // 1. 获取歌单详情拿到trackIds
-  const detail = await axios.get(
-    `https://music.163.com/api/v1/playlist/detail?id=${chart.id}`,
-    { headers: { ...HEADERS, Cookie: ck }, timeout: 10000 },
-  );
-  const playlist = detail.data?.playlist || {};
-  const trackIds = (playlist.trackIds || []).slice(0, topN).map((t) => t.id);
-  console.log(
-    `[${chart.name}] 获取到 ${trackIds.length} 个trackId (共${playlist.trackCount}首)`,
-  );
-
-  if (trackIds.length === 0) return [];
-
-  // 2. 分批获取歌曲详情（API每次最多50）
-  const BATCH = 50;
-  const songs = [];
-  for (let i = 0; i < trackIds.length; i += BATCH) {
-    const batch = trackIds.slice(i, i + BATCH);
+  // 重试机制
+  let lastError = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      const res = await axios.get(
-        `https://music.163.com/api/song/detail?ids=[${batch.join(",")}]`,
-        { headers: { ...HEADERS, Cookie: ck }, timeout: 10000 },
+      const ck = await getCookie();
+
+      // 1. 获取歌单详情拿到trackIds
+      const detail = await axios.get(
+        `https://music.163.com/api/v1/playlist/detail?id=${chart.id}`,
+        { headers: { ...HEADERS, Cookie: ck }, timeout: 10000 }
       );
-      const batchSongs = (res.data?.songs || []).map((s) => ({
-        id: s.id,
-        name: s.name,
-        artists: (s.artists || []).map((a) => ({ id: a.id, name: a.name })),
-        album: s.album
-          ? { id: s.album.id, name: s.album.name, cover: s.album.picUrl }
-          : null,
-        popularity: s.popularity || 0,
-        duration: s.duration || 0,
-        publish_time: s.publishTime || null,
-        rank: 0,
-        chart_type: chartType,
-        chart_name: chart.name,
-      }));
-      songs.push(...batchSongs);
+
+      const playlist = detail.data?.playlist || {};
+      const trackIds = (playlist.trackIds || []).slice(0, topN).map((t) => t.id);
+
+      console.log(`[${chart.name}] 获取到 ${trackIds.length} 个trackId (共${playlist.trackCount}首)`);
+
+      if (trackIds.length === 0) {
+        console.log(`[${chart.name}] 没有获取到trackId，可能请求失败`);
+        continue;
+      }
+
+      // 2. 分批获取歌曲详情（API每次最多50）
+      const BATCH = 50;
+      const songs = [];
+
+      for (let i = 0; i < trackIds.length; i += BATCH) {
+        const batch = trackIds.slice(i, i + BATCH);
+
+        // 每批之间延迟500ms
+        if (i > 0) await sleep(500);
+
+        try {
+          const res = await axios.get(
+            `https://music.163.com/api/song/detail?ids=[${batch.join(",")}]`,
+            { headers: { ...HEADERS, Cookie: ck }, timeout: 10000 }
+          );
+
+          const batchSongs = (res.data?.songs || []).map((s) => ({
+            id: s.id,
+            name: s.name,
+            artists: (s.artists || []).map((a) => ({ id: a.id, name: a.name })),
+            album: s.album
+              ? { id: s.album.id, name: s.album.name, cover: s.album.picUrl }
+              : null,
+            popularity: s.popularity || 0,
+            duration: s.duration || 0,
+            publish_time: s.publishTime || null,
+            rank: 0,
+            chart_type: chartType,
+            chart_name: chart.name,
+          }));
+
+          songs.push(...batchSongs);
+        } catch (e) {
+          console.log(`[${chart.name}] 批处理失败: ${e.message}`);
+        }
+      }
+
+      console.log(`[${chart.name}] 获取到 ${songs.length} 首歌曲`);
+
+      // 3. 按trackIds原始顺序排序并设置正确排名
+      const ordered = trackIds
+        .map((id, idx) => {
+          const s = songs.find((x) => x.id === id);
+          if (s) s.rank = idx + 1;
+          return s;
+        })
+        .filter(Boolean);
+
+      console.log(`[${chart.name}] 排序完成: ${ordered.length} 首`);
+      return ordered;
+
     } catch (e) {
-      console.log(`[${chart.name}] 批处理失败: ${e.message}`);
+      lastError = e;
+      console.log(`[${chart.name}] 第${attempt}次尝试失败: ${e.message}`);
+      if (attempt < 3) {
+        await sleep(1000 * attempt); // 递增延迟
+      }
     }
   }
 
-  console.log(`[${chart.name}] ✅ 获取到 ${songs.length} 首歌曲`);
-
-  // 按trackIds原始顺序排序并设置正确排名
-  const ordered = trackIds
-    .map((id, idx) => {
-      const s = songs.find((x) => x.id === id);
-      if (s) s.rank = idx + 1;
-      return s;
-    })
-    .filter(Boolean);
-
-  console.log(`[${chart.name}] 排序完成: ${ordered.length} 首`);
-  return ordered;
+  console.log(`[${chart.name}] 爬取失败，已重试3次: ${lastError?.message}`);
+  return [];
 }
 
 /**
@@ -102,10 +141,17 @@ async function crawlChart(chartType = "hot", topN = 100) {
  */
 async function crawlAndSaveAllCharts() {
   const results = {};
+
   for (const type of Object.keys(CHARTS)) {
     const songs = await crawlChart(type, 50);
     results[type] = songs;
+
+    // 每个榜单之间延迟1秒
+    if (type !== Object.keys(CHARTS).pop()) {
+      await sleep(1000);
+    }
   }
+
   return results;
 }
 
@@ -115,7 +161,7 @@ async function crawlAndSaveAllCharts() {
 async function getChartSongs(chartType = "hot") {
   const [rows] = await pool.execute(
     `SELECT * FROM hot_songs WHERE chart_type = ? ORDER BY ranking ASC`,
-    [chartType],
+    [chartType]
   );
   return rows;
 }
@@ -132,11 +178,11 @@ async function getAllChartSongs() {
  * 批量保存排行榜数据到数据库
  */
 async function saveChartsToDB(chartsData) {
-  // 确保hot_songs表存在（新增chart_type字段）
+  // 确保hot_songs表存在（使用复合主键，同一首歌可出现在多个榜单）
   try {
     await pool.execute(`CREATE TABLE IF NOT EXISTS hot_songs (
       id BIGINT,
-      chart_type VARCHAR(20),
+      chart_type VARCHAR(20) DEFAULT 'hot',
       name VARCHAR(500) NOT NULL,
       artists TEXT,
       album_name VARCHAR(500),
@@ -152,15 +198,23 @@ async function saveChartsToDB(chartsData) {
     console.log(`[排行榜] 创建表失败: ${e.message}`);
   }
 
-  // 清空旧数据
-  await pool.execute("DELETE FROM hot_songs");
-
+  // 按榜单类型分别更新：只有爬取成功的榜单才覆盖旧数据
   let totalSaved = 0;
+
   for (const [chartType, songs] of Object.entries(chartsData)) {
+    if (!songs || songs.length === 0) {
+      console.log(`[排行榜] ${chartType} 爬取为空，保留旧数据`);
+      continue;
+    }
+
+    // 只删除当前榜单的旧数据
+    await pool.execute("DELETE FROM hot_songs WHERE chart_type = ?", [chartType]);
+
     for (const s of songs) {
       try {
         await pool.execute(
-          `INSERT INTO hot_songs (id, chart_type, name, artists, album_name, album_id, popularity, duration, publish_year, ranking) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO hot_songs (id, chart_type, name, artists, album_name, album_id, popularity, duration, publish_year, ranking)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             s.id,
             chartType,
@@ -172,14 +226,18 @@ async function saveChartsToDB(chartsData) {
             s.duration,
             s.publish_time ? new Date(s.publish_time).getFullYear() : null,
             s.rank,
-          ],
+          ]
         );
         totalSaved++;
-      } catch (e) { }
+      } catch (e) {
+        console.log(`[排行榜] 插入失败 id=${s.id} chart=${chartType}: ${e.message}`);
+      }
     }
+
+    console.log(`[排行榜] ${chartType} 已保存 ${songs.length} 首`);
   }
 
-  console.log(`[排行榜] ✅ 已存入 ${totalSaved} 首到 hot_songs 表`);
+  console.log(`[排行榜] 共保存 ${totalSaved} 首到 hot_songs 表`);
   return totalSaved;
 }
 

@@ -3,6 +3,7 @@ const router = express.Router();
 const { pool } = require("../db");
 const crawler = require("../crawler");
 const scraper = require("../scraper");
+const hotSongs = require("../hot_songs");
 
 // ============================================================
 // 🔍 搜索 API — 爬虫实时搜索网易云音乐
@@ -568,6 +569,25 @@ router.get("/artist/:id/crawl", async (req, res) => {
   }
 });
 
+// 获取相似歌手
+router.get("/artist/:id/similar", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.execute(
+      `SELECT sa.similar_artist_id, sa.similarity_score, a.name, a.avatar_url
+       FROM similar_artists sa
+       JOIN artists a ON a.id = sa.similar_artist_id
+       WHERE sa.artist_id = ?
+       ORDER BY sa.similarity_score DESC
+       LIMIT 6`,
+      [parseInt(id)]
+    );
+    res.json({ code: 200, data: rows });
+  } catch (err) {
+    res.json({ code: 200, data: [], msg: err.message });
+  }
+});
+
 // 批量爬取歌手ID（全量）
 router.get("/crawl/ids", async (req, res) => {
   try {
@@ -599,13 +619,48 @@ router.get("/crawl/details", async (req, res) => {
 // router.get("/ml/similar/:id", async (req, res) => { ... });
 // router.get("/ml/compute-all", async (req, res) => { ... });
 
-// 热歌榜
+// 爬取单个排行榜
+router.get("/chart/crawl/:type", async (req, res) => {
+  try {
+    const { type } = req.params;
+    const chart = hotSongs.CHARTS[type];
+    if (!chart) {
+      return res.json({ code: 400, msg: `未知排行榜: ${type}` });
+    }
+
+    console.log(`[Chart Crawl] 开始爬取 ${chart.name}...`);
+    const songs = await hotSongs.crawlChart(type, 50);
+
+    if (songs.length > 0) {
+      await hotSongs.saveChartsToDB({ [type]: songs });
+      console.log(`[Chart Crawl] ${chart.name} 爬取成功: ${songs.length} 首`);
+    } else {
+      console.log(`[Chart Crawl] ${chart.name} 爬取失败，无数据`);
+    }
+
+    res.json({
+      code: 200,
+      data: {
+        chartType: type,
+        chartName: chart.name,
+        count: songs.length,
+        success: songs.length > 0,
+      },
+    });
+  } catch (err) {
+    console.error(`[Chart Crawl] 爬取失败: ${err.message}`);
+    res.json({ code: 200, data: { count: 0, success: false, msg: err.message } });
+  }
+});
+
+// 热歌榜（全量爬取）
 router.get("/hotsongs", async (req, res) => {
   try {
-    // 确保表存在
+    // 确保表存在（使用复合主键，同一首歌可出现在多个榜单）
     try {
       await pool.execute(`CREATE TABLE IF NOT EXISTS hot_songs (
-      id BIGINT PRIMARY KEY,
+      id BIGINT,
+      chart_type VARCHAR(20) DEFAULT 'hot',
       name VARCHAR(500) NOT NULL,
       artists TEXT,
       album_name VARCHAR(500),
@@ -614,7 +669,8 @@ router.get("/hotsongs", async (req, res) => {
       duration INT DEFAULT 0,
       publish_year INT,
       ranking INT DEFAULT 0,
-      last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (id, chart_type)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
     } catch { }
 
@@ -691,7 +747,10 @@ router.get("/compare/charts", async (req, res) => {
             : 0,
         max_pop: pops.length > 0 ? Math.max(...pops) : 0,
         // 计算总评论数
-        total_comments: songs.reduce((sum, s) => sum + (s.comments_count || 0), 0),
+        total_comments: songs.reduce(
+          (sum, s) => sum + (s.comments_count || 0),
+          0,
+        ),
         top10: songs.slice(0, 10).map((s, i) => ({
           rank: i + 1,
           name: s.name,
@@ -746,9 +805,9 @@ router.get("/compare/charts", async (req, res) => {
       .map((s, i) => ({
         rank: i + 1,
         name: s.name,
-        pop: s.plays,  // 热度值（0-100）
+        pop: s.plays, // 热度值（0-100）
         plays: s.plays,
-        comments: s.comments_count || 0,  // 评论数
+        comments: s.comments_count || 0, // 评论数
         artist_id: s.artist_id,
       }));
 
@@ -761,7 +820,10 @@ router.get("/compare/charts", async (req, res) => {
     const maxSongCount = Math.max(...data.artists.map((a) => a.song_count), 1);
     const maxAlbumSize = Math.max(...data.artists.map((a) => a.album_size), 1);
     const maxAvgPop = Math.max(...data.artists.map((a) => a.avg_pop), 1);
-    const maxComments = Math.max(...data.artists.map((a) => a.total_comments), 1);
+    const maxComments = Math.max(
+      ...data.artists.map((a) => a.total_comments),
+      1,
+    );
 
     data.radar = data.artists.map((a) => ({
       name: a.name,
@@ -769,7 +831,10 @@ router.get("/compare/charts", async (req, res) => {
       歌曲数: Math.round((a.song_count / maxSongCount) * 100),
       专辑数: Math.round((a.album_size / maxAlbumSize) * 100),
       平均热度: maxAvgPop > 0 ? Math.round((a.avg_pop / maxAvgPop) * 100) : 0,
-      评论数: maxComments > 0 ? Math.round((a.total_comments / maxComments) * 100) : 0,
+      评论数:
+        maxComments > 0
+          ? Math.round((a.total_comments / maxComments) * 100)
+          : 0,
       // 原始数据也保留，供前端使用
       _raw: {
         song_count: a.song_count,
@@ -780,31 +845,47 @@ router.get("/compare/charts", async (req, res) => {
     }));
 
     // 多排行榜统计：计算对比歌手在各排行榜中的出现次数
-    // 先重新爬取最新排行榜数据，确保数据是最新的
+    // 确保 hot_songs 表存在且使用正确的复合主键
     try {
-      const chartsData = await hotSongs.crawlAndSaveAllCharts();
-      await hotSongs.saveChartsToDB(chartsData);
-    } catch (e) {
-      console.log(`[Compare] 爬取排行榜失败: ${e.message}`);
-    }
+      await pool.execute(`CREATE TABLE IF NOT EXISTS hot_songs (
+        id BIGINT,
+        chart_type VARCHAR(20) DEFAULT 'hot',
+        name VARCHAR(500) NOT NULL,
+        artists TEXT,
+        album_name VARCHAR(500),
+        album_id BIGINT,
+        popularity INT DEFAULT 0,
+        duration INT DEFAULT 0,
+        publish_year INT,
+        ranking INT DEFAULT 0,
+        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id, chart_type)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+    } catch { }
 
-    const [chartsData] = await pool.execute("SELECT chart_type, artists FROM hot_songs");
+    // 从数据库读取排行榜数据（不再自动爬取）
+    const [chartsData] = await pool.execute(
+      "SELECT chart_type, artists FROM hot_songs",
+    );
     const chartCounts = {
-      hot: {},      // 热歌榜
-      rising: {},   // 飙升榜
-      new: {},      // 新歌榜
+      hot: {}, // 热歌榜
+      rising: {}, // 飙升榜
+      new: {}, // 新歌榜
       original: {}, // 原创榜
     };
 
     for (const row of chartsData) {
       try {
-        const artists = JSON.parse(row.artists || "[]");
+        const songArtists = JSON.parse(row.artists || "[]");
         const chartType = row.chart_type || "hot";
         if (!chartCounts[chartType]) chartCounts[chartType] = {};
 
-        for (const artist of artists) {
-          if (artistIds.includes(artist.id)) {
-            chartCounts[chartType][artist.id] = (chartCounts[chartType][artist.id] || 0) + 1;
+        for (const art of songArtists) {
+          // 兼容 artist.id 可能是数字或字符串
+          const artId = Number(art.id);
+          if (artistIds.includes(artId)) {
+            chartCounts[chartType][artId] =
+              (chartCounts[chartType][artId] || 0) + 1;
           }
         }
       } catch { }
@@ -813,8 +894,11 @@ router.get("/compare/charts", async (req, res) => {
     // 汇总各歌手在所有排行榜的总次数
     data.chartCounts = data.artists.map((a) => ({
       name: a.name,
-      total: (chartCounts.hot[a.id] || 0) + (chartCounts.rising[a.id] || 0) +
-        (chartCounts.new[a.id] || 0) + (chartCounts.original[a.id] || 0),
+      total:
+        (chartCounts.hot[a.id] || 0) +
+        (chartCounts.rising[a.id] || 0) +
+        (chartCounts.new[a.id] || 0) +
+        (chartCounts.original[a.id] || 0),
       hot: chartCounts.hot[a.id] || 0,
       rising: chartCounts.rising[a.id] || 0,
       new: chartCounts.new[a.id] || 0,

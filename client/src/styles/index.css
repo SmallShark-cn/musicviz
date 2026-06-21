@@ -917,6 +917,58 @@ body {
 .artist-bar-card:hover {
     border-color: var(--accent);
 }
+.artist-bar-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.similar-artists-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 4px;
+}
+.similar-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+.similar-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.similar-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px 3px 3px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+.similar-chip:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    transform: scale(1.05);
+}
+.similar-chip-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.similar-chip-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
+}
 .artist-bar-avatar {
     width: 40px;
     height: 40px;

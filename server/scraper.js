@@ -24,7 +24,7 @@ async function crawlAndSaveArtist(artistId) {
       await pool.execute(
         `ALTER TABLE artists ADD COLUMN album_size INT DEFAULT 0`,
       );
-    } catch {}
+    } catch { }
   }
   try {
     await pool.execute(
@@ -35,7 +35,7 @@ async function crawlAndSaveArtist(artistId) {
       await pool.execute(
         `ALTER TABLE artists ADD COLUMN music_size INT DEFAULT 0`,
       );
-    } catch {}
+    } catch { }
   }
 
   // 1. 抓取歌手详情
@@ -83,7 +83,7 @@ async function crawlAndSaveArtist(artistId) {
           headers: { "User-Agent": "Mozilla/5.0 ... Chrome/120" },
           timeout: 5000,
         })
-        .catch(() => {});
+        .catch(() => { });
       const ck = r0?.headers?.["set-cookie"]
         ? r0.headers["set-cookie"].map((c) => c.split(";")[0]).join("; ")
         : "";
@@ -106,6 +106,15 @@ async function crawlAndSaveArtist(artistId) {
     }
   } catch (e) {
     // 专辑获取失败不影响主流程
+  }
+
+  // 2.6 抓取相似歌手
+  let similarArtists = [];
+  try {
+    similarArtists = await crawler.getSimilarArtists(artistId);
+    console.log(`[Scraper] 获取到 ${similarArtists.length} 位相似歌手`);
+  } catch (e) {
+    console.error(`[Scraper] 抓取相似歌手失败: ${e.message}`);
   }
 
   // 3. 存入数据库
@@ -187,7 +196,29 @@ async function crawlAndSaveArtist(artistId) {
             al.size || al.songSize || 0,
             al.info?.commentCount || al.commentCount || 0,
           ]);
-        } catch {}
+        } catch { }
+      }
+    }
+
+    // 存相似歌手
+    if (similarArtists.length > 0) {
+      // 先确保相似歌手在 artists 表中有记录
+      for (const sim of similarArtists) {
+        await conn.execute(
+          `INSERT IGNORE INTO artists (id, name, avatar_url) VALUES (?, ?, ?)`,
+          [sim.id, sim.name || "", sim.avatar_url || ""]
+        );
+      }
+      // 清除旧的相似歌手关系，插入新的
+      await conn.execute(
+        `DELETE FROM similar_artists WHERE artist_id = ?`,
+        [artistId]
+      );
+      for (const sim of similarArtists) {
+        await conn.execute(
+          `INSERT IGNORE INTO similar_artists (artist_id, similar_artist_id, similarity_score) VALUES (?, ?, ?)`,
+          [artistId, sim.id, sim.similarity_score || 0]
+        );
       }
     }
 

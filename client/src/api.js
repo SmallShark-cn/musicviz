@@ -22,9 +22,11 @@ export const getArtistDetail = (id) => fetchApi(`/artist/${id}`);
 export const getArtistSongs = (id) => fetchApi(`/artist/${id}/songs`);
 export const getArtistPopularity = (id) => fetchApi(`/artist/${id}/popularity`);
 export const crawlArtist = (id) => fetchApi(`/artist/${id}/crawl`);
+export const getSimilarArtists = (id) => fetchApi(`/artist/${id}/similar`);
 export const getCompareCharts = (ids) =>
   fetchApi(`/compare/charts?ids=${ids.join(",")}`);
 export const getHotSongs = () => fetchApi("/hotsongs");
+export const crawlChart = (type) => fetchApi(`/chart/crawl/${type}`);
 
 // 图表
 export const getStylePie = () => fetchApi("/chart/style-pie");

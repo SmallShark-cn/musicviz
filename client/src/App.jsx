@@ -64,6 +64,9 @@ export default function App() {
     status: "准备中...",
   });
 
+  // 相似歌手数据
+  const [similarArtists, setSimilarArtists] = useState({});
+
   const updateRegion = (artistId, region) => {
     setRegionMap((prev) => {
       const next = { ...prev, [artistId]: region };
@@ -93,6 +96,9 @@ export default function App() {
     if (entered && selectedArtists.length === 0) setEntered(false);
   }, [selectedArtists, entered]);
 
+  // 跟踪上一次的歌手ID列表，只有真正变化时才刷新图表
+  const prevArtistIdsRef = useRef("");
+
   // 刷新图表数据
   const refreshCharts = useCallback(async () => {
     if (selectedArtists.length === 0 || showLoadingPage) return;
@@ -105,12 +111,23 @@ export default function App() {
     setIsLoading(false);
   }, [selectedArtists, showLoadingPage]);
 
-  // 进入可视化页面时首次加载图表
+  // 当选中歌手列表真正发生变化时才刷新图表（搜索输入不会触发）
   useEffect(() => {
-    if (entered && !isLanding && !showLoadingPage && selectedArtists.length > 0) {
-      refreshCharts();
-    }
-  }, [entered, isLanding, showLoadingPage]); // 不依赖 selectedArtists，避免输入时触发
+    if (
+      !entered ||
+      isLanding ||
+      showLoadingPage ||
+      selectedArtists.length === 0
+    )
+      return;
+    const idsKey = selectedArtists
+      .map((a) => a.id)
+      .sort((a, b) => a - b)
+      .join(",");
+    if (idsKey === prevArtistIdsRef.current) return; // 歌手没变，跳过
+    prevArtistIdsRef.current = idsKey;
+    refreshCharts();
+  }, [entered, isLanding, showLoadingPage, selectedArtists, refreshCharts]);
 
   // 进入可视化时自动抓取热歌榜
   useEffect(() => {
@@ -122,20 +139,34 @@ export default function App() {
     }
   }, [entered, isLanding, showLoadingPage]);
 
+  // 获取相似歌手
+  useEffect(() => {
+    if (!entered || selectedArtists.length === 0) return;
+    selectedArtists.forEach((a) => {
+      if (!similarArtists[a.id]) {
+        api.getSimilarArtists(a.id).then((data) => {
+          if (data && data.length > 0) {
+            setSimilarArtists((prev) => ({ ...prev, [a.id]: data }));
+          }
+        }).catch(() => { });
+      }
+    });
+  }, [entered, selectedArtists]);
+
   // 处理进入可视化
   const handleEnterVisualization = async () => {
-    const artistNames = selectedArtists.map((a) => artistDetails[a.id]?.name || a.name);
-    const totalArtists = selectedArtists.length;
-    const totalDuration = 1500; // 总时长1.5秒
-    const perArtistDelay = Math.max(300, (totalDuration - 800) / totalArtists); // 每个歌手的处理时间
+    const artistNames = selectedArtists.map(
+      (a) => artistDetails[a.id]?.name || a.name,
+    );
+    const chartTypes = ["hot", "rising", "new", "original"];
+    const totalArtists = artistNames.length;
 
-    // 显示全屏加载页面
+    // 显示全屏加载页面（只显示歌手）
     setShowLoadingPage(true);
     setLoadingPageData({
       artists: artistNames.map((name, index) => ({
         name,
-        status: index === 0 ? "processing" : "pending", // 第一个开始处理
-        index,
+        status: index === 0 ? "processing" : "pending",
       })),
       currentArtist: artistNames[0] || "",
       progress: 5,
@@ -145,12 +176,11 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      // 逐个处理歌手，模拟进度
+      // 阶段1: 逐个爬取歌手
       for (let i = 0; i < totalArtists; i++) {
         const artistId = selectedArtists[i].id;
         const artistName = artistNames[i];
 
-        // 更新当前处理的歌手
         setLoadingPageData((prev) => ({
           ...prev,
           artists: prev.artists.map((a, idx) => ({
@@ -158,19 +188,16 @@ export default function App() {
             status: idx === i ? "processing" : idx < i ? "done" : "pending",
           })),
           currentArtist: artistName,
-          progress: 5 + Math.round((i / totalArtists) * 60),
+          progress: 5 + Math.round((i / totalArtists) * 50),
           status: `正在抓取 ${artistName}...`,
         }));
 
-        // 抓取歌手数据（后台操作）
         try {
           await api.crawlArtist(artistId);
-        } catch { }
+        } catch (e) {
+          console.error(`抓取歌手 ${artistName} 失败:`, e);
+        }
 
-        // 等待一段时间，让用户看到进度
-        await new Promise((r) => setTimeout(r, perArtistDelay));
-
-        // 标记为完成
         setLoadingPageData((prev) => ({
           ...prev,
           artists: prev.artists.map((a, idx) => ({
@@ -180,15 +207,43 @@ export default function App() {
         }));
       }
 
-      // 获取图表数据
+      // 阶段2: 后台爬取四个榜单（不显示在进度条）
       setLoadingPageData((prev) => ({
         ...prev,
-        progress: 80,
+        progress: 65,
+        status: "正在抓取更多数据...",
+      }));
+
+      const chartResults = [];
+      for (const chartType of chartTypes) {
+        try {
+          const result = await api.crawlChart(chartType);
+          chartResults.push({
+            type: chartType,
+            count: result.count || 0,
+            success: result.success !== false && (result.count || 0) > 0,
+          });
+        } catch (e) {
+          console.error(`爬取排行榜 ${chartType} 失败:`, e);
+          chartResults.push({ type: chartType, count: 0, success: false });
+        }
+      }
+
+      const successfulCharts = chartResults.filter((c) => c.success);
+      console.log(`排行榜爬取完成: ${successfulCharts.length}/${chartTypes.length} 成功`);
+
+      // 阶段3: 获取图表数据
+      setLoadingPageData((prev) => ({
+        ...prev,
+        progress: 90,
         status: "正在分析数据...",
       }));
 
       const data = await api.getCompareCharts(selectedArtists.map((a) => a.id));
       setCompareData(data);
+
+      // 隐藏loading页面
+      setShowLoadingPage(false);
 
       // 完成后
       setLoadingPageData((prev) => ({
@@ -197,16 +252,23 @@ export default function App() {
         status: "加载完成!",
       }));
 
-      // 延迟关闭加载页面
       setTimeout(() => {
         setShowLoadingPage(false);
         setEntered(true);
         setIsLoading(false);
       }, 500);
     } catch (error) {
-      setShowLoadingPage(false);
-      setEntered(true);
-      setIsLoading(false);
+      console.error("加载失败:", error);
+      setLoadingPageData((prev) => ({
+        ...prev,
+        progress: 100,
+        status: "加载失败，请重试",
+      }));
+      setTimeout(() => {
+        setShowLoadingPage(false);
+        setEntered(true);
+        setIsLoading(false);
+      }, 1500);
     }
   };
 
@@ -258,6 +320,13 @@ export default function App() {
       return;
     }
 
+    const chartTypes = [
+      { type: "hot", name: "热歌榜" },
+      { type: "rising", name: "飙升榜" },
+      { type: "new", name: "新歌榜" },
+      { type: "original", name: "原创榜" },
+    ];
+
     // 如果已经进入可视化页面，显示加载页面
     const isInVisualization = entered && !isLanding;
     if (isInVisualization) {
@@ -266,10 +335,9 @@ export default function App() {
         artists: [...selectedArtists, artist].map((a, idx) => ({
           name: artistDetails[a.id]?.name || a.name,
           status: idx === selectedArtists.length ? "processing" : "done",
-          index: idx,
         })),
         currentArtist: artist.name,
-        progress: 70,
+        progress: 30,
         status: `正在抓取 ${artist.name}...`,
       });
     }
@@ -341,21 +409,47 @@ export default function App() {
       }));
     } catch { }
 
-    // 如果在可视化页面，完成加载
+    // 如果在可视化页面，后台爬取排行榜
     if (isInVisualization) {
+      // 标记歌手抓取完成
+      setLoadingPageData((prev) => ({
+        ...prev,
+        artists: prev.artists.map((a) => ({ ...a, status: "done" })),
+        status: "正在抓取更多数据...",
+        progress: 30,
+      }));
+
+      // 后台爬取排行榜（不显示进度）
+      for (const chart of chartTypes) {
+        try {
+          await api.crawlChart(chart.type);
+        } catch (e) {
+          console.error(`爬取 ${chart.name} 失败:`, e);
+        }
+      }
+
+      // 获取图表数据
+      setLoadingPageData((prev) => ({
+        ...prev,
+        progress: 90,
+        status: "正在分析数据...",
+      }));
+
+      // 直接获取数据，避免 refreshCharts 因 showLoadingPage 为 true 而跳过
+      const data = await api.getCompareCharts(
+        [...selectedArtists, artist].map((a) => a.id),
+      );
+      setCompareData(data);
+
+      // 隐藏loading页面
+      setShowLoadingPage(false);
+
+      // 完成后
       setLoadingPageData((prev) => ({
         ...prev,
         progress: 100,
         status: "加载完成!",
-        artists: prev.artists.map((a, idx) => ({
-          ...a,
-          status: "done",
-        })),
       }));
-      setTimeout(() => {
-        setShowLoadingPage(false);
-        refreshCharts(); // 添加歌手完成后刷新图表
-      }, 300);
     }
 
     setLoading(false);
@@ -599,31 +693,65 @@ export default function App() {
           <div className="artist-bar">
             {selectedArtists.map((a) => {
               const d = artistDetails[a.id] || {};
+              const similars = similarArtists[a.id] || [];
               return (
-                <div key={a.id} className="artist-bar-card">
-                  <img
-                    className="artist-bar-avatar"
-                    src={
-                      d.avatar_url ||
-                      `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name)}&background=ec4141&color=fff&size=80`
-                    }
-                    alt={d.name}
-                  />
-                  <div className="artist-bar-info">
-                    <div className="artist-bar-name">{d.name}</div>
-                    <div className="artist-bar-stats">
-                      <span>🎵 {d.song_count || 0} 首</span>
-                      {d.followers > 1000 && (
-                        <span>👤 {formatLargeNumber(d.followers)}</span>
-                      )}
+                <div key={a.id} className="artist-bar-wrapper">
+                  <div className="artist-bar-card">
+                    <img
+                      className="artist-bar-avatar"
+                      src={
+                        d.avatar_url ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name)}&background=ec4141&color=fff&size=80`
+                      }
+                      alt={d.name}
+                    />
+                    <div className="artist-bar-info">
+                      <div className="artist-bar-name">{d.name}</div>
+                      <div className="artist-bar-stats">
+                        <span>🎵 {d.song_count || 0} 首</span>
+                        {d.followers > 1000 && (
+                          <span>👤 {formatLargeNumber(d.followers)}</span>
+                        )}
+                      </div>
                     </div>
+                    <button
+                      className="artist-bar-remove"
+                      onClick={() => removeArtist(a.id)}
+                    >
+                      ✕
+                    </button>
                   </div>
-                  <button
-                    className="artist-bar-remove"
-                    onClick={() => removeArtist(a.id)}
-                  >
-                    ✕
-                  </button>
+                  {similars.length > 0 && (
+                    <div className="similar-artists-row">
+                      <div className="similar-label">相似歌手</div>
+                      <div className="similar-list">
+                        {similars.map((sim) => (
+                          <div
+                            key={sim.similar_artist_id}
+                            className="similar-chip"
+                            onClick={() => {
+                              if (selectedArtists.length < MAX_ARTISTS &&
+                                !selectedArtists.find(x => x.id === sim.similar_artist_id)) {
+                                selectArtist({
+                                  id: sim.similar_artist_id,
+                                  name: sim.name,
+                                  avatar_url: sim.avatar_url,
+                                });
+                              }
+                            }}
+                            title={sim.name}
+                          >
+                            <img
+                              className="similar-chip-avatar"
+                              src={sim.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sim.name)}&background=666&color=fff&size=32`}
+                              alt=""
+                            />
+                            <span className="similar-chip-name">{sim.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -787,7 +915,7 @@ export default function App() {
               )}
             </Panel>
 
-            {/* 
+            {/*
             <Panel icon="🥧" title="歌曲年代分布占比">
               {compareData?.era_pie?.length > 0 ? (
                 <PieChart data={compareData.era_pie} />
@@ -800,7 +928,7 @@ export default function App() {
             </Panel>
 */}
 
-            {/* 
+            {/*
             <Panel icon="📈" title="各歌手年代趋势">
               {compareData?.artists?.length > 0 ? (
                 <LineChart
@@ -821,7 +949,7 @@ export default function App() {
             </Panel>
             */}
 
-            {/* 
+            {/*
             <Panel icon="📊" title="歌手核心指标分组对比">
               {compareData?.artists?.length > 0 ? (
                 <GroupedBarChart
@@ -841,7 +969,7 @@ export default function App() {
             </Panel>
             */}
 
-            {/* 
+            {/*
             <Panel icon="🎯" title="歌曲数 vs 专辑数 (散点图)">
               {compareData?.artists?.length > 1 ? (
                 <ScatterChart
@@ -865,7 +993,7 @@ export default function App() {
             </Panel>
             */}
 
-            {/* 
+            {/*
             <Panel icon="🔥" title="热歌榜 Top20">
               {hotSongs.length > 0 ? (
                 <BarChart

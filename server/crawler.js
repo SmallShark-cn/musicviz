@@ -20,46 +20,103 @@ async function initSession() {
   if (cookieJar && csrfToken) return; // 已初始化
 
   console.log("[爬虫] 初始化 session...");
-  const res = await axios.get("https://music.163.com/", {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
-      Accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-    },
-    maxRedirects: 5,
-    timeout: 10000,
-  });
+  try {
+    // 方法1: 访问首页
+    const res = await axios.get("https://music.163.com/", {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+      },
+      maxRedirects: 5,
+      timeout: 10000,
+      // 禁止自动跟随重定向，手动处理以保留 cookie
+      validateStatus: () => true,
+    });
 
-  // 提取 cookies
-  const setCookie = res.headers["set-cookie"];
-  if (setCookie && setCookie.length > 0) {
-    const newCookies = setCookie.map((c) => c.split(";")[0]).join("; ");
-    cookieJar = cookieJar ? `${cookieJar}; ${newCookies}` : newCookies;
-  }
+    // 提取 cookies
+    const setCookie = res.headers["set-cookie"];
+    if (setCookie && setCookie.length > 0) {
+      const newCookies = setCookie.map((c) => c.split(";")[0]).join("; ");
+      cookieJar = cookieJar ? `${cookieJar}; ${newCookies}` : newCookies;
+    }
 
-  // 提取 csrf_token（通常在 __csrf cookie 中）
-  const csrfMatch = cookieJar.match(/__csrf=([^;]+)/);
-  if (csrfMatch) {
-    csrfToken = csrfMatch[1];
-  }
+    // 方法2: 如果首页没拿到完整cookie，尝试访问登录页面
+    if (!cookieJar || cookieJar.length < 100) {
+      console.log("[爬虫] 尝试访问登录页面获取更多 cookie...");
+      try {
+        const loginRes = await axios.get("https://music.163.com/#/login", {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            Referer: "https://music.163.com/",
+          },
+          timeout: 10000,
+          validateStatus: () => true,
+        });
+        const loginSetCookie = loginRes.headers["set-cookie"];
+        if (loginSetCookie && loginSetCookie.length > 0) {
+          const newCookies = loginSetCookie.map((c) => c.split(";")[0]).join("; ");
+          cookieJar = cookieJar ? `${cookieJar}; ${newCookies}` : newCookies;
+        }
+      } catch (e) {
+        console.log("[爬虫] 登录页面访问失败:", e.message);
+      }
+    }
 
-  // 也尝试从 MUSIC_U cookie 或其他方式
-  if (!csrfToken) {
-    const musicUMatch = cookieJar.match(/MUSIC_U=([^;]+)/);
-    // 有些情况下 csrf 通过页面中 meta 标签传递
-    if (typeof res.data === "string") {
-      const csrfMatch2 = res.data.match(
-        /csrf_token["']?\s*[:=]\s*["']([^"'\s]+)["']/,
-      );
-      if (csrfMatch2) csrfToken = csrfMatch2[1];
+    // 方法3: 访问 API 端点
+    if (!cookieJar || cookieJar.length < 100) {
+      console.log("[爬虫] 尝试 /api 端点...");
+      const apiRes = await axios.get("https://music.163.com/api/", {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+          Accept: "application/json",
+          Referer: "https://music.163.com/",
+        },
+        timeout: 10000,
+        validateStatus: () => true,
+      });
+      const apiSetCookie = apiRes.headers["set-cookie"];
+      if (apiSetCookie && apiSetCookie.length > 0) {
+        const newCookies = apiSetCookie.map((c) => c.split(";")[0]).join("; ");
+        cookieJar = cookieJar ? `${cookieJar}; ${newCookies}` : newCookies;
+      }
+    }
+
+    // 提取 csrf_token（通常在 __csrf cookie 中）
+    const csrfMatch = cookieJar.match(/__csrf=([^;]+)/);
+    if (csrfMatch) {
+      csrfToken = csrfMatch[1];
+    }
+
+    // 如果还是没有 csrf，尝试从其他 cookie 生成
+    if (!csrfToken) {
+      // 某些 API 不需要真实的 csrf，可以用任意值
+      // 尝试从 MUSIC_U 或其他 cookie 提取
+      const musicUMatch = cookieJar.match(/MUSIC_U=([^;]+)/);
+      if (musicUMatch) {
+        // 使用 MUSIC_U 的前32位作为 csrf
+        csrfToken = musicUMatch[1].substring(0, 32);
+      } else {
+        // 生成一个随机的 csrf token（某些公开 API 允许）
+        csrfToken = crypto.randomBytes(16).toString('hex');
+      }
+    }
+
+    console.log(
+      `[爬虫] Session 就绪, cookie 长度=${cookieJar.length}, csrf=${csrfToken ? "已获取" : "无"}`,
+    );
+  } catch (e) {
+    console.error(`[爬虫] 初始化 session 失败: ${e.message}`);
+    // 即使失败也生成一个 csrf token
+    if (!csrfToken) {
+      csrfToken = crypto.randomBytes(16).toString('hex');
     }
   }
-
-  console.log(
-    `[爬虫] Session 就绪, cookie 长度=${cookieJar.length}, csrf=${csrfToken || "无"}`,
-  );
 }
 
 /**
@@ -210,6 +267,105 @@ async function search(keyword, type = "100", limit = 30, offset = 0) {
 /**
  * 获取歌手详情
  */
+function extractRegionFromDesc(desc) {
+  if (!desc) return "";
+
+  // 台湾相关
+  if (desc.includes("台湾") || desc.includes("台北") || desc.includes("新北")) {
+    return "中国台湾";
+  }
+  // 香港相关
+  if (desc.includes("香港")) {
+    return "中国香港";
+  }
+  // 澳门相关
+  if (desc.includes("澳门")) {
+    return "中国澳门";
+  }
+  // 美国相关
+  if (desc.includes("美国") || desc.includes("USA") || desc.includes("American") || /\bUS\b/.test(desc)) {
+    return "美国";
+  }
+  // 日本相关
+  if (desc.includes("日本") || desc.includes("东京") || /\bJapan\b/i.test(desc) || /\bJapanese\b/i.test(desc)) {
+    return "日本";
+  }
+  // 韩国相关
+  if (desc.includes("韩国") || desc.includes("首尔") || /\bKorea\b/i.test(desc) || /\bKorean\b/i.test(desc)) {
+    return "韩国";
+  }
+  // 新加坡相关
+  if (desc.includes("新加坡") || /\bSingapore\b/i.test(desc)) {
+    return "新加坡";
+  }
+  // 马来西亚相关
+  if (desc.includes("马来西亚") || /\bMalaysia\b/i.test(desc) || /\bMalaysian\b/i.test(desc)) {
+    return "马来西亚";
+  }
+  // 英国相关
+  if (desc.includes("英国") || desc.includes("伦敦") || /\bUK\b/.test(desc) || /\bUnited Kingdom\b/i.test(desc) || /\bBritish\b/i.test(desc) || /\bEngland\b/i.test(desc)) {
+    return "英国";
+  }
+  // 法国相关
+  if (desc.includes("法国") || desc.includes("巴黎") || /\bFrance\b/i.test(desc) || /\bFrench\b/i.test(desc)) {
+    return "法国";
+  }
+  // 德国相关
+  if (desc.includes("德国") || /\bGermany\b/i.test(desc) || /\bGerman\b/i.test(desc)) {
+    return "德国";
+  }
+  // 荷兰相关
+  if (desc.includes("荷兰") || /\bNetherlands\b/i.test(desc) || /\bDutch\b/i.test(desc) || /\bHolland\b/i.test(desc)) {
+    return "荷兰";
+  }
+  // 加拿大相关
+  if (desc.includes("加拿大") || /\bCanada\b/i.test(desc) || /\bCanadian\b/i.test(desc)) {
+    return "加拿大";
+  }
+  // 澳大利亚相关
+  if (desc.includes("澳大利亚") || desc.includes("澳洲") || /\bAustralia\b/i.test(desc) || /\bAustralian\b/i.test(desc)) {
+    return "澳大利亚";
+  }
+  // 瑞典相关
+  if (desc.includes("瑞典") || /\bSweden\b/i.test(desc) || /\bSwedish\b/i.test(desc)) {
+    return "瑞典";
+  }
+  // 挪威相关
+  if (desc.includes("挪威") || /\bNorway\b/i.test(desc) || /\bNorwegian\b/i.test(desc)) {
+    return "挪威";
+  }
+  // 意大利相关
+  if (desc.includes("意大利") || /\bItaly\b/i.test(desc) || /\bItalian\b/i.test(desc)) {
+    return "意大利";
+  }
+  // 西班牙相关
+  if (desc.includes("西班牙") || /\bSpain\b/i.test(desc) || /\bSpanish\b/i.test(desc)) {
+    return "西班牙";
+  }
+  // 巴西相关
+  if (desc.includes("巴西") || /\bBrazil\b/i.test(desc) || /\bBrazilian\b/i.test(desc)) {
+    return "巴西";
+  }
+  // 印度相关
+  if (desc.includes("印度") || /\bIndia\b/i.test(desc) || /\bIndian\b/i.test(desc)) {
+    return "印度";
+  }
+  // 泰国相关
+  if (desc.includes("泰国") || /\bThailand\b/i.test(desc) || /\bThai\b/i.test(desc)) {
+    return "泰国";
+  }
+  // 菲律宾相关
+  if (desc.includes("菲律宾") || /\bPhilippines\b/i.test(desc) || /\bFilipino\b/i.test(desc)) {
+    return "菲律宾";
+  }
+  // 印尼相关
+  if (desc.includes("印尼") || desc.includes("印度尼西亚") || /\bIndonesia\b/i.test(desc) || /\bIndonesian\b/i.test(desc)) {
+    return "印度尼西亚";
+  }
+  // 无法识别，返回空字符串
+  return "";
+}
+
 async function getArtistDetail(artistId) {
   // 使用 /api/artist/{id} 端点（已验证可用）
   const url = `https://music.163.com/api/artist/${artistId}?csrf_token=${csrfToken}`;
@@ -233,6 +389,9 @@ async function getArtistDetail(artistId) {
     }
   } catch { }
 
+  // 从简介中提取地区
+  const region = extractRegionFromDesc(briefDesc);
+
   return {
     id: a.id || artistId,
     name: a.name || "",
@@ -240,7 +399,7 @@ async function getArtistDetail(artistId) {
     // accountId 不是粉丝数，fansSize 始终为 null
     followers: 0,
     brief_desc: briefDesc,
-    region: a.nationality || "",
+    region: region,
     music_size: a.musicSize || 0,
     album_size: a.albumSize || 0,
     aliases: a.alias || [],
@@ -280,22 +439,80 @@ async function getArtistTopSongs(artistId) {
 
 /**
  * 获取相似歌手
+ * 使用本地 NeteaseCloudMusicApi 服务
  */
 async function getSimilarArtists(artistId) {
-  const url = `https://music.163.com/api/artist/simi?id=${artistId}&csrf_token=${csrfToken}`;
   console.log(`[爬虫] similar artists: ${artistId}`);
-  const data = await request(url);
 
-  if (data.code !== 200) {
-    throw new Error(`similar API 返回 code=${data.code}`);
+  try {
+    // 使用本地 NeteaseCloudMusicApi 服务（端口4000）
+    const url = `http://localhost:4000/simi/artist?id=${artistId}`;
+
+    const res = await axios.get(url, {
+      timeout: 10000,
+    });
+
+    const data = res.data;
+
+    if (!data || data.code !== 200) {
+      console.log(`[爬虫] API 返回错误: code=${data?.code}`);
+      return [];
+    }
+
+    const rawArtists = data.artists || [];
+
+    if (!Array.isArray(rawArtists) || rawArtists.length === 0) {
+      console.log(`[爬虫] 未获取到相似歌手数据`);
+      return [];
+    }
+
+    console.log(`[爬虫] 成功获取 ${rawArtists.length} 位相似歌手`);
+
+    // 只返回前6个相似歌手
+    return rawArtists.slice(0, 6).map((a) => ({
+      id: a.id,
+      name: a.name,
+      avatar_url: a.picUrl || a.img1v1Url || "",
+      similarity_score: 0,
+    }));
+
+  } catch (error) {
+    console.error(`[爬虫] 获取相似歌手失败:`, error.message);
+    return [];
   }
+}
 
-  return (data.artists || data.data?.artists || []).map((a) => ({
-    id: a.id,
-    name: a.name,
-    avatar_url: a.picUrl || a.img1v1Url || "",
-    similarity_score: a.score || 0,
-  }));
+/**
+ * 获取歌手描述/简介
+ * 使用本地 NeteaseCloudMusicApi 服务
+ */
+async function getArtistDesc(artistId) {
+  console.log(`[爬虫] artist desc: ${artistId}`);
+
+  try {
+    const url = `http://localhost:4000/artist/desc?id=${artistId}`;
+
+    const res = await axios.get(url, {
+      timeout: 10000,
+    });
+
+    const data = res.data;
+
+    if (!data || data.code !== 200) {
+      console.log(`[爬虫] 获取歌手描述失败: code=${data?.code}`);
+      return null;
+    }
+
+    console.log(`[爬虫] 成功获取歌手描述`);
+    return {
+      briefDesc: data.briefDesc || "",
+      introduction: data.introduction || [],
+    };
+
+  } catch (error) {
+    console.error(`[爬虫] 获取歌手描述失败:`, error.message);
+    return null;
+  }
 }
 
 /**
@@ -365,16 +582,72 @@ async function getArtistFollowers(artistId) {
   return 0;
 }
 
+/**
+ * 获取歌曲歌词
+ * @param {number} songId 歌曲ID
+ * @returns {Promise<string>} 纯歌词文本（已去除时间戳）
+ */
+async function getSongLyric(songId) {
+  const url = `https://music.163.com/api/song/lyric?id=${songId}&lv=1&kv=1&tv=-1`;
+  try {
+    const data = await request(url);
+    if (data.code !== 200 || !data.lrc || !data.lrc.lyric) {
+      return "";
+    }
+
+    // 过滤制作信息、 credits 等元数据关键词
+    const metaKeywords = [
+      "制作", "编曲", "作词", "作曲", "混音", "监制", "出品", "企划",
+      "统筹", "吉他", "弦乐", "人声", "录音棚", "录音室", "录音师",
+      "母带", "发行", "推广", "营销", "总监", "助理", "编辑",
+      "设计", "封面", "摄影", "造型", "化妆", "发型", "艺人",
+      "经纪", "公司", "有限公司", "工作室", "团队", "鸣谢",
+      "SP", "OP", "ISRC", "ISBN", "版权", "代理", "出品人",
+      "发行人", "A&R", "制作人", "联合", "协力", "协助",
+      "音乐", "总监", "指挥", "演奏", "乐团", "乐队", "合唱",
+      "和声", "和音", "伴唱", "伴奏", "键盘", "贝斯", "鼓手",
+      "打击乐", "管乐", "铜管", "木管", "小提琴", "大提琴",
+      "中提琴", "低音提琴", "竖琴", "钢琴", "合成器", "编程",
+      "采样", "音效", "后期", "缩混", "母带处理", "重新",
+      "牛班", "NEWBAND", "银河", "方舟", "维伴", "青桔",
+      "汪苏", "刘涛", "赵建飞", "陈韵", "王子", "首席",
+      "爱乐乐团", "国际", "录音", "编写", "监制",
+    ];
+
+    // 去除时间戳 [00:00.000] 和元数据，保留纯歌词
+    const lyric = data.lrc.lyric
+      .split("\n")
+      .map((line) => line.replace(/^\[\d{2}:\d{2}\.\d{2,3}\]/, "").trim())
+      .filter((line) => {
+        if (!line || line.startsWith("[") || line.startsWith("{")) return false;
+        // 过滤包含制作信息的行（行中有1个以上制作关键词且字数<30）
+        const metaCount = metaKeywords.filter((k) => line.includes(k)).length;
+        if (metaCount >= 1 && line.length < 30) return false;
+        if (metaCount >= 2) return false;
+        // 过滤纯英文大写（如 NEWBAND, SP, OP 等）
+        if (/^[A-Z\s]+$/.test(line) && line.length < 20) return false;
+        return true;
+      })
+      .join("\n");
+    return lyric;
+  } catch (e) {
+    console.error(`[爬虫] 获取歌词失败: ${songId} - ${e.message}`);
+    return "";
+  }
+}
+
 module.exports = {
   initSession,
   searchSuggest,
   search,
   getArtistDetail,
   getArtistTopSongs,
+  getArtistDesc,
   getSimilarArtists,
   getSongCommentCount,
   getBatchCommentCounts,
   getArtistFollowers,
+  getSongLyric,
   getCookie: () => cookieJar,
   getCsrf: () => csrfToken,
 };

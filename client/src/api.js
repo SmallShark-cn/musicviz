@@ -23,10 +23,12 @@ export const getArtistSongs = (id) => fetchApi(`/artist/${id}/songs`);
 export const getArtistPopularity = (id) => fetchApi(`/artist/${id}/popularity`);
 export const crawlArtist = (id) => fetchApi(`/artist/${id}/crawl`);
 export const getSimilarArtists = (id) => fetchApi(`/artist/${id}/similar`);
+export const getArtistDesc = (id) => fetchApi(`/artist/${id}/desc`);
+export const getArtistTopSongs = (id, limit = 20) =>
+  fetchApi(`/artist/${id}/top-songs?limit=${limit}`);
+export const getHotSearch = () => fetchApi("/hot-search");
 export const getCompareCharts = (ids) =>
   fetchApi(`/compare/charts?ids=${ids.join(",")}`);
-export const getHotSongs = () => fetchApi("/hotsongs");
-export const crawlChart = (type) => fetchApi(`/chart/crawl/${type}`);
 
 // 图表
 export const getStylePie = () => fetchApi("/chart/style-pie");
@@ -54,3 +56,5 @@ export const getGroupedBar = (ids) =>
   fetchApi(`/chart/grouped-bar${ids ? `?ids=${ids}` : ""}`);
 export const getBubble = () => fetchApi("/chart/bubble");
 export const getRegionMap = () => fetchApi("/chart/region-map");
+export const getLyricWordcloud = (ids) =>
+  fetchApi(`/lyrics/wordcloud?ids=${ids.join(",")}`);

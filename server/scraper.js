@@ -47,6 +47,15 @@ async function crawlAndSaveArtist(artistId) {
     throw e;
   }
 
+  // 1.1 获取粉丝数
+  try {
+    const followers = await crawler.getArtistFollowers(artistId);
+    detail.followers = followers;
+    console.log(`[Scraper] 获取到粉丝数: ${followers}`);
+  } catch (e) {
+    console.error(`[Scraper] 获取粉丝数失败: ${e.message}`);
+  }
+
   // 2. 抓取热门歌曲
   let songs = [];
   try {
@@ -237,6 +246,13 @@ async function crawlAndSaveArtist(artistId) {
   return {
     ...detail,
     songs_count: songs.length,
+    // 计算平均热度和热度峰值（使用 plays 字段）
+    avg_pop: songs.length > 0
+      ? Math.round(songs.reduce((sum, s) => sum + (s.plays || 0), 0) / songs.length)
+      : 0,
+    max_pop: songs.length > 0
+      ? Math.max(...songs.map(s => s.plays || 0))
+      : 0,
   };
 }
 

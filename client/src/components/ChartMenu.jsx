@@ -1,7 +1,7 @@
 import React from 'react';
-import { CHART_CONFIG, CHART_TYPES } from '../hooks/useDragDrop';
+import { PANEL_CONFIG, PANEL_TYPES } from '../hooks/useDragDrop';
 
-const ALL_CHARTS = Object.entries(CHART_CONFIG).map(([id, config]) => ({
+const ALL_PANELS = Object.entries(PANEL_CONFIG).map(([id, config]) => ({
   id,
   ...config,
 }));
@@ -46,34 +46,34 @@ export default function ChartMenu({
           <div className="chart-menu-section">
             <h4>📋 可用图表</h4>
             <div className="chart-menu-list">
-              {ALL_CHARTS.map((chart) => {
-                const isInGrid = panelOrder.includes(chart.id);
+              {ALL_PANELS.map((panel) => {
+                const isInGrid = panelOrder.includes(panel.id);
                 return (
                   <div
-                    key={chart.id}
+                    key={panel.id}
                     className={`chart-menu-item ${isInGrid ? 'in-grid' : 'available'}`}
                     draggable
                     onDragStart={(e) => {
-                      e.dataTransfer.setData('text/plain', chart.id);
+                      e.dataTransfer.setData('text/plain', panel.id);
                       e.dataTransfer.effectAllowed = 'move';
                     }}
                     onDragEnd={onDragEnd}
                     onClick={() => {
                       if (isInGrid) {
-                        onRemoveFromGrid(chart.id);
+                        onRemoveFromGrid(panel.id);
                       } else {
-                        onAddToGrid(chart.id);
+                        onAddToGrid(panel.id);
                       }
                     }}
                   >
-                    <span className="chart-menu-item-icon">{chart.icon}</span>
-                    <span className="chart-menu-item-title">{chart.title}</span>
+                    <span className="chart-menu-item-icon">{panel.icon}</span>
+                    <span className="chart-menu-item-title">{panel.title}</span>
                     {isInGrid ? (
                       <button
                         className="chart-menu-item-remove"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onRemoveFromGrid(chart.id);
+                          onRemoveFromGrid(panel.id);
                         }}
                         title="移除"
                       >
@@ -95,28 +95,28 @@ export default function ChartMenu({
               {panelOrder.length === 0 ? (
                 <div className="chart-menu-empty">暂无图表，请从上方添加</div>
               ) : (
-                panelOrder.map((chartId, index) => {
-                  const chart = CHART_CONFIG[chartId];
-                  if (!chart) return null;
+                panelOrder.map((panelId, index) => {
+                  const panel = PANEL_CONFIG[panelId];
+                  if (!panel) return null;
                   return (
                     <div
-                      key={chartId}
-                      className={`chart-menu-item in-grid ${activePanelId === chartId ? 'dragging' : ''}`}
+                      key={panelId}
+                      className={`chart-menu-item in-grid ${activePanelId === panelId ? 'dragging' : ''}`}
                       draggable
                       onDragStart={(e) => {
-                        e.dataTransfer.setData('text/plain', chartId);
+                        e.dataTransfer.setData('text/plain', panelId);
                         e.dataTransfer.effectAllowed = 'move';
                       }}
                       onDragEnd={onDragEnd}
                     >
                       <span className="chart-menu-item-index">{index + 1}</span>
-                      <span className="chart-menu-item-icon">{chart.icon}</span>
-                      <span className="chart-menu-item-title">{chart.title}</span>
+                      <span className="chart-menu-item-icon">{panel.icon}</span>
+                      <span className="chart-menu-item-title">{panel.title}</span>
                       <button
                         className="chart-menu-item-remove"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onRemoveFromGrid(chartId);
+                          onRemoveFromGrid(panelId);
                         }}
                         title="移除"
                       >

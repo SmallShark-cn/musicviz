@@ -25,12 +25,12 @@ router.get("/search/artists", async (req, res) => {
     const data = result.artists.map((a) => ({
       id: a.id,
       name: a.name,
-      avatar_url: a.avatar_url || "",
-      followers: 0,
+      avatar_url: a.avatar_url || a.picUrl || "",
+      followers: a.followers || a.fansSize || 0,
       region: "",
       brief_desc: a.brief_desc || "",
-      music_size: a.music_size || 0,
-      album_size: a.album_size || 0,
+      music_size: a.music_size || a.musicSize || 0,
+      album_size: a.album_size || a.albumSize || 0,
       identity: a.identity || [],
     }));
     console.log(
@@ -211,13 +211,26 @@ router.get("/chart/plays-trend", async (req, res) => {
 // 3.5 不同专辑年代热度变化 (折线图)
 router.get("/chart/era-trend", async (req, res) => {
   try {
-    const [rows] = await pool.execute(
-      `SELECT s.publish_year, SUM(s.plays) as total_plays, COUNT(*) as song_count
-       FROM songs s
-       WHERE s.publish_year IS NOT NULL AND s.publish_year > 0
-       GROUP BY s.publish_year
-       ORDER BY s.publish_year ASC`,
-    );
+    const { artist_id } = req.query;
+
+    // 获取Top50热门歌曲的年代分布
+    let sql = `SELECT publish_year, SUM(plays) as total_plays, COUNT(*) as song_count
+       FROM (
+         SELECT * FROM songs 
+         WHERE publish_year IS NOT NULL AND publish_year > 0`;
+    const params = [];
+
+    if (artist_id) {
+      sql += ` AND artist_id = ?`;
+      params.push(artist_id);
+    }
+
+    sql += ` ORDER BY plays DESC LIMIT 50
+       ) AS top_songs
+       GROUP BY publish_year
+       ORDER BY publish_year ASC`;
+
+    const [rows] = await pool.execute(sql, params);
     res.json({ code: 200, data: rows });
   } catch (err) {
     res.status(500).json({ code: 500, msg: err.message });
@@ -305,27 +318,47 @@ router.get("/chart/radar", async (req, res) => {
     const { ids } = req.query; // 逗号分隔的歌手id
     const artistIds = ids ? ids.split(",").map(Number) : [];
     if (artistIds.length === 0) {
-      // 默认取Top5粉丝最多的歌手
+      // 默认取Top5歌曲最多的歌手（替代粉丝数排序）
       const [top] = await pool.execute(
-        "SELECT id FROM artists ORDER BY followers DESC LIMIT 5",
+        "SELECT id FROM artists ORDER BY music_size DESC LIMIT 5",
       );
       artistIds.push(...top.map((r) => r.id));
     }
     const placeholders = artistIds.map(() => "?").join(",");
 
     const [rows] = await pool.execute(
-      `SELECT a.id, a.name, a.followers,
-        COUNT(DISTINCT s.id) as hot_songs,
-        COUNT(DISTINCT ast.style_id) as style_count,
-        COALESCE(SUM(s.comments_count), 0) as total_comments
+      `SELECT a.id, a.name, a.followers, a.music_size as song_count,
+        a.album_size,
+        COALESCE(SUM(s.comments_count), 0) as total_comments,
+        COUNT(DISTINCT s.id) as song_count_in_db,
+        COUNT(DISTINCT s.publish_year) as era_count
        FROM artists a
        LEFT JOIN songs s ON a.id = s.artist_id
-       LEFT JOIN artist_styles ast ON a.id = ast.artist_id
        WHERE a.id IN (${placeholders})
-       GROUP BY a.id, a.name, a.followers`,
+       GROUP BY a.id, a.name, a.followers, a.music_size, a.album_size`,
       artistIds,
     );
-    res.json({ code: 200, data: rows });
+
+    // 转换数据格式，使用年代多样性（标准化到0-100）
+    const maxEraCount = Math.max(...rows.map(r => r.era_count || 0), 1);
+    const maxComments = Math.max(...rows.map(r => r.total_comments || 0), 1);
+    const result = rows.map(row => ({
+      id: row.id,
+      name: row.name,
+      '歌曲数': row.song_count || 0,
+      '专辑数': row.album_size || 0,
+      '多样性': maxEraCount > 0 ? Math.round((row.era_count || 0) / maxEraCount * 100) : 0,
+      '评论数': row.total_comments || 0,
+      _raw: {
+        song_count: row.song_count,
+        album_size: row.album_size,
+        followers: row.followers,
+        era_count: row.era_count,
+        total_comments: row.total_comments,
+      }
+    }));
+
+    res.json({ code: 200, data: result });
   } catch (err) {
     res.status(500).json({ code: 500, msg: err.message });
   }
@@ -334,13 +367,21 @@ router.get("/chart/radar", async (req, res) => {
 // 3.13 环形图 — Top5专辑评论占比
 router.get("/chart/album-donut", async (req, res) => {
   try {
-    const [rows] = await pool.execute(
-      `SELECT al.name, al.comment_count, a.name as artist_name
-       FROM albums al
-       JOIN artists a ON al.artist_id = a.id
-       ORDER BY al.comment_count DESC
-       LIMIT 5`,
-    );
+    const { artist_id } = req.query;
+    let sql = `SELECT s.album_name as name, SUM(s.comments_count) as comment_count, a.name as artist_name
+       FROM songs s
+       JOIN artists a ON s.artist_id = a.id
+       WHERE s.album_name IS NOT NULL AND s.album_name != ''`;
+    const params = [];
+
+    if (artist_id) {
+      sql += ` AND s.artist_id = ?`;
+      params.push(artist_id);
+    }
+
+    sql += ` GROUP BY s.album_name, a.name ORDER BY comment_count DESC LIMIT 5`;
+
+    const [rows] = await pool.execute(sql, params);
     res.json({ code: 200, data: rows });
   } catch (err) {
     res.status(500).json({ code: 500, msg: err.message });
@@ -576,17 +617,21 @@ router.get("/artist/:id/crawl", async (req, res) => {
 router.get("/artist/:id/similar", async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.execute(
-      `SELECT sa.similar_artist_id, sa.similarity_score, a.name, a.avatar_url
-       FROM similar_artists sa
-       JOIN artists a ON a.id = sa.similar_artist_id
-       WHERE sa.artist_id = ?
-       ORDER BY sa.similarity_score DESC
-       LIMIT 6`,
-      [parseInt(id)],
-    );
-    res.json({ code: 200, data: rows });
+
+    // 直接从网页爬取相似歌手
+    const similarArtists = await crawler.getSimilarArtists(parseInt(id));
+
+    // 转换为前端期望的格式
+    const data = similarArtists.map((a) => ({
+      similar_artist_id: a.id,
+      name: a.name,
+      avatar_url: a.avatar_url,
+      similarity_score: a.similarity_score || 0,
+    }));
+
+    res.json({ code: 200, data });
   } catch (err) {
+    console.error(`[Similar] 获取相似歌手失败: ${err.message}`);
     res.json({ code: 200, data: [], msg: err.message });
   }
 });
@@ -620,24 +665,9 @@ router.get("/artist/:id/top-songs", async (req, res) => {
 // 获取热搜列表
 router.get("/hot-search", async (req, res) => {
   try {
-    const axios = require("axios");
-    const response = await axios.get(
-      "http://localhost:4000/search/hot/detail",
-      {
-        timeout: 10000,
-      },
-    );
-    const data = response.data;
-    if (data.code !== 200) {
-      return res.json({ code: 500, data: [], msg: "获取热搜失败" });
-    }
-    const hotList = (data.data || []).slice(0, 15).map((item) => ({
-      searchWord: item.searchWord,
-      score: item.score,
-      iconType: item.iconType,
-      content: item.content || "",
-    }));
-    res.json({ code: 200, data: hotList });
+    const crawler = require("../crawler");
+    const hotList = await crawler.getHotSearch();
+    res.json({ code: 200, data: hotList.slice(0, 15) });
   } catch (err) {
     res.json({ code: 500, data: [], msg: err.message });
   }
@@ -687,7 +717,7 @@ router.get("/compare/charts", async (req, res) => {
     // 1. 获取歌手基本信息
     const placeholders = artistIds.map(() => "?").join(",");
     const [artists] = await pool.execute(
-      `SELECT id, name, avatar_url, album_size, music_size FROM artists WHERE id IN (${placeholders})`,
+      `SELECT id, name, avatar_url, album_size, music_size, followers FROM artists WHERE id IN (${placeholders})`,
       artistIds,
     );
 
@@ -724,6 +754,7 @@ router.get("/compare/charts", async (req, res) => {
         avatar_url: a.avatar_url,
         song_count: a.music_size || 0,
         album_size: a.album_size || 0,
+        followers: a.followers || 0,
         avg_pop:
           pops.length > 0
             ? Math.round(pops.reduce((a, b) => a + b, 0) / pops.length)
@@ -802,18 +833,20 @@ router.get("/compare/charts", async (req, res) => {
     // 雷达图数据归一化处理
     const maxSongCount = Math.max(...data.artists.map((a) => a.song_count), 1);
     const maxAlbumSize = Math.max(...data.artists.map((a) => a.album_size), 1);
-    const maxAvgPop = Math.max(...data.artists.map((a) => a.avg_pop), 1);
+    // 计算年代多样性（不同年代的数量）
+    const eraDiversity = data.artists.map((a) => (a.yearly_trend || []).length);
+    const maxEraDiversity = Math.max(...eraDiversity, 1);
     const maxComments = Math.max(
       ...data.artists.map((a) => a.total_comments),
       1,
     );
 
-    data.radar = data.artists.map((a) => ({
+    data.radar = data.artists.map((a, idx) => ({
       name: a.name,
       // 归一化到 0-100 范围
       歌曲数: Math.round((a.song_count / maxSongCount) * 100),
       专辑数: Math.round((a.album_size / maxAlbumSize) * 100),
-      平均热度: maxAvgPop > 0 ? Math.round((a.avg_pop / maxAvgPop) * 100) : 0,
+      风格数: Math.round((((a.yearly_trend || []).length) / maxEraDiversity) * 100), // 用年代多样性替代风格数
       评论数:
         maxComments > 0
           ? Math.round((a.total_comments / maxComments) * 100)
@@ -822,7 +855,7 @@ router.get("/compare/charts", async (req, res) => {
       _raw: {
         song_count: a.song_count,
         album_size: a.album_size,
-        avg_pop: a.avg_pop,
+        style_count: (a.yearly_trend || []).length,
         total_comments: a.total_comments,
       },
     }));
@@ -860,7 +893,7 @@ router.get("/compare/charts", async (req, res) => {
               (chartCounts[chartType][artId] || 0) + 1;
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     data.chartCounts = data.artists.map((a) => ({
@@ -890,21 +923,21 @@ router.get("/hotsongs", async (req, res) => {
     try {
       await pool.execute(
         "CREATE TABLE IF NOT EXISTS hot_songs (" +
-          "id BIGINT," +
-          "chart_type VARCHAR(20) DEFAULT 'hot'," +
-          "name VARCHAR(500) NOT NULL," +
-          "artists TEXT," +
-          "album_name VARCHAR(500)," +
-          "album_id BIGINT," +
-          "popularity INT DEFAULT 0," +
-          "duration INT DEFAULT 0," +
-          "publish_year INT," +
-          "ranking INT DEFAULT 0," +
-          "last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-          "PRIMARY KEY (id, chart_type)" +
-          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+        "id BIGINT," +
+        "chart_type VARCHAR(20) DEFAULT 'hot'," +
+        "name VARCHAR(500) NOT NULL," +
+        "artists TEXT," +
+        "album_name VARCHAR(500)," +
+        "album_id BIGINT," +
+        "popularity INT DEFAULT 0," +
+        "duration INT DEFAULT 0," +
+        "publish_year INT," +
+        "ranking INT DEFAULT 0," +
+        "last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+        "PRIMARY KEY (id, chart_type)" +
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
       );
-    } catch (e) {}
+    } catch (e) { }
 
     // 清空旧数据并重新爬取所有排行榜
     await pool.execute("DELETE FROM hot_songs");
@@ -1549,7 +1582,7 @@ router.get("/comments/wordcloud", async (req, res) => {
           });
           allCommentTexts.push(...comments);
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const combinedText = allCommentTexts.join("\n");

@@ -20,13 +20,13 @@ export default function BubbleChart({ data }) {
         tooltip: {
           trigger: "item",
           formatter: (p) =>
-            `${p.value[3]}<br/>粉丝: ${(p.value[0] / 1e4).toFixed(0)}万<br/>总播放: ${(p.value[1] / 1e8).toFixed(1)}亿<br/>平均评论: ${p.value[2].toFixed(0)}`,
+            `${p.value[3]}<br/>歌曲数: ${p.value[0].toFixed(0)}首<br/>总播放: ${(p.value[1] / 1e8).toFixed(1)}亿<br/>平均评论: ${p.value[2].toFixed(0)}`,
         },
         grid: { left: 70, right: 30, top: 20, bottom: 50 },
         xAxis: {
           type: "value",
-          name: "粉丝数",
-          axisLabel: { formatter: (v) => (v / 1e4).toFixed(0) + "万" },
+          name: "歌曲数",
+          axisLabel: { formatter: (v) => v.toFixed(0) + "首" },
         },
         yAxis: {
           type: "value",
@@ -42,7 +42,7 @@ export default function BubbleChart({ data }) {
           {
             type: "scatter",
             data: data.map((d) => [
-              d.followers,
+              d.song_count,
               d.total_plays,
               d.avg_comments,
               d.name,

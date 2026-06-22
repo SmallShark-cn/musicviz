@@ -1,7 +1,13 @@
 import { useState, useCallback } from 'react';
 
-// 可拖拽的图表类型定义
-export const CHART_TYPES = {
+// 可拖拽的面板类型定义
+export const PANEL_TYPES = {
+  // 固定面板（不可拖拽）
+  COMPARE: 'compare',
+
+  // 可拖拽面板
+  ARTIST_INFO: 'artist_info',
+  HOT_SEARCH: 'hot_search',
   RADAR: 'radar',
   RANKING: 'ranking',
   LYRIC_WORDCLOUD: 'lyric_wordcloud',
@@ -13,48 +19,49 @@ export const CHART_TYPES = {
   GROUPED_BAR: 'grouped_bar',
   PLAYS_TREND: 'plays_trend',
   STYLE_PIE: 'style_pie',
-  STYLE_HEATMAP: 'style_heatmap',
   ALBUM_DONUT: 'album_donut',
   STACKED_ERA: 'stacked_era',
   SCATTER: 'scatter',
 };
 
-// 图表配置信息
-export const CHART_CONFIG = {
-  [CHART_TYPES.RADAR]: { icon: '📋', title: '多歌手指标对比 (雷达图)', span: 1 },
-  [CHART_TYPES.RANKING]: { icon: '🔥', title: 'Top10 歌曲评论数排名', span: 1 },
-  [CHART_TYPES.LYRIC_WORDCLOUD]: { icon: '☁️', title: 'Top10歌曲歌词词云', span: 2 },
-  [CHART_TYPES.MAP]: { icon: '🗺️', title: '歌手归属地热力地图', span: 3 },
-  [CHART_TYPES.SENTIMENT]: { icon: '😊', title: '评论情感分析', span: 1 },
-  [CHART_TYPES.TOPIC]: { icon: '🏷️', title: '评论主题聚类', span: 2 },
-  [CHART_TYPES.ERA_PIE]: { icon: '🥧', title: '歌曲年代分布占比', span: 1 },
-  [CHART_TYPES.YEARLY_TREND]: { icon: '📈', title: '各歌手年度产出趋势', span: 2 },
-  [CHART_TYPES.GROUPED_BAR]: { icon: '📊', title: '歌手核心指标分组对比', span: 2 },
-  [CHART_TYPES.PLAYS_TREND]: { icon: '📉', title: '播放量排名衰减曲线', span: 1 },
-  [CHART_TYPES.STYLE_PIE]: { icon: '🎵', title: '风格标签分布占比', span: 1 },
-  [CHART_TYPES.STYLE_HEATMAP]: { icon: '🌡️', title: '风格-粉丝数相关性热力图', span: 2 },
-  [CHART_TYPES.ALBUM_DONUT]: { icon: '💿', title: '热门专辑评论占比', span: 1 },
-  [CHART_TYPES.STACKED_ERA]: { icon: '📚', title: '不同时期音乐风格演变', span: 2 },
-  [CHART_TYPES.SCATTER]: { icon: '🎯', title: '粉丝数 vs 评论数 (散点图)', span: 1 },
+// 面板配置信息
+export const PANEL_CONFIG = {
+  [PANEL_TYPES.ARTIST_INFO]: { icon: '📝', title: '歌手简介', span: 3 },
+  [PANEL_TYPES.HOT_SEARCH]: { icon: '🔥', title: '实时热搜榜', span: 1 },
+  [PANEL_TYPES.RADAR]: { icon: '📋', title: '多歌手指标对比 (雷达图)', span: 1 },
+  [PANEL_TYPES.RANKING]: { icon: '🔥', title: 'Top10 歌曲评论数排名', span: 1 },
+  [PANEL_TYPES.LYRIC_WORDCLOUD]: { icon: '☁️', title: 'Top10歌曲歌词词云', span: 1 },
+  [PANEL_TYPES.MAP]: { icon: '🗺️', title: '歌手归属地热力地图', span: 1 },
+  [PANEL_TYPES.SENTIMENT]: { icon: '😊', title: '评论情感分析', span: 1 },
+  [PANEL_TYPES.TOPIC]: { icon: '🏷️', title: '评论主题聚类', span: 1 },
+  [PANEL_TYPES.ERA_PIE]: { icon: '🥧', title: '歌曲年代分布占比', span: 1 },
+  [PANEL_TYPES.YEARLY_TREND]: { icon: '📈', title: '各歌手年度产出趋势', span: 1 },
+  [PANEL_TYPES.GROUPED_BAR]: { icon: '📊', title: '歌手核心指标分组对比', span: 1 },
+  [PANEL_TYPES.PLAYS_TREND]: { icon: '📉', title: '播放量排名衰减曲线', span: 1 },
+  [PANEL_TYPES.STYLE_PIE]: { icon: '🎵', title: '风格标签分布占比', span: 1 },
+  [PANEL_TYPES.ALBUM_DONUT]: { icon: '💿', title: '热门专辑评论占比', span: 1 },
+  [PANEL_TYPES.STACKED_ERA]: { icon: '📚', title: '不同时期音乐风格演变', span: 1 },
+  [PANEL_TYPES.SCATTER]: { icon: '🎯', title: '粉丝数 vs 评论数 (散点图)', span: 1 },
 };
 
-// 默认布局：15张图
+// 默认布局
 const DEFAULT_LAYOUT = [
-  CHART_TYPES.RADAR,
-  CHART_TYPES.RANKING,
-  CHART_TYPES.GROUPED_BAR,
-  CHART_TYPES.YEARLY_TREND,
-  CHART_TYPES.LYRIC_WORDCLOUD,
-  CHART_TYPES.ERA_PIE,
-  CHART_TYPES.PLAYS_TREND,
-  CHART_TYPES.SCATTER,
-  CHART_TYPES.MAP,
-  CHART_TYPES.STYLE_PIE,
-  CHART_TYPES.STYLE_HEATMAP,
-  CHART_TYPES.ALBUM_DONUT,
-  CHART_TYPES.STACKED_ERA,
-  CHART_TYPES.SENTIMENT,
-  CHART_TYPES.TOPIC,
+  PANEL_TYPES.ARTIST_INFO,
+  PANEL_TYPES.HOT_SEARCH,
+  PANEL_TYPES.RADAR,
+  PANEL_TYPES.RANKING,
+  PANEL_TYPES.GROUPED_BAR,
+  PANEL_TYPES.YEARLY_TREND,
+  PANEL_TYPES.LYRIC_WORDCLOUD,
+  PANEL_TYPES.ERA_PIE,
+  PANEL_TYPES.PLAYS_TREND,
+  PANEL_TYPES.SCATTER,
+  PANEL_TYPES.MAP,
+  PANEL_TYPES.STYLE_PIE,
+  PANEL_TYPES.ALBUM_DONUT,
+  PANEL_TYPES.STACKED_ERA,
+  PANEL_TYPES.SENTIMENT,
+  PANEL_TYPES.TOPIC,
 ];
 
 export function useDragDrop() {

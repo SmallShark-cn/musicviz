@@ -191,7 +191,8 @@ async function crawlAndSaveArtist(artistId) {
         ON DUPLICATE KEY UPDATE
           name = VALUES(name),
           publish_time = VALUES(publish_time),
-          song_count = VALUES(song_count)`;
+          song_count = VALUES(song_count),
+          comment_count = VALUES(comment_count)`;
       for (const al of albums) {
         const pt = al.publishTime
           ? new Date(al.publishTime).toISOString().split("T")[0]

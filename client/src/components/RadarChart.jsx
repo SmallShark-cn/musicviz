@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
 
-const DIMS = ["歌曲数", "专辑数", "平均热度", "评论数"];
+const DIMS = ["歌曲数", "专辑数", "风格数", "评论数"];
 
 export default function RadarChart({ data }) {
   const { theme } = useTheme();
@@ -39,7 +39,7 @@ export default function RadarChart({ data }) {
               return `${d.name}<br/>` +
                 `歌曲数: ${raw.song_count || d["歌曲数"]}<br/>` +
                 `专辑数: ${raw.album_size || d["专辑数"]}<br/>` +
-                `平均热度: ${raw.avg_pop || d["平均热度"]}<br/>` +
+                `风格数: ${raw.style_count || d["风格数"]}<br/>` +
                 `评论数: ${(raw.total_comments || d["评论数"]).toLocaleString()}`;
             },
           },
@@ -64,7 +64,7 @@ export default function RadarChart({ data }) {
                 value: [
                   d["歌曲数"] || 0,
                   d["专辑数"] || 0,
-                  d["平均热度"] || 0,
+                  d["风格数"] || 0,
                   d["评论数"] || 0,
                 ],
                 lineStyle: { color: colors[i % colors.length], width: 2 },

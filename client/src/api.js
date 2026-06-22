@@ -38,7 +38,8 @@ export const getTop10Comments = (artistId) =>
   fetchApi(`/chart/top10-comments${artistId ? `?artist_id=${artistId}` : ""}`);
 export const getPlaysTrend = (artistId) =>
   fetchApi(`/chart/plays-trend${artistId ? `?artist_id=${artistId}` : ""}`);
-export const getEraTrend = () => fetchApi("/chart/era-trend");
+export const getEraTrend = (artistId) =>
+  fetchApi(`/chart/era-trend${artistId ? `?artist_id=${artistId}` : ""}`);
 export const getCommentWordcloud = (artistId) =>
   fetchApi(
     `/chart/comment-wordcloud${artistId ? `?artist_id=${artistId}` : ""}`,
@@ -48,7 +49,8 @@ export const getStyleBoxplot = () => fetchApi("/chart/style-boxplot");
 export const getScatter = () => fetchApi("/chart/scatter");
 export const getRadar = (ids) =>
   fetchApi(`/chart/radar${ids ? `?ids=${ids}` : ""}`);
-export const getAlbumDonut = () => fetchApi("/chart/album-donut");
+export const getAlbumDonut = (artistId) =>
+  fetchApi(`/chart/album-donut${artistId ? `?artist_id=${artistId}` : ""}`);
 export const getViolin = () => fetchApi("/chart/violin");
 export const getStackedEra = () => fetchApi("/chart/stacked-era");
 export const getSankey = () => fetchApi("/chart/sankey");

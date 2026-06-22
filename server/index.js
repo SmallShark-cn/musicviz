@@ -4,6 +4,17 @@ const cors = require("cors");
 const { initDatabase } = require("./db");
 const apiRoutes = require("./routes/api");
 
+// 处理未处理的Promise拒绝
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("未处理的Promise拒绝:", reason);
+});
+
+// 处理未捕获的异常
+process.on("uncaughtException", (err) => {
+  console.error("未捕获的异常:", err);
+  process.exit(1);
+});
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 

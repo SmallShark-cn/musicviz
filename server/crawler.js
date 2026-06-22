@@ -10,8 +10,11 @@ const crypto = require("crypto");
 // Cookie / Session 管理
 // ============================================================
 
-let cookieJar = "";
-let csrfToken = "";
+// 用户提供的登录态Cookie（用于获取粉丝数等需要登录的功能）
+const USER_COOKIE = '_ntes_nnid=7904eea0e9797c762a2641d9077b5540,1762224547989; _ntes_nuid=7904eea0e9797c762a2641d9077b5540; NMTID=00O68yenl7ArFfKREi6p5FQ4rnKrT0AAAGaTMSqSQ; WEVNSM=1.0.0; WNMCID=xxreko.1762224548968.01.0; WM_TID=Po49cJJHS6NEERVVFEKWzDSgtCSd7PM3; ntes_utid=tid._.HY6x9QHRLgJEV1EQUALDmCD19XGaFw2s._.0; sDeviceId=YD-Bzi5MbMB7mFAUwFQEVLC2DCxtCHLE1i8; __snaker__id=81jjfC65uBb4T9ip; ntes_kaola_ad=1; nts_mail_user=axwl040812@163.com:-1:1; NTES_P_UTID=itWbo7GLjT5sIHvgJibH3uqA8bHeTc3X|1775458611; P_INFO=15922079023|1780825749|1|music|00&99|null&null&null#heb&130100#10#0|&0|null|15922079023; _iuqxldmzr_=32; Hm_lvt_1483fb4774c02a30ffa6f0e2945e9b70=1780901822,1781576402,1782090194; HMACCOUNT=BA6F0F854698C7D1; WM_NI=27lSYQ2E71qBGgO49KHjzVNNmK0YRMGxqYKe%2FrQUObLzkQ7bpKFr%2B%2BGVs2%2FIWDY7Gau%2FLSlz6O5m0Q3ZHG%2F%2BRfyI2Q3vaJ%2BPKnm%2BOGf%2BwgiapeXzalJK%2BrcfCwchj0lPMUo%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6ee97b679fc9c9adaaa7993b08ba6c45e878f8eacc63ea6a6a894f268b19aada4db2af0fea7c3b92af2e9a4b4dc5bf29bf9d2f44a85b981d5bc418cb6b6b7cd46af9500bad14785a8bfbaca6fedae9fb6ce6a90a6a5b2b66ab4958a93aa21858abdd3ae43959c97d8c66bb7f184b4ef72f691fb8eb35bf18688a8ae2192bab7aab15bf1aaafabaa5c89b2a3ccce4da6f5b988ec6bb4bb989be4688a95e593e26e81a9ad89e93cb09083b6ee37e2a3; JSESSIONID-WYYY=ymNkgoOFiE%5CYtssm73%2FzZ1mQ6xOjAZN%2BMZTKxxc%2B83DdBH3Hk9KwkDzo9eP19x5oGZDKbFyHARUgdvRnxei3fMpomPFnmN%2BXPnQQKo8SGlt2k69%2Bov7Th7n%5CdzPpg%2BWKevgvbKUzqzosnlBT6qTrHr6%2BZVFQyqKe4WVisc%2BeXYgZOd2Z%3A1782093735017; gdxidpyhxdE=U1z8jRmys6y%5CC2Usgt0SL%2FTlZWMzmV%2Bo5EdtQxM7rUpg%2FUuO0g9Mi3%2BfyHrDEo%2BI%2Bw%5CKQxUaG%5COIoXS%2BCKDB6vNvy19zVKDtnts0IfvgPv%2F4r%5CIQ9oYNt%2Bnw%2B5ehx%5CrHR6bPiLI68HnHfQnEtXVJC7MXzv2vOsS8zoWCWrbsCszIlb5C%3A1782093595594; __csrf=5926969fd5ec7a23456bb83865e837ff; Hm_lpvt_1483fb4774c02a30ffa6f0e2945e9b70=1782092735';
+
+let cookieJar = USER_COOKIE; // 直接使用登录态Cookie
+let csrfToken = "5926969fd5ec7a23456bb83865e837ff"; // 从Cookie中提取的csrf token
 
 /**
  * 初始化 session：访问首页获取 cookie 和 csrf_token
@@ -231,8 +234,8 @@ async function search(keyword, type = "100", limit = 30, offset = 0) {
         alias: a.alias || [],
         music_size: a.musicSize || 0,
         album_size: a.albumSize || 0,
-        // fansSize 始终为 null，搜索接口不返回真实粉丝数
-        followers: 0,
+        // 搜索接口返回粉丝数在 fansSize 字段中
+        followers: a.fansSize || 0,
         brief_desc: a.briefDesc || "",
         trans_name: a.trans || "",
         identity: a.identity || [],
@@ -476,17 +479,24 @@ async function getArtistDetail(artistId) {
     if (introRes && introRes.code === 200 && introRes.briefDesc) {
       briefDesc = introRes.briefDesc;
     }
-  } catch {}
+  } catch { }
 
   // 从简介中提取地区
   const region = extractRegionFromDesc(briefDesc);
+
+  // 获取粉丝数
+  let followers = 0;
+  try {
+    followers = await getArtistFollowers(artistId);
+  } catch (e) {
+    console.log(`[爬虫] 获取粉丝数失败: ${e.message}`);
+  }
 
   return {
     id: a.id || artistId,
     name: a.name || "",
     avatar_url: a.picUrl || a.cover || a.img1v1Url || "",
-    // accountId 不是粉丝数，fansSize 始终为 null
-    followers: 0,
+    followers: followers,
     brief_desc: briefDesc,
     region: region,
     music_size: a.musicSize || 0,
@@ -528,42 +538,90 @@ async function getArtistTopSongs(artistId) {
 
 /**
  * 获取相似歌手
- * 使用本地 NeteaseCloudMusicApi 服务
+ * 从歌手页面HTML中解析相似歌手
+ * URL格式: https://music.163.com/artist?id=7763
  */
 async function getSimilarArtists(artistId) {
   console.log(`[爬虫] similar artists: ${artistId}`);
 
   try {
-    // 使用本地 NeteaseCloudMusicApi 服务（端口4000）
-    const url = `http://localhost:4000/simi/artist?id=${artistId}`;
+    // 直接访问歌手页面
+    const url = `https://music.163.com/artist?id=${artistId}`;
+    console.log(`[爬虫] 获取相似歌手: ${url}`);
 
-    const res = await axios.get(url, {
+    const htmlRes = await axios.get(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "Cookie": cookieJar,
+        "Referer": "https://music.163.com/",
+      },
       timeout: 10000,
     });
 
-    const data = res.data;
+    const html = htmlRes.data;
 
-    if (!data || data.code !== 200) {
-      console.log(`[爬虫] API 返回错误: code=${data?.code}`);
-      return [];
+    // 查找相似歌手区域
+    // HTML结构: <span class="f-fl">相似歌手</span> 后面跟着 <ul class="m-hdlist">...</ul>
+    // 或者直接查找 <a href="/artist?id=xxx" class="nm nm-icn f-thide s-fc0">歌手名</a>
+
+    const similarArtists = [];
+
+    // 方法1: 查找相似歌手区块后的歌手链接
+    // 匹配模式: 找到"相似歌手"文本，然后在后面的内容中提取歌手链接
+    const simSectionMatch = html.match(/相似歌手[\s\S]*?<ul[^>]*class="m-hdlist"[^>]*>([\s\S]*?)<\/ul>/i);
+
+    if (simSectionMatch) {
+      const sectionHtml = simSectionMatch[1];
+      // 提取歌手信息: <a href="/artist?id=12345" class="nm nm-icn f-thide s-fc0">歌手名</a>
+      const artistRegex = /<a[^>]*href="\/artist\?id=(\d+)"[^>]*class="[^"]*nm[^"]*"[^>]*>([^<]+)<\/a>/gi;
+      let match;
+
+      while ((match = artistRegex.exec(sectionHtml)) !== null && similarArtists.length < 6) {
+        const id = parseInt(match[1], 10);
+        const name = match[2].trim();
+
+        // 尝试提取头像
+        const avatarMatch = sectionHtml.match(new RegExp(`<img[^>]*data-src="([^"]+)"[^>]*>`, 'i'));
+        const avatar = avatarMatch ? avatarMatch[1].replace(/http:/, 'https:') : '';
+
+        if (id && name) {
+          similarArtists.push({
+            id,
+            name,
+            avatar_url: avatar,
+            similarity_score: 0,
+          });
+        }
+      }
     }
 
-    const rawArtists = data.artists || [];
+    // 方法2: 如果方法1失败，尝试更通用的匹配
+    if (similarArtists.length === 0) {
+      // 查找所有歌手链接，排除当前歌手
+      const allArtistsRegex = /<a[^>]*href="\/artist\?id=(\d+)"[^>]*>([^<]+)<\/a>/gi;
+      let match;
+      const seen = new Set([artistId]);
 
-    if (!Array.isArray(rawArtists) || rawArtists.length === 0) {
-      console.log(`[爬虫] 未获取到相似歌手数据`);
-      return [];
+      while ((match = allArtistsRegex.exec(html)) !== null && similarArtists.length < 6) {
+        const id = parseInt(match[1], 10);
+        const name = match[2].trim();
+
+        if (id && name && !seen.has(id)) {
+          seen.add(id);
+          similarArtists.push({
+            id,
+            name,
+            avatar_url: '',
+            similarity_score: 0,
+          });
+        }
+      }
     }
 
-    console.log(`[爬虫] 成功获取 ${rawArtists.length} 位相似歌手`);
-
-    // 只返回前6个相似歌手
-    return rawArtists.slice(0, 6).map((a) => ({
-      id: a.id,
-      name: a.name,
-      avatar_url: a.picUrl || a.img1v1Url || "",
-      similarity_score: 0,
-    }));
+    console.log(`[爬虫] 成功获取 ${similarArtists.length} 位相似歌手`);
+    return similarArtists;
   } catch (error) {
     console.error(`[爬虫] 获取相似歌手失败:`, error.message);
     return [];
@@ -648,25 +706,85 @@ async function getBatchCommentCounts(songIds) {
 }
 
 /**
- * 获取歌手粉丝数（需要登录态，公开API不返回）
- * 尝试从歌手详情页获取
+ * 获取歌手粉丝数
+ * 从歌手用户主页HTML中解析粉丝数
+ * URL格式: https://music.163.com/user/home?id={userId}
+ * HTML字段: <strong id="fan_count">14216514</strong>
  */
-async function getArtistFollowers(artistId) {
-  // 网易云公开API不返回粉丝数，尝试从其他接口获取
-  const url = `https://music.163.com/api/artist/detail?id=${artistId}&csrf_token=${csrfToken}`;
+// 已知歌手的accountId映射表（歌手ID -> 用户ID）
+const ARTIST_ACCOUNT_MAP = {
+  6452: 281382,    // 周杰伦
+  13193: 38672879, // 林俊杰 (旧ID)
+  3684: 38672879,  // 林俊杰 (新ID)
+  5346: 12138950,  // 张学友
+  7763: 35740139,  // 陈奕迅
+  1050282: 29879271, // 邓紫棋
+  1045124: 460912, // 华晨宇
+  5771: 51801979,  // 周深
+  1055927: 38361126, // 毛不易
+  1024220: 175326, // 薛之谦
+  1050662: 12143967, // 李荣浩
+  1197201: 29593150, // 吴青峰
+  1040383: 29802127, // 买辣椒也用券
+};
+
+/**
+ * 获取歌手粉丝数
+ * @param {number} artistId 歌手ID
+ * @param {number} accountId 可选的用户账号ID
+ * @returns {Promise<number>} 粉丝数
+ */
+async function getArtistFollowers(artistId, accountId = null) {
   try {
-    const data = await request(url);
-    if (data.code === 200 && data.data?.artist) {
-      // 尝试多个可能的字段
-      return (
-        data.data.artist.followers ||
-        data.data.artist.fansSize ||
-        data.data.artist.followeds ||
-        0
-      );
+    // 优先使用传入的accountId，否则使用映射表
+    if (!accountId) {
+      accountId = ARTIST_ACCOUNT_MAP[artistId];
     }
-  } catch (e) {}
-  return 0;
+
+    if (!accountId) {
+      console.log(`[爬虫] 歌手无accountId映射: ${artistId}`);
+      return 0;
+    }
+
+    // 访问用户主页获取粉丝数
+    const userHomeUrl = `https://music.163.com/user/home?id=${accountId}`;
+    console.log(`[爬虫] 获取粉丝数: ${userHomeUrl}`);
+
+    const htmlRes = await axios.get(userHomeUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "Cookie": cookieJar,
+        "Referer": "https://music.163.com/",
+      },
+      timeout: 10000,
+    });
+
+    const html = htmlRes.data;
+
+    // 解析 <strong id="fan_count">14216514</strong>
+    const fanCountMatch = html.match(/<strong\s+id="fan_count"[^>]*>(\d+)<\/strong>/i);
+    if (fanCountMatch) {
+      const fans = parseInt(fanCountMatch[1], 10);
+      console.log(`[爬虫] 成功获取粉丝数: ${artistId} -> ${fans}`);
+      return fans;
+    }
+
+    // 备用：尝试其他格式
+    const altMatch = html.match(/id="fan_count"[^>]*>(\d+)/i);
+    if (altMatch) {
+      const fans = parseInt(altMatch[1], 10);
+      console.log(`[爬虫] 成功获取粉丝数(备用): ${artistId} -> ${fans}`);
+      return fans;
+    }
+
+    console.log(`[爬虫] 未找到粉丝数字段: ${artistId}`);
+    return 0;
+  } catch (e) {
+    console.error(`[爬虫] 获取粉丝数失败: ${artistId} - ${e.message}`);
+    return 0;
+  }
 }
 
 /**
@@ -815,8 +933,69 @@ async function getSongComments(songId, limit) {
   try {
     const data = await request(url);
     if (data.code !== 200) return [];
-    return (data.hotComments || data.comments || []).map(function(c) { return c.content || ""; });
+    return (data.hotComments || data.comments || []).map(function (c) { return c.content || ""; });
   } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * 获取热搜列表
+ * 使用热歌榜数据模拟热搜榜
+ */
+async function getHotSearch() {
+  console.log(`[爬虫] 获取热搜列表（使用热歌榜数据）`);
+
+  try {
+    // 使用热歌榜数据模拟热搜
+    const hotSongs = await getHotSongsFromPlaylist();
+
+    // 将歌曲数据转换为热搜格式
+    const hotList = hotSongs.map((song, index) => ({
+      searchWord: song.name,
+      score: Math.max(1000000 - index * 10000, 100000), // 模拟热度值
+      iconType: index < 3 ? 1 : 0, // 前三名标为热
+      content: `${song.artists} - ${song.album_name}`,
+      url: `https://music.163.com/song?id=${song.id}`,
+      hotValue: Math.max(1000000 - index * 10000, 100000),
+      ranking: index + 1,
+    }));
+
+    console.log(`[爬虫] 成功获取 ${hotList.length} 条热搜数据`);
+    return hotList;
+  } catch (e) {
+    console.error(`[爬虫] 获取热搜失败: ${e.message}`);
+    return [];
+  }
+}
+
+/**
+ * 获取热歌榜数据
+ */
+async function getHotSongsFromPlaylist(playlistId = '3778678') {
+  const url = `https://music.163.com/api/v3/playlist/detail?id=${playlistId}`;
+  console.log(`[爬虫] 获取热歌榜: ${playlistId}`);
+
+  try {
+    const data = await request(url);
+
+    if (data.code !== 200) {
+      console.log(`[爬虫] 热歌榜API返回 code=${data.code}`);
+      return [];
+    }
+
+    const tracks = data.playlist?.tracks || data.data?.playlist?.tracks || [];
+
+    return tracks.slice(0, 20).map((track) => ({
+      id: track.id,
+      name: track.name,
+      artists: (track.artists || track.ar || []).map(a => a.name).join(' / '),
+      album_name: track.album?.name || track.al?.name || '',
+      plays: track.pop || 0,
+      duration: track.duration || track.dt || 0,
+    }));
+  } catch (e) {
+    console.error(`[爬虫] 获取热歌榜失败: ${e.message}`);
     return [];
   }
 }
@@ -834,6 +1013,7 @@ module.exports = {
   getArtistFollowers,
   getSongLyric,
   getSongComments,
+  getHotSearch,
   getCookie: () => cookieJar,
   getCsrf: () => csrfToken,
 };

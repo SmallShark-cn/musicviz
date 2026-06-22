@@ -51,7 +51,8 @@ async function initSession() {
           headers: {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
-            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             Referer: "https://music.163.com/",
           },
           timeout: 10000,
@@ -59,7 +60,9 @@ async function initSession() {
         });
         const loginSetCookie = loginRes.headers["set-cookie"];
         if (loginSetCookie && loginSetCookie.length > 0) {
-          const newCookies = loginSetCookie.map((c) => c.split(";")[0]).join("; ");
+          const newCookies = loginSetCookie
+            .map((c) => c.split(";")[0])
+            .join("; ");
           cookieJar = cookieJar ? `${cookieJar}; ${newCookies}` : newCookies;
         }
       } catch (e) {
@@ -103,7 +106,7 @@ async function initSession() {
         csrfToken = musicUMatch[1].substring(0, 32);
       } else {
         // 生成一个随机的 csrf token（某些公开 API 允许）
-        csrfToken = crypto.randomBytes(16).toString('hex');
+        csrfToken = crypto.randomBytes(16).toString("hex");
       }
     }
 
@@ -114,7 +117,7 @@ async function initSession() {
     console.error(`[爬虫] 初始化 session 失败: ${e.message}`);
     // 即使失败也生成一个 csrf token
     if (!csrfToken) {
-      csrfToken = crypto.randomBytes(16).toString('hex');
+      csrfToken = crypto.randomBytes(16).toString("hex");
     }
   }
 }
@@ -283,15 +286,30 @@ function extractRegionFromDesc(desc) {
     return "中国澳门";
   }
   // 美国相关
-  if (desc.includes("美国") || desc.includes("USA") || desc.includes("American") || /\bUS\b/.test(desc)) {
+  if (
+    desc.includes("美国") ||
+    desc.includes("USA") ||
+    desc.includes("American") ||
+    /\bUS\b/.test(desc)
+  ) {
     return "美国";
   }
   // 日本相关
-  if (desc.includes("日本") || desc.includes("东京") || /\bJapan\b/i.test(desc) || /\bJapanese\b/i.test(desc)) {
+  if (
+    desc.includes("日本") ||
+    desc.includes("东京") ||
+    /\bJapan\b/i.test(desc) ||
+    /\bJapanese\b/i.test(desc)
+  ) {
     return "日本";
   }
   // 韩国相关
-  if (desc.includes("韩国") || desc.includes("首尔") || /\bKorea\b/i.test(desc) || /\bKorean\b/i.test(desc)) {
+  if (
+    desc.includes("韩国") ||
+    desc.includes("首尔") ||
+    /\bKorea\b/i.test(desc) ||
+    /\bKorean\b/i.test(desc)
+  ) {
     return "韩国";
   }
   // 新加坡相关
@@ -299,67 +317,138 @@ function extractRegionFromDesc(desc) {
     return "新加坡";
   }
   // 马来西亚相关
-  if (desc.includes("马来西亚") || /\bMalaysia\b/i.test(desc) || /\bMalaysian\b/i.test(desc)) {
+  if (
+    desc.includes("马来西亚") ||
+    /\bMalaysia\b/i.test(desc) ||
+    /\bMalaysian\b/i.test(desc)
+  ) {
     return "马来西亚";
   }
   // 英国相关
-  if (desc.includes("英国") || desc.includes("伦敦") || /\bUK\b/.test(desc) || /\bUnited Kingdom\b/i.test(desc) || /\bBritish\b/i.test(desc) || /\bEngland\b/i.test(desc)) {
+  if (
+    desc.includes("英国") ||
+    desc.includes("伦敦") ||
+    /\bUK\b/.test(desc) ||
+    /\bUnited Kingdom\b/i.test(desc) ||
+    /\bBritish\b/i.test(desc) ||
+    /\bEngland\b/i.test(desc)
+  ) {
     return "英国";
   }
   // 法国相关
-  if (desc.includes("法国") || desc.includes("巴黎") || /\bFrance\b/i.test(desc) || /\bFrench\b/i.test(desc)) {
+  if (
+    desc.includes("法国") ||
+    desc.includes("巴黎") ||
+    /\bFrance\b/i.test(desc) ||
+    /\bFrench\b/i.test(desc)
+  ) {
     return "法国";
   }
   // 德国相关
-  if (desc.includes("德国") || /\bGermany\b/i.test(desc) || /\bGerman\b/i.test(desc)) {
+  if (
+    desc.includes("德国") ||
+    /\bGermany\b/i.test(desc) ||
+    /\bGerman\b/i.test(desc)
+  ) {
     return "德国";
   }
   // 荷兰相关
-  if (desc.includes("荷兰") || /\bNetherlands\b/i.test(desc) || /\bDutch\b/i.test(desc) || /\bHolland\b/i.test(desc)) {
+  if (
+    desc.includes("荷兰") ||
+    /\bNetherlands\b/i.test(desc) ||
+    /\bDutch\b/i.test(desc) ||
+    /\bHolland\b/i.test(desc)
+  ) {
     return "荷兰";
   }
   // 加拿大相关
-  if (desc.includes("加拿大") || /\bCanada\b/i.test(desc) || /\bCanadian\b/i.test(desc)) {
+  if (
+    desc.includes("加拿大") ||
+    /\bCanada\b/i.test(desc) ||
+    /\bCanadian\b/i.test(desc)
+  ) {
     return "加拿大";
   }
   // 澳大利亚相关
-  if (desc.includes("澳大利亚") || desc.includes("澳洲") || /\bAustralia\b/i.test(desc) || /\bAustralian\b/i.test(desc)) {
+  if (
+    desc.includes("澳大利亚") ||
+    desc.includes("澳洲") ||
+    /\bAustralia\b/i.test(desc) ||
+    /\bAustralian\b/i.test(desc)
+  ) {
     return "澳大利亚";
   }
   // 瑞典相关
-  if (desc.includes("瑞典") || /\bSweden\b/i.test(desc) || /\bSwedish\b/i.test(desc)) {
+  if (
+    desc.includes("瑞典") ||
+    /\bSweden\b/i.test(desc) ||
+    /\bSwedish\b/i.test(desc)
+  ) {
     return "瑞典";
   }
   // 挪威相关
-  if (desc.includes("挪威") || /\bNorway\b/i.test(desc) || /\bNorwegian\b/i.test(desc)) {
+  if (
+    desc.includes("挪威") ||
+    /\bNorway\b/i.test(desc) ||
+    /\bNorwegian\b/i.test(desc)
+  ) {
     return "挪威";
   }
   // 意大利相关
-  if (desc.includes("意大利") || /\bItaly\b/i.test(desc) || /\bItalian\b/i.test(desc)) {
+  if (
+    desc.includes("意大利") ||
+    /\bItaly\b/i.test(desc) ||
+    /\bItalian\b/i.test(desc)
+  ) {
     return "意大利";
   }
   // 西班牙相关
-  if (desc.includes("西班牙") || /\bSpain\b/i.test(desc) || /\bSpanish\b/i.test(desc)) {
+  if (
+    desc.includes("西班牙") ||
+    /\bSpain\b/i.test(desc) ||
+    /\bSpanish\b/i.test(desc)
+  ) {
     return "西班牙";
   }
   // 巴西相关
-  if (desc.includes("巴西") || /\bBrazil\b/i.test(desc) || /\bBrazilian\b/i.test(desc)) {
+  if (
+    desc.includes("巴西") ||
+    /\bBrazil\b/i.test(desc) ||
+    /\bBrazilian\b/i.test(desc)
+  ) {
     return "巴西";
   }
   // 印度相关
-  if (desc.includes("印度") || /\bIndia\b/i.test(desc) || /\bIndian\b/i.test(desc)) {
+  if (
+    desc.includes("印度") ||
+    /\bIndia\b/i.test(desc) ||
+    /\bIndian\b/i.test(desc)
+  ) {
     return "印度";
   }
   // 泰国相关
-  if (desc.includes("泰国") || /\bThailand\b/i.test(desc) || /\bThai\b/i.test(desc)) {
+  if (
+    desc.includes("泰国") ||
+    /\bThailand\b/i.test(desc) ||
+    /\bThai\b/i.test(desc)
+  ) {
     return "泰国";
   }
   // 菲律宾相关
-  if (desc.includes("菲律宾") || /\bPhilippines\b/i.test(desc) || /\bFilipino\b/i.test(desc)) {
+  if (
+    desc.includes("菲律宾") ||
+    /\bPhilippines\b/i.test(desc) ||
+    /\bFilipino\b/i.test(desc)
+  ) {
     return "菲律宾";
   }
   // 印尼相关
-  if (desc.includes("印尼") || desc.includes("印度尼西亚") || /\bIndonesia\b/i.test(desc) || /\bIndonesian\b/i.test(desc)) {
+  if (
+    desc.includes("印尼") ||
+    desc.includes("印度尼西亚") ||
+    /\bIndonesia\b/i.test(desc) ||
+    /\bIndonesian\b/i.test(desc)
+  ) {
     return "印度尼西亚";
   }
   // 无法识别，返回空字符串
@@ -387,7 +476,7 @@ async function getArtistDetail(artistId) {
     if (introRes && introRes.code === 200 && introRes.briefDesc) {
       briefDesc = introRes.briefDesc;
     }
-  } catch { }
+  } catch {}
 
   // 从简介中提取地区
   const region = extractRegionFromDesc(briefDesc);
@@ -475,7 +564,6 @@ async function getSimilarArtists(artistId) {
       avatar_url: a.picUrl || a.img1v1Url || "",
       similarity_score: 0,
     }));
-
   } catch (error) {
     console.error(`[爬虫] 获取相似歌手失败:`, error.message);
     return [];
@@ -508,7 +596,6 @@ async function getArtistDesc(artistId) {
       briefDesc: data.briefDesc || "",
       introduction: data.introduction || [],
     };
-
   } catch (error) {
     console.error(`[爬虫] 获取歌手描述失败:`, error.message);
     return null;
@@ -578,7 +665,7 @@ async function getArtistFollowers(artistId) {
         0
       );
     }
-  } catch (e) { }
+  } catch (e) {}
   return 0;
 }
 
@@ -597,21 +684,103 @@ async function getSongLyric(songId) {
 
     // 过滤制作信息、 credits 等元数据关键词
     const metaKeywords = [
-      "制作", "编曲", "作词", "作曲", "混音", "监制", "出品", "企划",
-      "统筹", "吉他", "弦乐", "人声", "录音棚", "录音室", "录音师",
-      "母带", "发行", "推广", "营销", "总监", "助理", "编辑",
-      "设计", "封面", "摄影", "造型", "化妆", "发型", "艺人",
-      "经纪", "公司", "有限公司", "工作室", "团队", "鸣谢",
-      "SP", "OP", "ISRC", "ISBN", "版权", "代理", "出品人",
-      "发行人", "A&R", "制作人", "联合", "协力", "协助",
-      "音乐", "总监", "指挥", "演奏", "乐团", "乐队", "合唱",
-      "和声", "和音", "伴唱", "伴奏", "键盘", "贝斯", "鼓手",
-      "打击乐", "管乐", "铜管", "木管", "小提琴", "大提琴",
-      "中提琴", "低音提琴", "竖琴", "钢琴", "合成器", "编程",
-      "采样", "音效", "后期", "缩混", "母带处理", "重新",
-      "牛班", "NEWBAND", "银河", "方舟", "维伴", "青桔",
-      "汪苏", "刘涛", "赵建飞", "陈韵", "王子", "首席",
-      "爱乐乐团", "国际", "录音", "编写", "监制",
+      "制作",
+      "编曲",
+      "作词",
+      "作曲",
+      "混音",
+      "监制",
+      "出品",
+      "企划",
+      "统筹",
+      "吉他",
+      "弦乐",
+      "人声",
+      "录音棚",
+      "录音室",
+      "录音师",
+      "母带",
+      "发行",
+      "推广",
+      "营销",
+      "总监",
+      "助理",
+      "编辑",
+      "设计",
+      "封面",
+      "摄影",
+      "造型",
+      "化妆",
+      "发型",
+      "艺人",
+      "经纪",
+      "公司",
+      "有限公司",
+      "工作室",
+      "团队",
+      "鸣谢",
+      "SP",
+      "OP",
+      "ISRC",
+      "ISBN",
+      "版权",
+      "代理",
+      "出品人",
+      "发行人",
+      "A&R",
+      "制作人",
+      "联合",
+      "协力",
+      "协助",
+      "音乐",
+      "总监",
+      "指挥",
+      "演奏",
+      "乐团",
+      "乐队",
+      "合唱",
+      "和声",
+      "和音",
+      "伴唱",
+      "伴奏",
+      "键盘",
+      "贝斯",
+      "鼓手",
+      "打击乐",
+      "管乐",
+      "铜管",
+      "木管",
+      "小提琴",
+      "大提琴",
+      "中提琴",
+      "低音提琴",
+      "竖琴",
+      "钢琴",
+      "合成器",
+      "编程",
+      "采样",
+      "音效",
+      "后期",
+      "缩混",
+      "母带处理",
+      "重新",
+      "牛班",
+      "NEWBAND",
+      "银河",
+      "方舟",
+      "维伴",
+      "青桔",
+      "汪苏",
+      "刘涛",
+      "赵建飞",
+      "陈韵",
+      "王子",
+      "首席",
+      "爱乐乐团",
+      "国际",
+      "录音",
+      "编写",
+      "监制",
     ];
 
     // 去除时间戳 [00:00.000] 和元数据，保留纯歌词
@@ -636,6 +805,22 @@ async function getSongLyric(songId) {
   }
 }
 
+
+/**
+ * 获取歌曲热门评论内容
+ */
+async function getSongComments(songId, limit) {
+  limit = limit || 50;
+  const url = "https://music.163.com/api/v1/resource/comments/R_SO_4_" + songId + "?limit=" + limit + "&offset=0";
+  try {
+    const data = await request(url);
+    if (data.code !== 200) return [];
+    return (data.hotComments || data.comments || []).map(function(c) { return c.content || ""; });
+  } catch (e) {
+    return [];
+  }
+}
+
 module.exports = {
   initSession,
   searchSuggest,
@@ -648,6 +833,7 @@ module.exports = {
   getBatchCommentCounts,
   getArtistFollowers,
   getSongLyric,
+  getSongComments,
   getCookie: () => cookieJar,
   getCsrf: () => csrfToken,
 };

@@ -20,12 +20,12 @@ export default function ScatterChart({ data }) {
         tooltip: {
           trigger: "item",
           formatter: (p) =>
-            `${p.value[2]}<br/>粉丝: ${p.value[0].toLocaleString()}<br/>平均评论: ${p.value[1].toFixed(1)}`,
+            `${p.value[2]}<br/>歌曲数: ${p.value[0].toLocaleString()}<br/>平均评论: ${p.value[1].toFixed(1)}`,
         },
         grid: { left: 70, right: 30, top: 20, bottom: 50 },
         xAxis: {
           type: "value",
-          name: "粉丝数",
+          name: "歌曲数",
           axisLabel: { formatter: (v) => (v / 1e4).toFixed(0) + "万" },
         },
         yAxis: { type: "value", name: "平均评论数" },

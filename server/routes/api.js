@@ -4,6 +4,7 @@ const router = express.Router();
 const { pool } = require("../db");
 const crawler = require("../crawler");
 const scraper = require("../scraper");
+const hotSongs = require("../hot_songs");
 
 // ============================================================
 // 🔍 搜索 API — 爬虫实时搜索网易云音乐
@@ -282,13 +283,15 @@ router.get("/chart/style-boxplot", async (req, res) => {
 router.get("/chart/scatter", async (req, res) => {
   try {
     const [rows] = await pool.execute(
-      `SELECT a.id, a.name, a.followers,
+      `SELECT a.id, a.name, a.music_size as followers,
         COALESCE(AVG(s.comments_count), 0) as avg_comments,
         COUNT(s.id) as song_count
        FROM artists a
        LEFT JOIN songs s ON a.id = s.artist_id
-       GROUP BY a.id, a.name, a.followers
-       HAVING a.followers > 0`,
+       GROUP BY a.id, a.name, a.music_size
+       HAVING song_count > 0 AND avg_comments > 0
+       ORDER BY followers DESC
+       LIMIT 50`,
     );
     res.json({ code: 200, data: rows });
   } catch (err) {
@@ -580,7 +583,7 @@ router.get("/artist/:id/similar", async (req, res) => {
        WHERE sa.artist_id = ?
        ORDER BY sa.similarity_score DESC
        LIMIT 6`,
-      [parseInt(id)]
+      [parseInt(id)],
     );
     res.json({ code: 200, data: rows });
   } catch (err) {
@@ -604,7 +607,10 @@ router.get("/artist/:id/top-songs", async (req, res) => {
   try {
     const { id } = req.params;
     const { limit = 20 } = req.query;
-    const songs = await crawler.getArtistTopSongs(parseInt(id), parseInt(limit));
+    const songs = await crawler.getArtistTopSongs(
+      parseInt(id),
+      parseInt(limit),
+    );
     res.json({ code: 200, data: songs });
   } catch (err) {
     res.json({ code: 500, data: [], msg: err.message });
@@ -614,19 +620,22 @@ router.get("/artist/:id/top-songs", async (req, res) => {
 // 获取热搜列表
 router.get("/hot-search", async (req, res) => {
   try {
-    const axios = require('axios');
-    const response = await axios.get('http://localhost:4000/search/hot/detail', {
-      timeout: 10000,
-    });
+    const axios = require("axios");
+    const response = await axios.get(
+      "http://localhost:4000/search/hot/detail",
+      {
+        timeout: 10000,
+      },
+    );
     const data = response.data;
     if (data.code !== 200) {
-      return res.json({ code: 500, data: [], msg: '获取热搜失败' });
+      return res.json({ code: 500, data: [], msg: "获取热搜失败" });
     }
     const hotList = (data.data || []).slice(0, 15).map((item) => ({
       searchWord: item.searchWord,
       score: item.score,
       iconType: item.iconType,
-      content: item.content || '',
+      content: item.content || "",
     }));
     res.json({ code: 200, data: hotList });
   } catch (err) {
@@ -818,9 +827,98 @@ router.get("/compare/charts", async (req, res) => {
       },
     }));
 
+    // 5. 多排行榜统计：每次对比都重新爬取最新数据
+    console.log("[Compare] 开始爬取最新排行榜...");
+    try {
+      const chartsData = await hotSongs.crawlAndSaveAllCharts();
+      await hotSongs.saveChartsToDB(chartsData);
+      console.log("[Compare] 排行榜爬取完成");
+    } catch (e) {
+      console.log("Compare 爬取排行榜失败:", e.message);
+    }
+
+    const [chartsData] = await pool.execute(
+      "SELECT chart_type, artists FROM hot_songs",
+    );
+    const chartCounts = {
+      hot: {},
+      rising: {},
+      new: {},
+      original: {},
+    };
+
+    for (const row of chartsData) {
+      try {
+        const songArtists = JSON.parse(row.artists || "[]");
+        const chartType = row.chart_type || "hot";
+        if (!chartCounts[chartType]) chartCounts[chartType] = {};
+
+        for (const art of songArtists) {
+          const artId = Number(art.id);
+          if (artistIds.includes(artId)) {
+            chartCounts[chartType][artId] =
+              (chartCounts[chartType][artId] || 0) + 1;
+          }
+        }
+      } catch (e) {}
+    }
+
+    data.chartCounts = data.artists.map((a) => ({
+      name: a.name,
+      total:
+        (chartCounts.hot[a.id] || 0) +
+        (chartCounts.rising[a.id] || 0) +
+        (chartCounts.new[a.id] || 0) +
+        (chartCounts.original[a.id] || 0),
+      hot: chartCounts.hot[a.id] || 0,
+      rising: chartCounts.rising[a.id] || 0,
+      new: chartCounts.new[a.id] || 0,
+      original: chartCounts.original[a.id] || 0,
+    }));
+
     res.json({ code: 200, data });
   } catch (err) {
     console.error(`[Compare] 失败: ${err.message}`);
+    res.status(500).json({ code: 500, msg: err.message });
+  }
+});
+
+// 热歌榜（手动刷新排行榜数据）
+router.get("/hotsongs", async (req, res) => {
+  try {
+    // 确保表存在（使用复合主键，同一首歌可出现在多个榜单）
+    try {
+      await pool.execute(
+        "CREATE TABLE IF NOT EXISTS hot_songs (" +
+          "id BIGINT," +
+          "chart_type VARCHAR(20) DEFAULT 'hot'," +
+          "name VARCHAR(500) NOT NULL," +
+          "artists TEXT," +
+          "album_name VARCHAR(500)," +
+          "album_id BIGINT," +
+          "popularity INT DEFAULT 0," +
+          "duration INT DEFAULT 0," +
+          "publish_year INT," +
+          "ranking INT DEFAULT 0," +
+          "last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+          "PRIMARY KEY (id, chart_type)" +
+          ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+      );
+    } catch (e) {}
+
+    // 清空旧数据并重新爬取所有排行榜
+    await pool.execute("DELETE FROM hot_songs");
+    const chartsData = await hotSongs.crawlAndSaveAllCharts();
+    await hotSongs.saveChartsToDB(chartsData);
+    const [songs] = await pool.execute(
+      "SELECT * FROM hot_songs ORDER BY chart_type, ranking ASC LIMIT 100",
+    );
+    const data = songs.map((s) => ({
+      ...s,
+      artists: s.artists ? JSON.parse(s.artists) : [],
+    }));
+    res.json({ code: 200, data });
+  } catch (err) {
     res.status(500).json({ code: 500, msg: err.message });
   }
 });
@@ -835,40 +933,46 @@ router.get("/analysis/sentiment/:songId", async (req, res) => {
     const { songId } = req.params;
     const { limit = 50 } = req.query;
 
-    const { exec } = require('child_process');
-    const scriptPath = path.join(__dirname, '..', 'comment_analyzer.py');
-    const serverDir = path.join(__dirname, '..');
+    const { exec } = require("child_process");
+    const scriptPath = path.join(__dirname, "..", "comment_analyzer.py");
+    const serverDir = path.join(__dirname, "..");
 
-    exec(`python "${scriptPath}" --analyze ${songId} ${limit}`, {
-      cwd: serverDir
-    }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`[Sentiment Analysis] 执行错误: ${error.message}`);
-        res.json({
-          code: 200,
-          data: {
-            sentiment: { positive: 0, neutral: 0, negative: 0 },
-            total_comments: 0,
-            error: error.message
-          }
-        });
-        return;
-      }
-      try {
-        const data = JSON.parse(stdout);
-        res.json({ code: 200, data });
-      } catch (parseError) {
-        console.error(`[Sentiment Analysis] JSON解析失败: ${parseError.message}`);
-        res.json({
-          code: 200,
-          data: {
-            sentiment: { positive: 0, neutral: 0, negative: 0 },
-            total_comments: 0,
-            error: parseError.message
-          }
-        });
-      }
-    });
+    exec(
+      `python "${scriptPath}" --analyze ${songId} ${limit}`,
+      {
+        cwd: serverDir,
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`[Sentiment Analysis] 执行错误: ${error.message}`);
+          res.json({
+            code: 200,
+            data: {
+              sentiment: { positive: 0, neutral: 0, negative: 0 },
+              total_comments: 0,
+              error: error.message,
+            },
+          });
+          return;
+        }
+        try {
+          const data = JSON.parse(stdout);
+          res.json({ code: 200, data });
+        } catch (parseError) {
+          console.error(
+            `[Sentiment Analysis] JSON解析失败: ${parseError.message}`,
+          );
+          res.json({
+            code: 200,
+            data: {
+              sentiment: { positive: 0, neutral: 0, negative: 0 },
+              total_comments: 0,
+              error: parseError.message,
+            },
+          });
+        }
+      },
+    );
   } catch (err) {
     console.error(`[Sentiment Analysis] 失败: ${err.message}`);
     res.json({
@@ -876,8 +980,8 @@ router.get("/analysis/sentiment/:songId", async (req, res) => {
       data: {
         sentiment: { positive: 0, neutral: 0, negative: 0 },
         total_comments: 0,
-        error: err.message
-      }
+        error: err.message,
+      },
     });
   }
 });
@@ -888,40 +992,44 @@ router.get("/analysis/topics/:songId", async (req, res) => {
     const { songId } = req.params;
     const { limit = 50 } = req.query;
 
-    const { exec } = require('child_process');
-    const scriptPath = path.join(__dirname, '..', 'comment_analyzer.py');
-    const serverDir = path.join(__dirname, '..');
+    const { exec } = require("child_process");
+    const scriptPath = path.join(__dirname, "..", "comment_analyzer.py");
+    const serverDir = path.join(__dirname, "..");
 
-    exec(`python "${scriptPath}" --topics ${songId} ${limit}`, {
-      cwd: serverDir
-    }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`[Topic Analysis] 执行错误: ${error.message}`);
-        res.json({
-          code: 200,
-          data: {
-            topics: [],
-            total_comments: 0,
-            error: error.message
-          }
-        });
-        return;
-      }
-      try {
-        const data = JSON.parse(stdout);
-        res.json({ code: 200, data });
-      } catch (parseError) {
-        console.error(`[Topic Analysis] JSON解析失败: ${parseError.message}`);
-        res.json({
-          code: 200,
-          data: {
-            topics: [],
-            total_comments: 0,
-            error: parseError.message
-          }
-        });
-      }
-    });
+    exec(
+      `python "${scriptPath}" --topics ${songId} ${limit}`,
+      {
+        cwd: serverDir,
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`[Topic Analysis] 执行错误: ${error.message}`);
+          res.json({
+            code: 200,
+            data: {
+              topics: [],
+              total_comments: 0,
+              error: error.message,
+            },
+          });
+          return;
+        }
+        try {
+          const data = JSON.parse(stdout);
+          res.json({ code: 200, data });
+        } catch (parseError) {
+          console.error(`[Topic Analysis] JSON解析失败: ${parseError.message}`);
+          res.json({
+            code: 200,
+            data: {
+              topics: [],
+              total_comments: 0,
+              error: parseError.message,
+            },
+          });
+        }
+      },
+    );
   } catch (err) {
     console.error(`[Topic Analysis] 失败: ${err.message}`);
     res.json({
@@ -929,8 +1037,8 @@ router.get("/analysis/topics/:songId", async (req, res) => {
       data: {
         topics: [],
         total_comments: 0,
-        error: err.message
-      }
+        error: err.message,
+      },
     });
   }
 });
@@ -941,47 +1049,53 @@ router.get("/analysis/combined/:songId", async (req, res) => {
     const { songId } = req.params;
     const { limit = 50 } = req.query;
 
-    const { exec } = require('child_process');
-    const scriptPath = path.join(__dirname, '..', 'comment_analyzer.py');
-    const serverDir = path.join(__dirname, '..');
+    const { exec } = require("child_process");
+    const scriptPath = path.join(__dirname, "..", "comment_analyzer.py");
+    const serverDir = path.join(__dirname, "..");
 
-    exec(`python "${scriptPath}" --combined ${songId} ${limit}`, {
-      cwd: serverDir
-    }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`[Combined Analysis] 执行错误: ${error.message}`);
-        console.error(`stderr: ${stderr}`);
-        res.json({
-          code: 200,
-          data: {
-            sentiment: { positive: 0, neutral: 0, negative: 0 },
-            topics: [],
-            total_comments: 0,
-            error: error.message,
-            stderr: stderr
-          }
-        });
-        return;
-      }
-      try {
-        console.log(`[Combined Analysis] stdout: ${stdout}`);
-        const data = JSON.parse(stdout);
-        res.json({ code: 200, data });
-      } catch (parseError) {
-        console.error(`[Combined Analysis] JSON解析失败: ${parseError.message}`);
-        console.error(`原始输出: "${stdout}"`);
-        res.json({
-          code: 200,
-          data: {
-            sentiment: { positive: 0, neutral: 0, negative: 0 },
-            topics: [],
-            total_comments: 0,
-            error: parseError.message,
-            raw_output: stdout
-          }
-        });
-      }
-    });
+    exec(
+      `python "${scriptPath}" --combined ${songId} ${limit}`,
+      {
+        cwd: serverDir,
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`[Combined Analysis] 执行错误: ${error.message}`);
+          console.error(`stderr: ${stderr}`);
+          res.json({
+            code: 200,
+            data: {
+              sentiment: { positive: 0, neutral: 0, negative: 0 },
+              topics: [],
+              total_comments: 0,
+              error: error.message,
+              stderr: stderr,
+            },
+          });
+          return;
+        }
+        try {
+          console.log(`[Combined Analysis] stdout: ${stdout}`);
+          const data = JSON.parse(stdout);
+          res.json({ code: 200, data });
+        } catch (parseError) {
+          console.error(
+            `[Combined Analysis] JSON解析失败: ${parseError.message}`,
+          );
+          console.error(`原始输出: "${stdout}"`);
+          res.json({
+            code: 200,
+            data: {
+              sentiment: { positive: 0, neutral: 0, negative: 0 },
+              topics: [],
+              total_comments: 0,
+              error: parseError.message,
+              raw_output: stdout,
+            },
+          });
+        }
+      },
+    );
   } catch (err) {
     console.error(`[Combined Analysis] 失败: ${err.message}`);
     res.json({
@@ -990,8 +1104,8 @@ router.get("/analysis/combined/:songId", async (req, res) => {
         sentiment: { positive: 0, neutral: 0, negative: 0 },
         topics: [],
         total_comments: 0,
-        error: err.message
-      }
+        error: err.message,
+      },
     });
   }
 });
@@ -1004,42 +1118,304 @@ const jieba = require("nodejieba");
 
 // 中文停用词
 const STOP_WORDS = new Set([
-  "的", "了", "和", "是", "就", "都", "而", "及", "与", "着", "或", "一个",
-  "没有", "我们", "你们", "他们", "它们", "这个", "那个", "这些", "那些",
-  "什么", "怎么", "为什么", "因为", "所以", "但是", "然而", "虽然", "还是",
-  "在", "有", "也", "很", "到", "会", "可以", "能", "不", "人", "都",
-  "要", "自己", "这", "那", "应该", "必须", "需要", "可能", "应该",
-  "一", "二", "三", "四", "五", "六", "七", "八", "九", "十",
-  "啊", "哦", "嗯", "呢", "吧", "吗", "嘛", "呀", "哇", "哈", "呵",
-  "我", "你", "他", "她", "它", "谁", "哪", "个", "种", "类",
-  "又", "再", "还", "更", "最", "只", "但", "而", "却", "如果",
-  "让", "给", "把", "被", "对", "向", "从", "比", "为", "以",
-  "过", "上", "下", "中", "里", "外", "内", "间", "边", "面",
-  "想", "说", "看", "听", "做", "来", "去", "走", "回", "知道",
-  "觉得", "感觉", "认为", "以为", "记得", "忘记", "想起",
-  "时间", "时候", "时刻", "时期", "年代", "日子", "今天", "明天",
-  "现在", "当时", "以前", "后来", "之后", "之前", "开始", "结束",
-  "地方", "这里", "那里", "到处", "四处", "哪里", "那边",
-  "东西", "事情", "情况", "问题", "原因", "结果", "方法", "方式",
-  "一直", "总是", "经常", "常常", "有时", "偶尔", "从来", "永远",
-  "非常", "特别", "比较", "相当", "十分", "极其", "太", "好", "真",
-  "已经", "曾经", "刚刚", "正在", "将要", "就要", "快要", "才",
-  "就", "还", "又", "再", "也", "都", "全", "只", "仅", "光",
-  "着", "了", "过", "的", "地", "得",
-  "与", "同", "和", "跟", "及", "以及", "并", "且", "而", "或",
-  "如果", "假如", "假设", "即使", "尽管", "虽然", "但是", "然而",
-  "不仅", "不但", "而且", "并且", "或者", "还是", "要么",
-  "由于", "因为", "所以", "因此", "因而", "于是", "从而",
-  "只要", "只有", "无论", "不管", "不论", "即使", "哪怕",
-  "为了", "为着", "关于", "对于", "至于", "根据", "按照",
-  "随着", "除了", "除开", "除去", "有关", "相关", "涉及",
-  "每", "各", "诸", "凡", "凡例", "凡此", "所有", "一切",
-  "有人", "有人", "人们", "人家", "别人", "人家", "大家",
-  "有人", "有的", "有些", "某些", "有的", "之一", "之一",
-  "之类", "等等", "云云", "什么的", "这个", "那个",
-  "牛班", "NEWBAND", "银河", "方舟", "维伴", "青桔",
-  "汪苏", "刘涛", "赵建飞", "陈韵", "王子", "首席",
-  "爱乐乐团", "国际", "编写", "监制", "录音",
+  "的",
+  "了",
+  "和",
+  "是",
+  "就",
+  "都",
+  "而",
+  "及",
+  "与",
+  "着",
+  "或",
+  "一个",
+  "没有",
+  "我们",
+  "你们",
+  "他们",
+  "它们",
+  "这个",
+  "那个",
+  "这些",
+  "那些",
+  "什么",
+  "怎么",
+  "为什么",
+  "因为",
+  "所以",
+  "但是",
+  "然而",
+  "虽然",
+  "还是",
+  "在",
+  "有",
+  "也",
+  "很",
+  "到",
+  "会",
+  "可以",
+  "能",
+  "不",
+  "人",
+  "都",
+  "要",
+  "自己",
+  "这",
+  "那",
+  "应该",
+  "必须",
+  "需要",
+  "可能",
+  "应该",
+  "一",
+  "二",
+  "三",
+  "四",
+  "五",
+  "六",
+  "七",
+  "八",
+  "九",
+  "十",
+  "啊",
+  "哦",
+  "嗯",
+  "呢",
+  "吧",
+  "吗",
+  "嘛",
+  "呀",
+  "哇",
+  "哈",
+  "呵",
+  "我",
+  "你",
+  "他",
+  "她",
+  "它",
+  "谁",
+  "哪",
+  "个",
+  "种",
+  "类",
+  "又",
+  "再",
+  "还",
+  "更",
+  "最",
+  "只",
+  "但",
+  "而",
+  "却",
+  "如果",
+  "让",
+  "给",
+  "把",
+  "被",
+  "对",
+  "向",
+  "从",
+  "比",
+  "为",
+  "以",
+  "过",
+  "上",
+  "下",
+  "中",
+  "里",
+  "外",
+  "内",
+  "间",
+  "边",
+  "面",
+  "想",
+  "说",
+  "看",
+  "听",
+  "做",
+  "来",
+  "去",
+  "走",
+  "回",
+  "知道",
+  "觉得",
+  "感觉",
+  "认为",
+  "以为",
+  "记得",
+  "忘记",
+  "想起",
+  "时间",
+  "时候",
+  "时刻",
+  "时期",
+  "年代",
+  "日子",
+  "今天",
+  "明天",
+  "现在",
+  "当时",
+  "以前",
+  "后来",
+  "之后",
+  "之前",
+  "开始",
+  "结束",
+  "地方",
+  "这里",
+  "那里",
+  "到处",
+  "四处",
+  "哪里",
+  "那边",
+  "东西",
+  "事情",
+  "情况",
+  "问题",
+  "原因",
+  "结果",
+  "方法",
+  "方式",
+  "一直",
+  "总是",
+  "经常",
+  "常常",
+  "有时",
+  "偶尔",
+  "从来",
+  "永远",
+  "非常",
+  "特别",
+  "比较",
+  "相当",
+  "十分",
+  "极其",
+  "太",
+  "好",
+  "真",
+  "已经",
+  "曾经",
+  "刚刚",
+  "正在",
+  "将要",
+  "就要",
+  "快要",
+  "才",
+  "就",
+  "还",
+  "又",
+  "再",
+  "也",
+  "都",
+  "全",
+  "只",
+  "仅",
+  "光",
+  "着",
+  "了",
+  "过",
+  "的",
+  "地",
+  "得",
+  "与",
+  "同",
+  "和",
+  "跟",
+  "及",
+  "以及",
+  "并",
+  "且",
+  "而",
+  "或",
+  "如果",
+  "假如",
+  "假设",
+  "即使",
+  "尽管",
+  "虽然",
+  "但是",
+  "然而",
+  "不仅",
+  "不但",
+  "而且",
+  "并且",
+  "或者",
+  "还是",
+  "要么",
+  "由于",
+  "因为",
+  "所以",
+  "因此",
+  "因而",
+  "于是",
+  "从而",
+  "只要",
+  "只有",
+  "无论",
+  "不管",
+  "不论",
+  "即使",
+  "哪怕",
+  "为了",
+  "为着",
+  "关于",
+  "对于",
+  "至于",
+  "根据",
+  "按照",
+  "随着",
+  "除了",
+  "除开",
+  "除去",
+  "有关",
+  "相关",
+  "涉及",
+  "每",
+  "各",
+  "诸",
+  "凡",
+  "凡例",
+  "凡此",
+  "所有",
+  "一切",
+  "有人",
+  "有人",
+  "人们",
+  "人家",
+  "别人",
+  "人家",
+  "大家",
+  "有人",
+  "有的",
+  "有些",
+  "某些",
+  "有的",
+  "之一",
+  "之一",
+  "之类",
+  "等等",
+  "云云",
+  "什么的",
+  "这个",
+  "那个",
+  "牛班",
+  "NEWBAND",
+  "银河",
+  "方舟",
+  "维伴",
+  "青桔",
+  "汪苏",
+  "刘涛",
+  "赵建飞",
+  "陈韵",
+  "王子",
+  "首席",
+  "爱乐乐团",
+  "国际",
+  "编写",
+  "监制",
+  "录音",
 ]);
 
 function extractWords(text) {
@@ -1081,7 +1457,7 @@ router.get("/lyrics/wordcloud", async (req, res) => {
          WHERE artist_id = ?
          ORDER BY comments_count DESC
          LIMIT 3`,
-        [artistId]
+        [artistId],
       );
       allSongs.push(...songs);
     }
@@ -1130,6 +1506,70 @@ router.get("/lyrics/wordcloud", async (req, res) => {
     });
   } catch (err) {
     console.error(`[歌词词云] 失败: ${err.message}`);
+    res.status(500).json({ code: 500, msg: err.message });
+  }
+});
+
+// 评论词云
+router.get("/comments/wordcloud", async (req, res) => {
+  try {
+    const { ids } = req.query;
+    if (!ids) return res.status(400).json({ code: 400, msg: "缺少歌手ID参数" });
+
+    const artistIds = ids.split(",").map(function (id) {
+      return parseInt(id.trim());
+    });
+
+    const allSongs = [];
+    for (const artistId of artistIds) {
+      const [songs] = await pool.query(
+        "SELECT id, name, artist_id, comments_count FROM songs WHERE artist_id = ? ORDER BY comments_count DESC LIMIT 3",
+        [artistId],
+      );
+      allSongs.push(...songs);
+    }
+
+    allSongs.sort(function (a, b) {
+      return (b.comments_count || 0) - (a.comments_count || 0);
+    });
+    const topSongs = allSongs.slice(0, 10);
+
+    const allCommentTexts = [];
+    const songComments = [];
+
+    for (const song of topSongs) {
+      try {
+        const comments = await crawler.getSongComments(song.id, 30);
+        if (comments.length > 0) {
+          songComments.push({
+            id: song.id,
+            name: song.name,
+            artistId: song.artist_id,
+            commentCount: comments.length,
+          });
+          allCommentTexts.push(...comments);
+        }
+      } catch (e) {}
+    }
+
+    const combinedText = allCommentTexts.join("\n");
+    const wordFreq = extractWords(combinedText);
+
+    const wordCloudData = Object.entries(wordFreq)
+      .map(function (entry) {
+        return { name: entry[0], value: entry[1] };
+      })
+      .sort(function (a, b) {
+        return b.value - a.value;
+      })
+      .slice(0, 100);
+
+    res.json({
+      code: 200,
+      data: { words: wordCloudData, songs: songComments },
+    });
+  } catch (err) {
+    console.error("[评论词云] 失败:", err.message);
     res.status(500).json({ code: 500, msg: err.message });
   }
 });

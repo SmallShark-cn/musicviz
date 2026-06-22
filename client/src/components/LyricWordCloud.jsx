@@ -58,21 +58,6 @@ export default function LyricWordCloud({ data }) {
               textStyle: {
                 fontFamily: "sans-serif",
                 fontWeight: "bold",
-                color: function () {
-                  const colors = [
-                    "#ec4141",
-                    "#3b82f6",
-                    "#10b981",
-                    "#f59e0b",
-                    "#8b5cf6",
-                    "#ec4899",
-                    "#06b6d4",
-                    "#f97316",
-                    "#84cc16",
-                    "#6366f1",
-                  ];
-                  return colors[Math.floor(Math.random() * colors.length)];
-                },
               },
               emphasis: {
                 focus: "self",
@@ -81,13 +66,28 @@ export default function LyricWordCloud({ data }) {
                   textShadowColor: "#333",
                 },
               },
-              data: words.map((w) => ({
-                name: w.name,
-                value: w.value,
-                textStyle: {
-                  fontSize: Math.max(12, Math.min(48, (w.value / maxValue) * 40 + 14)),
-                },
-              })),
+              data: words.map((w) => {
+                const colors = [
+                  "#ec4141",
+                  "#3b82f6",
+                  "#10b981",
+                  "#f59e0b",
+                  "#8b5cf6",
+                  "#ec4899",
+                  "#06b6d4",
+                  "#f97316",
+                  "#84cc16",
+                  "#6366f1",
+                ];
+                return {
+                  name: w.name,
+                  value: w.value,
+                  textStyle: {
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    fontSize: Math.max(12, Math.min(48, (w.value / maxValue) * 40 + 14)),
+                  },
+                };
+              }),
             },
           ],
         },

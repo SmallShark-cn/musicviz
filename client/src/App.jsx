@@ -187,7 +187,7 @@ export default function App() {
 
       // 加载歌词词云
       try {
-        const lyricData = await api.getLyricWordcloud(ids);
+        const lyricData = await api.getCommentWordcloudMulti(ids);
         setLyricWordCloudData(lyricData);
       } catch (e) {
         console.error("歌词词云加载失败:", e);
@@ -638,7 +638,7 @@ export default function App() {
   const CHART_CONFIG_DRAG = {
     radar: { icon: '📋', title: '多歌手指标对比 (雷达图)' },
     ranking: { icon: '🔥', title: 'Top10 歌曲评论数排名' },
-    lyric_wordcloud: { icon: '☁️', title: 'Top10歌曲歌词词云' },
+    lyric_wordcloud: { icon: '☁️', title: '评论词云' },
     map: { icon: '🗺️', title: '歌手归属地热力地图' },
     sentiment: { icon: '😊', title: '评论情感分析' },
     topic: { icon: '🏷️', title: '评论主题聚类' },

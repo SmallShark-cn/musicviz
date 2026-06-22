@@ -1,0 +1,43 @@
+{
+  "hash": "582ae6cf",
+  "configHash": "0aa6c525",
+  "lockfileHash": "0b7bdd76",
+  "browserHash": "518040d2",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "8d75a8cc",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "5f27816e",
+      "needsInterop": true
+    },
+    "echarts": {
+      "src": "../../node_modules/echarts/index.js",
+      "file": "echarts.js",
+      "fileHash": "b411a61b",
+      "needsInterop": false
+    },
+    "echarts-wordcloud": {
+      "src": "../../node_modules/echarts-wordcloud/index.js",
+      "file": "echarts-wordcloud.js",
+      "fileHash": "5a2ecab2",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-3SOFIYQK": {
+      "file": "chunk-3SOFIYQK.js"
+    },
+    "chunk-MBMNNYI7": {
+      "file": "chunk-MBMNNYI7.js"
+    },
+    "chunk-HKJ2B2AA": {
+      "file": "chunk-HKJ2B2AA.js"
+    }
+  }
+}

@@ -2,8 +2,8 @@
 """
 互动度评分预测 — 分类模型
 ==================================
-目标：预测歌曲互动评分(1-10分)
-模型：XGBoost + GridSearchCV 调参
+目标：预测歌曲互动评分(1-5分)
+模型：RandomForest + GradientBoosting + GridSearchCV 调参
 """
 
 import json
@@ -33,6 +33,7 @@ DB_CONFIG = {
 }
 
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "ml_result.json")
+TRAINING_CURVE_FILE = os.path.join(os.path.dirname(__file__), "training_curve.json")
 LOG = []
 
 def log(msg):
@@ -78,8 +79,6 @@ for r in rows:
     if yr > 2026 or (yr < 1980 and yr != 0):
         continue
 
-    # 互动指数 = log(评论数+1) / log(最大评论数+1) → 0~1
-    # 不在这里用，只是概念上的
     valid.append(
         {
             **r,
@@ -182,79 +181,114 @@ X_tr, X_te, y_tr, y_te = train_test_split(
 log(f"训练集: {len(X_tr)}, 测试集: {len(X_te)}")
 
 # ============================================================
-# 4. 调参 (XGBoost + RandomForest)
+# 4. 调参 + 训练曲线记录
 # ============================================================
-section("4. GridSearchCV 调参")
+section("4. GridSearchCV 调参 & 训练曲线")
 
-# 模型 A: RandomForest
-log("\n[模型 B] RandomForest Classifier")
-rf_params = {
-    "n_estimators": [100, 200, 300],
-    "max_depth": [10, 15, None],
-    "min_samples_split": [2, 5],
-    "min_samples_leaf": [1, 2],
+# 记录训练曲线数据
+training_curves = {
+    "rf": {"train_acc": [], "cv_acc": [], "n_estimators": []},
+    "gb": {"train_acc": [], "cv_acc": [], "n_estimators": []},
 }
-log(
-    f"  搜索空间: {len(rf_params['n_estimators']) * len(rf_params['max_depth']) * len(rf_params['min_samples_split']) * len(rf_params['min_samples_leaf'])} 种组合"
-)
 
-rf_gs = GridSearchCV(
-    RandomForestClassifier(random_state=42, class_weight="balanced"),
-    rf_params,
-    cv=5,
-    scoring="accuracy",
-    n_jobs=-1,
-    verbose=0,
+# 模型 A: RandomForest — 记录不同 n_estimators 下的训练/验证准确率
+log("\n[模型 A] RandomForest Classifier — 训练曲线")
+rf_n_estim_list = [10, 30, 50, 80, 100, 150, 200, 250, 300]
+rf_best_params = None
+rf_best_cv = 0
+
+for n_est in rf_n_estim_list:
+    rf_tmp = RandomForestClassifier(
+        n_estimators=n_est, max_depth=10, min_samples_split=2,
+        min_samples_leaf=1, random_state=42, class_weight="balanced"
+    )
+    # 5折交叉验证
+    cv_scores = cross_val_score(rf_tmp, X_tr, y_tr, cv=5, scoring="accuracy")
+    cv_mean = cv_scores.mean()
+    # 全量训练集拟合，计算训练准确率
+    rf_tmp.fit(X_tr, y_tr)
+    train_acc = accuracy_score(y_tr, rf_tmp.predict(X_tr))
+
+    training_curves["rf"]["n_estimators"].append(n_est)
+    training_curves["rf"]["train_acc"].append(round(train_acc * 100, 2))
+    training_curves["rf"]["cv_acc"].append(round(cv_mean * 100, 2))
+
+    log(f"  n_estimators={n_est:4d} | 训练准确率={train_acc*100:.1f}% | CV准确率={cv_mean*100:.1f}%")
+
+    if cv_mean > rf_best_cv:
+        rf_best_cv = cv_mean
+        rf_best_params = {"n_estimators": n_est, "max_depth": 10, "min_samples_split": 2, "min_samples_leaf": 1}
+
+log(f"\n  RF 最佳参数: {rf_best_params}")
+log(f"  RF 最佳CV准确率: {rf_best_cv * 100:.1f}%")
+
+# 用最佳参数做最终 RF
+rf_final = RandomForestClassifier(
+    random_state=42, class_weight="balanced", **rf_best_params
 )
-rf_gs.fit(X_tr, y_tr)
-rf_acc = accuracy_score(y_te, rf_gs.predict(X_te))
-log(f"  RF 最佳参数: {rf_gs.best_params_}")
-log(f"  RF 交叉验证准确率: {rf_gs.best_score_ * 100:.1f}%")
+rf_final.fit(X_tr, y_tr)
+rf_acc = accuracy_score(y_te, rf_final.predict(X_te))
 log(f"  RF 测试集准确率: {rf_acc * 100:.1f}%")
 
-# 模型 B: GradientBoosting
-log("\n[模型 B] GradientBoosting Classifier")
-gb_params = {
-    "n_estimators": [100, 200],
-    "max_depth": [3, 5, 7],
-    "learning_rate": [0.05, 0.1],
-}
-log(f"  搜索空间: {2 * 3 * 2} 种组合")
+# 模型 B: GradientBoosting — 记录不同 n_estimators 下的训练/验证准确率
+log("\n[模型 B] GradientBoosting Classifier — 训练曲线")
+gb_n_estim_list = [20, 50, 80, 100, 150, 200]
+gb_best_params = None
+gb_best_cv = 0
 
-gb_gs = GridSearchCV(
-    GradientBoostingClassifier(random_state=42),
-    gb_params,
-    cv=5,
-    scoring="accuracy",
-    n_jobs=-1,
-    verbose=0,
+for n_est in gb_n_estim_list:
+    gb_tmp = GradientBoostingClassifier(
+        n_estimators=n_est, max_depth=5, learning_rate=0.1, random_state=42
+    )
+    cv_scores = cross_val_score(gb_tmp, X_tr, y_tr, cv=5, scoring="accuracy")
+    cv_mean = cv_scores.mean()
+    gb_tmp.fit(X_tr, y_tr)
+    train_acc = accuracy_score(y_tr, gb_tmp.predict(X_tr))
+
+    training_curves["gb"]["n_estimators"].append(n_est)
+    training_curves["gb"]["train_acc"].append(round(train_acc * 100, 2))
+    training_curves["gb"]["cv_acc"].append(round(cv_mean * 100, 2))
+
+    log(f"  n_estimators={n_est:4d} | 训练准确率={train_acc*100:.1f}% | CV准确率={cv_mean*100:.1f}%")
+
+    if cv_mean > gb_best_cv:
+        gb_best_cv = cv_mean
+        gb_best_params = {"n_estimators": n_est, "max_depth": 5, "learning_rate": 0.1}
+
+log(f"\n  GB 最佳参数: {gb_best_params}")
+log(f"  GB 最佳CV准确率: {gb_best_cv * 100:.1f}%")
+
+# 用最佳参数做最终 GB
+gb_final = GradientBoostingClassifier(
+    random_state=42, **gb_best_params
 )
-gb_gs.fit(X_tr, y_tr)
-gb_acc = accuracy_score(y_te, gb_gs.predict(X_te))
-log(f"  GB 最佳参数: {gb_gs.best_params_}")
-log(f"  GB 交叉验证准确率: {gb_gs.best_score_ * 100:.1f}%")
+gb_final.fit(X_tr, y_tr)
+gb_acc = accuracy_score(y_te, gb_final.predict(X_te))
 log(f"  GB 测试集准确率: {gb_acc * 100:.1f}%")
 
-# 选最佳模型 (比较 A/B/C 三个模型)
+# 选最佳模型
 candidates = [
-    (rf_gs, rf_acc, "RandomForest"),
-    (gb_gs, gb_acc, "GradientBoosting"),
+    (rf_final, rf_acc, rf_best_cv, rf_best_params, "RandomForest"),
+    (gb_final, gb_acc, gb_best_cv, gb_best_params, "GradientBoosting"),
 ]
-best_gs, best_test, best_name = max(candidates, key=lambda x: x[1])
-best = best_gs.best_estimator_
-best_cv = best_gs.best_score_
-best_params = best_gs.best_params_
+best_model, best_test, best_cv, best_params, best_name = max(candidates, key=lambda x: x[1])
 
 log(f"\n  ✅ 最佳模型: {best_name}")
 log(f"  ✅ 测试集准确率: {best_test * 100:.1f}%")
+log(f"  ✅ 交叉验证准确率: {best_cv * 100:.1f}%")
+
+# 保存训练曲线
+with open(TRAINING_CURVE_FILE, "w", encoding="utf-8") as f:
+    json.dump(training_curves, f, ensure_ascii=False, indent=2)
+log(f"\n  训练曲线已保存: {TRAINING_CURVE_FILE}")
 
 # ============================================================
 # 5. 特征重要性
 # ============================================================
 section("5. 特征重要性")
 
-if hasattr(best, "feature_importances_"):
-    imps = best.feature_importances_
+if hasattr(best_model, "feature_importances_"):
+    imps = best_model.feature_importances_
     ranked = sorted(zip(selected_features, imps), key=lambda x: x[1], reverse=True)
     for name, imp in ranked:
         log(f"  {name:20s}: {imp * 100:.1f}%")
@@ -264,7 +298,7 @@ if hasattr(best, "feature_importances_"):
 # ============================================================
 section("6. 混淆矩阵 & 误差分析")
 
-y_pred = best.predict(X_te)
+y_pred = best_model.predict(X_te)
 cm = confusion_matrix(y_te, y_pred, labels=list(range(1, 11)))
 log("混淆矩阵 (行=实际, 列=预测):")
 header = "      " + "".join([f" 预{i:2d}" for i in range(1, 11)])
@@ -288,8 +322,8 @@ log(f"\n分类报告:\n{cr}")
 # ============================================================
 section("7. 全部歌曲预测")
 
-y_all = best.predict(X_scaled)
-y_all_proba = best.predict_proba(X_scaled)
+y_all = best_model.predict(X_scaled)
+y_all_proba = best_model.predict_proba(X_scaled)
 
 results = []
 for i, d in enumerate(valid):

@@ -72,23 +72,53 @@ const DB_CONFIG = {
 };
 ```
 
-### 3. 安装依赖 & 启动
+### 3. 安装依赖
 ```bash
-# 后端
+# 后端依赖
 cd server
 npm install
-npm run dev        # 启动后端服务 (端口 3001)
 
-# 前端（新终端）
+# 前端依赖（新终端）
 cd client
 npm install
-npm run dev        # 启动前端开发服务器 (端口 5173)
 ```
 
-### 4. 运行 ML 模型（可选）
+### 4. 初始化数据库
 ```bash
 cd server
-python3 ml_pipeline.py
+node seed.js    # 创建表结构 + 导入初始数据
+```
+
+### 5. 启动服务（需要三个终端）
+
+**终端 1 — 启动网易云音乐 API 服务**（端口 4000）
+```bash
+cd NeteaseCloudMusic_PythonSDK-0.2.1
+pip3 install flask
+python3 start_api.py
+```
+> 提供歌手描述、热搜等数据的 HTTP 接口，后端爬虫依赖此服务
+
+**终端 2 — 启动后端 API 服务**（端口 3001）
+```bash
+cd server
+npm run dev
+```
+> 后端提供所有数据接口：歌手爬取、图表数据、评论分析、ML 预测等
+
+**终端 3 — 启动前端开发服务器**（端口 5173）
+```bash
+cd client
+npm run dev
+```
+> 前端自动代理 API 请求到后端 3001 端口
+
+启动后访问 http://localhost:5173 即可使用。
+
+### 6. 运行 ML 模型（可选）
+```bash
+cd server
+python3 ml_pipeline.py    # 训练模型并生成 ml_result.json
 ```
 
 ## 项目结构

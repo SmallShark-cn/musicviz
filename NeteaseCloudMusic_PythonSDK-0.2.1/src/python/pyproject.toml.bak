@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "musiclibrary"
+version = "0.0.1"
+description = "Python bindings for MusicLibrary - access NetEase Cloud Music and KuGou Music APIs"
+authors = [
+    { name = "LuTong", email = "2061360308@qq.com" }
+]
+keywords = ["music", "netease", "kugou", "api", "music-library"]
+readme = "README.md"
+license = { file = "../../LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+
+[project.urls]
+Homepage = "https://github.com/2061360308/MusicLibrary"

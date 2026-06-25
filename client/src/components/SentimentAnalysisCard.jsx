@@ -134,10 +134,11 @@ const SentimentAnalysisCard = ({ songId, songName }) => {
         borderRadius: 'var(--radius)',
         padding: '20px',
         height: '100%',
-        minHeight: '420px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        flex: 1,
+        minHeight: 0
       }}>
         <div style={{ textAlign: 'center' }}>
           <div className="loading-spinner"></div>
@@ -155,10 +156,11 @@ const SentimentAnalysisCard = ({ songId, songName }) => {
         borderRadius: 'var(--radius)',
         padding: '20px',
         height: '100%',
-        minHeight: '420px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        flex: 1,
+        minHeight: 0
       }}>
         <p style={{ color: 'var(--text-muted)' }}>暂无数据</p>
       </div>
@@ -176,11 +178,15 @@ const SentimentAnalysisCard = ({ songId, songName }) => {
       background: 'var(--bg-card)',
       border: '1px solid var(--border-color)',
       borderRadius: 'var(--radius)',
-      padding: '20px',
-      minHeight: '420px',
-      height: '100%'
+      padding: '14px',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 0,
+      overflow: 'hidden',
+      flex: 1
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', flexShrink: 0 }}>
         <span style={{ fontSize: '20px' }}>😊</span>
         <div>
           <h3 style={{
@@ -199,22 +205,23 @@ const SentimentAnalysisCard = ({ songId, songName }) => {
         </div>
       </div>
 
-      <div ref={chartRef} style={{ height: '200px', width: '100%' }}></div>
+      <div ref={chartRef} style={{ flex: '1 1 0', minHeight: 0, width: '100%' }}></div>
 
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '12px',
-        marginTop: '16px'
+        gap: '10px',
+        marginTop: '10px',
+        flexShrink: 0
       }}>
         <div style={{
           background: 'rgba(16, 185, 129, 0.1)',
           borderRadius: '8px',
-          padding: '12px',
+          padding: '10px 8px',
           textAlign: 'center',
           border: '1px solid rgba(16, 185, 129, 0.2)'
         }}>
-          <div style={{ fontSize: '20px', fontWeight: '700', color: '#10b981' }}>
+          <div style={{ fontSize: '18px', fontWeight: '700', color: '#10b981' }}>
             {positive}
           </div>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
@@ -224,11 +231,11 @@ const SentimentAnalysisCard = ({ songId, songName }) => {
         <div style={{
           background: 'rgba(59, 130, 246, 0.1)',
           borderRadius: '8px',
-          padding: '12px',
+          padding: '10px 8px',
           textAlign: 'center',
           border: '1px solid rgba(59, 130, 246, 0.2)'
         }}>
-          <div style={{ fontSize: '20px', fontWeight: '700', color: '#3b82f6' }}>
+          <div style={{ fontSize: '18px', fontWeight: '700', color: '#3b82f6' }}>
             {neutral}
           </div>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
@@ -238,11 +245,11 @@ const SentimentAnalysisCard = ({ songId, songName }) => {
         <div style={{
           background: 'rgba(239, 68, 68, 0.1)',
           borderRadius: '8px',
-          padding: '12px',
+          padding: '10px 8px',
           textAlign: 'center',
           border: '1px solid rgba(239, 68, 68, 0.2)'
         }}>
-          <div style={{ fontSize: '20px', fontWeight: '700', color: '#ef4444' }}>
+          <div style={{ fontSize: '18px', fontWeight: '700', color: '#ef4444' }}>
             {negative}
           </div>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>

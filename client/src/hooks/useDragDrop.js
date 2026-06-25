@@ -46,11 +46,11 @@ export const PANEL_CONFIG = {
   [PANEL_TYPES.YEARLY_TREND]: {
     icon: "📈",
     title: "各歌手年度产出趋势",
-    span: 1,
+    span: 2,
   },
   [PANEL_TYPES.GROUPED_BAR]: {
-    icon: "📊",
-    title: "热度对比",
+    icon: "👥",
+    title: "听众活跃度对比",
     span: 1,
   },
   [PANEL_TYPES.PLAYS_TREND]: {

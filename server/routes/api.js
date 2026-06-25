@@ -1078,10 +1078,21 @@ router.get("/analysis/topics/:songId", async (req, res) => {
 });
 
 // 5.3 综合分析（情感+主题）
+// Node 端内存缓存: {(songId, limit): {at: timestamp, data: result}}
+const combinedCache = new Map();
+const COMBINED_CACHE_TTL = 5 * 60 * 1000; // 5分钟
+
 router.get("/analysis/combined/:songId", async (req, res) => {
   try {
     const { songId } = req.params;
     const { limit = 50 } = req.query;
+    const cacheKey = `${songId}_${limit}`;
+
+    // 命中缓存直接返回
+    const cached = combinedCache.get(cacheKey);
+    if (cached && Date.now() - cached.at < COMBINED_CACHE_TTL) {
+      return res.json({ code: 200, data: cached.data, cached: true });
+    }
 
     const { exec } = require("child_process");
     const scriptPath = path.join(__dirname, "..", "comment_analyzer.py");
@@ -1091,42 +1102,46 @@ router.get("/analysis/combined/:songId", async (req, res) => {
       `python "${scriptPath}" --combined ${songId} ${limit}`,
       {
         cwd: serverDir,
+        maxBuffer: 50 * 1024 * 1024,
       },
       (error, stdout, stderr) => {
         if (error) {
           console.error(`[Combined Analysis] 执行错误: ${error.message}`);
           console.error(`stderr: ${stderr}`);
-          res.json({
-            code: 200,
-            data: {
-              sentiment: { positive: 0, neutral: 0, negative: 0 },
-              topics: [],
-              total_comments: 0,
-              error: error.message,
-              stderr: stderr,
-            },
-          });
-          return;
+          const fallback = {
+            sentiment: { positive: 0, neutral: 0, negative: 0 },
+            topics: [],
+            total_comments: 0,
+            error: error.message,
+            stderr: stderr,
+          };
+          // 失败结果不缓存，下次重试
+          return res.json({ code: 200, data: fallback });
         }
         try {
-          console.log(`[Combined Analysis] stdout: ${stdout}`);
+          console.log(`[Combined Analysis] stdout: ${stdout.slice(0, 200)}...`);
           const data = JSON.parse(stdout);
-          res.json({ code: 200, data });
+          // 0 评论不缓存（可能遇到限流），让下次有机会重试
+          if (data.total_comments > 0) {
+            combinedCache.set(cacheKey, { at: Date.now(), data });
+            return res.json({ code: 200, data, cached: false });
+          } else {
+            return res.json({ code: 200, data });
+          }
         } catch (parseError) {
           console.error(
             `[Combined Analysis] JSON解析失败: ${parseError.message}`,
           );
           console.error(`原始输出: "${stdout}"`);
-          res.json({
-            code: 200,
-            data: {
-              sentiment: { positive: 0, neutral: 0, negative: 0 },
-              topics: [],
-              total_comments: 0,
-              error: parseError.message,
-              raw_output: stdout,
-            },
-          });
+          const fallback = {
+            sentiment: { positive: 0, neutral: 0, negative: 0 },
+            topics: [],
+            total_comments: 0,
+            error: parseError.message,
+            raw_output: stdout,
+          };
+          // 解析失败不缓存
+          return res.json({ code: 200, data: fallback });
         }
       },
     );

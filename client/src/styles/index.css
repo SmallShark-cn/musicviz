@@ -99,6 +99,31 @@ body {
     background: var(--accent);
 }
 
+/* 滚动区域 — 始终显示明显滚动条 */
+.scroll-area::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scroll-area::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.scroll-area::-webkit-scrollbar-thumb:hover {
+    background: #ec4141;
+}
+
+.scroll-area {
+    scrollbar-color: var(--accent) rgba(0, 0, 0, 0.3);
+    scrollbar-width: thin;
+}
+
 /* ============================================================
    Header
    ============================================================ */
@@ -274,8 +299,8 @@ body {
 .main-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 16px;
-    padding: 0 24px 24px;
+    gap: 14px;
+    padding: 8px 24px 24px;
 }
 
 .grid-col-span-2 {
@@ -336,33 +361,47 @@ body {
 }
 
 .panel-body {
-    padding: 16px;
-    min-height: 400px;
-    height: 400px;
+    padding: 12px 14px;
+    min-height: 360px;
+    height: 360px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
 .panel-body-tall {
-    height: 500px;
-    min-height: 500px;
+    height: 480px;
+    min-height: 480px;
 }
 
-.panel-body>.chart-container {
+.panel-body-tall-extra {
+    height: 640px;
+    min-height: 640px;
+}
+
+.panel-body>.chart-container,
+.panel-body>.map-wrap,
+.panel-body>.artist-info-grid,
+.panel-body>.hot-search-grid {
     flex: 1;
     min-height: 0;
 }
 
-.panel-body>div {
+.panel-body>.compact-bar {
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.panel-body>div:not(.chart-container):not(.map-wrap):not(.artist-info-grid):not(.hot-search-grid):not(.compact-bar) {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    overflow: hidden;
 }
 
-.panel-body>div>.chart-container {
+.panel-body>div>.chart-container,
+.panel-body>div>div>.chart-container,
+.panel-body>div>div>div>.chart-container {
     flex: 1;
     min-height: 0;
 }
@@ -709,6 +748,7 @@ body {
     display: flex;
     align-items: flex-start;
     gap: 6px;
+    flex-shrink: 0;
 }
 
 /* ============================================================
@@ -1346,7 +1386,7 @@ body {
 
 /* 歌手简介卡片 */
 .artist-info-section {
-    margin: 20px 0;
+    margin: 8px 0;
     padding: 0 20px;
 }
 
@@ -1362,6 +1402,8 @@ body {
     flex-direction: row;
     gap: 16px;
     width: 100%;
+    height: 100%;
+    align-items: stretch;
     /* 自定义滚动条样式 */
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) transparent;
@@ -1392,7 +1434,7 @@ body {
     border-radius: var(--radius);
     padding: 20px;
     transition: var(--transition);
-    max-height: 400px;
+    height: 100%;
     overflow-y: auto;
 }
 
@@ -1691,31 +1733,43 @@ body {
 
 /* 热搜榜 */
 .hot-search-section {
-    margin: 20px 0;
+    margin: 8px 0;
     padding: 0 20px;
 }
 
 .hot-search-grid {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
-    padding: 12px;
-    max-height: 320px;
+    padding: 8px 10px;
+    height: 100%;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.hot-search-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.hot-search-grid::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
 }
 
 .hot-search-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
+    gap: 8px;
+    padding: 6px 10px;
     background: var(--bg-secondary);
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: var(--transition);
+    flex-shrink: 0;
 }
 
 .hot-search-item:hover {
@@ -1729,16 +1783,17 @@ body {
 }
 
 .hot-search-rank {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--text-muted);
     background: var(--bg-card);
     border-radius: 4px;
+    flex-shrink: 0;
 }
 
 .hot-search-rank.rank-1 {
@@ -1758,7 +1813,7 @@ body {
 
 .hot-search-word {
     flex: 1;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;

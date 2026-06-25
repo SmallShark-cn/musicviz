@@ -1,9 +1,126 @@
 import { useEffect, useState } from 'react';
 
+const CommentModal = ({ topic, colors, onClose }) => {
+  if (!topic) return null;
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.7)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px',
+        backdropFilter: 'blur(4px)',
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: 'var(--bg-card)',
+          border: `1px solid ${colors.border}`,
+          borderRadius: '12px',
+          width: 'min(720px, 90vw)',
+          maxHeight: '85vh',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{
+          padding: '16px 20px',
+          borderBottom: `1px solid var(--border-color)`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{
+              background: colors.text,
+              color: 'white',
+              padding: '4px 10px',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: '600',
+            }}>
+              {topic.name}
+            </span>
+            <span style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: '500' }}>
+              {topic.count} 条评论
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border-color)',
+              borderRadius: '6px',
+              width: '32px',
+              height: '32px',
+              color: 'var(--text-primary)',
+              fontSize: '18px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onMouseEnter={(e) => e.target.style.background = 'var(--bg-secondary)'}
+            onMouseLeave={(e) => e.target.style.background = 'transparent'}
+          >
+            ×
+          </button>
+        </div>
+        <div
+          className="scroll-area"
+          style={{
+            padding: '20px',
+            overflowY: 'auto',
+            flex: 1,
+            minHeight: 0,
+            background: 'var(--bg-secondary)',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {topic.all_comments.map((comment, i) => (
+              <div
+                key={i}
+                style={{
+                  background: 'var(--bg-card)',
+                  borderRadius: '8px',
+                  padding: '12px 14px',
+                  borderLeft: `3px solid ${colors.text}`,
+                  fontSize: '13px',
+                  color: 'var(--text-primary)',
+                  lineHeight: '1.6',
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '6px' }}>
+                  #{i + 1}
+                </div>
+                {comment}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const TopicClusterCard = ({ songId, songName }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [expandedTopic, setExpandedTopic] = useState(null);
+  const [modalTopic, setModalTopic] = useState(null);
 
   useEffect(() => {
     if (!songId) return;
@@ -230,6 +347,7 @@ const TopicClusterCard = ({ songId, songName }) => {
   }
 
   if (!data || !data.topics || data.topics.length === 0) {
+    const isNoComments = (data?.total_comments ?? 0) === 0;
     return (
       <div style={{
         background: 'var(--bg-card)',
@@ -239,10 +357,17 @@ const TopicClusterCard = ({ songId, songName }) => {
         height: '100%',
         minHeight: '420px',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        gap: '6px',
       }}>
-        <p style={{ color: 'var(--text-muted)' }}>暂无主题数据</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 500 }}>
+          {isNoComments ? '📭 该歌曲暂无评论' : '🔍 暂无主题数据'}
+        </p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '12px', opacity: 0.7 }}>
+          {isNoComments ? '网易云暂无评论或评论接口暂不可用' : '所有评论均未匹配到主题分类'}
+        </p>
       </div>
     );
   }
@@ -254,11 +379,15 @@ const TopicClusterCard = ({ songId, songName }) => {
       background: 'var(--bg-card)',
       border: '1px solid var(--border-color)',
       borderRadius: 'var(--radius)',
-      padding: '20px',
-      minHeight: '420px',
-      height: '100%'
+      padding: '14px',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 0,
+      overflow: 'hidden',
+      flex: 1
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', flexShrink: 0 }}>
         <span style={{ fontSize: '20px' }}>🏷️</span>
         <div>
           <h3 style={{
@@ -277,185 +406,121 @@ const TopicClusterCard = ({ songId, songName }) => {
         </div>
       </div>
 
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-        maxHeight: '500px',
-        overflowY: 'auto'
-      }}>
+      <div
+        className="scroll-area"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          paddingRight: '4px'
+        }}
+      >
         {data.topics.map((topic, index) => {
           const colors = topicColors[index % topicColors.length];
-          const isExpanded = expandedTopic === topic.topic_id;
-          const filteredKeywords = filterKeywords(topic.keywords);
+          // 「未分类」用灰色调，与其他彩色主题区分
+          const isUnclassified = topic.name === '未分类';
+          const cardBg = isUnclassified ? 'rgba(156, 163, 175, 0.1)' : colors.bg;
+          const cardBorder = isUnclassified ? 'rgba(156, 163, 175, 0.3)' : colors.border;
+          const cardAccent = isUnclassified ? '#9ca3af' : colors.text;
 
           return (
             <div
               key={topic.topic_id}
               style={{
-                background: colors.bg,
-                border: `1px solid ${colors.border}`,
+                background: cardBg,
+                border: `1px solid ${cardBorder}`,
                 borderRadius: '10px',
-                padding: '16px',
-                borderLeft: `4px solid ${colors.text}`,
+                padding: '0 12px',
+                borderLeft: `4px solid ${cardAccent}`,
                 transition: 'all 0.2s ease',
-                maxHeight: isExpanded ? 'none' : '450px',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                height: '48px',
               }}
             >
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '12px'
+                gap: '8px',
+                width: '100%',
               }}>
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  flex: 1,
+                  minWidth: 0,
                 }}>
                   <span style={{
-                    background: colors.text,
+                    background: cardAccent,
                     color: 'white',
-                    padding: '4px 10px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '28px',
+                    padding: '0 12px',
                     borderRadius: '6px',
                     fontSize: '12px',
-                    fontWeight: '600'
+                    fontWeight: '600',
+                    whiteSpace: 'nowrap',
                   }}>
-                    主题 {index + 1}
+                    {topic.name}
                   </span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {topic.count}条评论
+                  <span style={{
+                    fontSize: '12px',
+                    color: 'var(--text-muted)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    height: '28px',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {topic.count} 条评论
                   </span>
                 </div>
-                {topic.count > 3 && (
+                {topic.count > 0 && (
                   <button
-                    onClick={() => setExpandedTopic(isExpanded ? null : topic.topic_id)}
+                    onClick={() => setModalTopic({ ...topic, _colors: { ...colors, text: cardAccent } })}
                     style={{
-                      background: colors.text,
+                      background: cardAccent,
                       color: 'white',
                       border: 'none',
                       borderRadius: '6px',
-                      padding: '4px 10px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: '28px',
+                      padding: '0 10px',
                       fontSize: '11px',
                       fontWeight: '500',
                       cursor: 'pointer',
-                      transition: 'opacity 0.2s'
+                      transition: 'opacity 0.2s',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
                     }}
                     onMouseEnter={(e) => e.target.style.opacity = '0.8'}
                     onMouseLeave={(e) => e.target.style.opacity = '1'}
                   >
-                    {isExpanded ? '收起' : `查看全部 ${topic.count} 条`}
+                    查看全部 {topic.count} 条
                   </button>
                 )}
               </div>
-
-              <div style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '6px',
-                marginBottom: '12px'
-              }}>
-                {filteredKeywords.length > 0 ? (
-                  filteredKeywords.map((keyword, i) => (
-                    <span
-                      key={i}
-                      style={{
-                        background: colors.bg,
-                        border: `1px solid ${colors.border}`,
-                        color: colors.text,
-                        padding: '4px 10px',
-                        borderRadius: '16px',
-                        fontSize: '12px',
-                        fontWeight: '500'
-                      }}
-                    >
-                      {keyword}
-                    </span>
-                  ))
-                ) : (
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    暂无有效关键词
-                  </span>
-                )}
-              </div>
-
-              {topic.examples && topic.examples.length > 0 && (
-                <div style={{
-                  background: 'rgba(0, 0, 0, 0.2)',
-                  borderRadius: '8px',
-                  padding: '10px',
-                  marginTop: '10px'
-                }}>
-                  <p style={{
-                    fontSize: '11px',
-                    color: 'var(--text-muted)',
-                    marginBottom: '6px'
-                  }}>
-                    📝 代表评论
-                  </p>
-                  <p style={{
-                    fontSize: '12px',
-                    color: 'var(--text-secondary)',
-                    lineHeight: '1.5',
-                    margin: 0,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical'
-                  }}>
-                    {topic.examples[0]}
-                  </p>
-                </div>
-              )}
-
-              {isExpanded && topic.all_comments && topic.all_comments.length > 0 && (
-                <div style={{
-                  background: 'rgba(0, 0, 0, 0.2)',
-                  borderRadius: '8px',
-                  padding: '12px',
-                  marginTop: '12px',
-                  maxHeight: '500px',
-                  overflowY: 'auto'
-                }}>
-                  <p style={{
-                    fontSize: '11px',
-                    color: 'var(--text-muted)',
-                    marginBottom: '10px',
-                    fontWeight: '500'
-                  }}>
-                    📋 全部 {topic.count} 条评论
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {topic.all_comments.map((comment, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          borderRadius: '6px',
-                          padding: '8px',
-                          borderLeft: `2px solid ${colors.text}`
-                        }}
-                      >
-                        <p style={{
-                          fontSize: '12px',
-                          color: 'var(--text-secondary)',
-                          lineHeight: '1.5',
-                          margin: 0,
-                          wordBreak: 'break-word'
-                        }}>
-                          {comment}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}
       </div>
+
+      {modalTopic && (
+        <CommentModal
+          topic={modalTopic}
+          colors={modalTopic._colors}
+          onClose={() => setModalTopic(null)}
+        />
+      )}
     </div>
   );
 };

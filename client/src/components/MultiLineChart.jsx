@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
-import ChartTip from "./ChartTip";
 
 /**
  * 多系列折线图组件 — 支持两种模式：
@@ -94,7 +93,9 @@ export default function MultiLineChart({ data }) {
               let tip = `<b>排名 #${params[0].axisValue}</b><br/>`;
               for (const p of params) {
                 if (p.value === null || p.value === undefined) continue;
-                tip += `${p.marker} ${p.seriesName}: 热度 ${p.value}<br/>`;
+                // 反推评论数 (log10(评论数+1)*20 = value)
+                const comments = Math.round(Math.pow(10, p.value / 20) - 1);
+                tip += `${p.marker} ${p.seriesName}: 预估播放量 ${comments.toLocaleString()}<br/>`;
               }
               return tip;
             }
@@ -120,7 +121,7 @@ export default function MultiLineChart({ data }) {
         },
         yAxis: {
           type: "value",
-          name: isRank ? "热度值" : "歌曲数",
+          name: isRank ? "预估播放量" : "歌曲数",
           minInterval: isRank ? undefined : 1,
           axisLabel: { fontSize: 11 },
         },
@@ -139,10 +140,6 @@ export default function MultiLineChart({ data }) {
 
   return (
     <div>
-      <ChartTip
-        icon="📈"
-        text="多歌手折线对比图：每条线代表一个歌手，斜率越大代表增长/下降越快。点击图例可隐藏/显示特定歌手。"
-      />
       <div ref={ref} className="chart-container" />
     </div>
   );

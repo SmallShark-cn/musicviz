@@ -105,8 +105,9 @@ export default function TrendAnalysisChart({ data }) {
           name: "热度值",
           nameTextStyle: { fontSize: 11 },
           axisLabel: { fontSize: 11 },
+          // y 轴不固定 max，让数据自适应（避免一直显示 0-100）
           min: 0,
-          max: 100,
+          scale: true,
         },
         series: [
           {

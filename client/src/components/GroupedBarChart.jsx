@@ -36,7 +36,7 @@ export default function GroupedBarChart({ data }) {
           bottom: 0,
           textStyle: { fontSize: 11 },
         },
-        grid: { left: 60, right: 30, top: 20, bottom: 50 },
+        grid: { left: 55, right: 20, top: 15, bottom: 45, containLabel: true },
         xAxis: {
           type: "category",
           data: names,

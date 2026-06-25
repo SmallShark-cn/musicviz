@@ -136,12 +136,12 @@ export default function MapChart({ artists, regionMap }) {
   }, [artists, regionMap, theme]);
 
   return (
-    <div className="map-wrap">
+    <div className="map-wrap" style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
       <ChartTip
         icon="🗺️"
         text="世界地图：颜色越深代表该国家的歌手数量越多。可滚动鼠标滚轮缩放，点击国家查看详情。"
       />
-      <div ref={ref} style={{ width: "100%", height: "400px" }} />
+      <div ref={ref} style={{ width: "100%", flex: 1, minHeight: 0 }} />
     </div>
   );
 }

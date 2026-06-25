@@ -1223,22 +1223,24 @@ export default function App() {
               )}
             </DraggablePanel>
 
-            {/* 3. 热度与影响力三维对比 */}
+            {/* 3. 听众活跃度对比 */}
             <DraggablePanel panelType={PANEL_TYPES.GROUPED_BAR}>
-              {compareData?.artists?.length > 0 ? (<>
-                <div style={{ marginBottom: 12, padding: 12, background: "var(--bg-secondary)", borderRadius: 8, border: "1px solid var(--border-color)", fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6 }}>
-                  对比不同歌手的整体热度水平和单曲上限。<br />
-                  平均热度 = 该歌手所有歌曲热度的平均分，反映整体实力；<br />
-                  热度峰值 = 该歌手单曲最高热度分，反映爆款天花板。
+              {compareData?.artists?.length > 0 ? (
+                <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
+                  <div style={{ marginBottom: 6, padding: "6px 8px", background: "var(--bg-secondary)", borderRadius: 4, border: "1px solid var(--border-color)", fontSize: 11, color: "var(--text-muted)", lineHeight: 1.5, flexShrink: 0 }}>
+                    对比不同歌手听众的活跃程度。平均热度=该歌手所有歌曲热度的平均分（整体活跃度），热度峰值=单曲最高热度分（爆款天花板）。
+                  </div>
+                  <div style={{ flex: 1, minHeight: 0 }}>
+                    <GroupedBarChart
+                      data={compareData.artists.map((a) => ({
+                        name: a.name,
+                        avg_pop: a.avg_pop || 0,
+                        max_pop: a.max_pop || 0,
+                      }))}
+                    />
+                  </div>
                 </div>
-                <GroupedBarChart
-                  data={compareData.artists.map((a) => ({
-                    name: a.name,
-                    avg_pop: a.avg_pop || 0,
-                    max_pop: a.max_pop || 0,
-                  }))}
-                />
-              </>) : (
+              ) : (
                 <div className="empty-state">
                   <div className="empty-state-icon">📊</div>
                   <p>暂无数据</p>
@@ -1247,7 +1249,10 @@ export default function App() {
             </DraggablePanel>
 
             {/* 4. 各歌手年度产出趋势 */}
-            <DraggablePanel panelType={PANEL_TYPES.YEARLY_TREND}>
+            <DraggablePanel
+              panelType={PANEL_TYPES.YEARLY_TREND}
+              className="grid-col-span-2"
+            >
               {compareData?.artists?.some((a) => a.yearly_trend?.length > 0) ? (
                 <MultiLineChart
                   data={compareData.artists.flatMap((a) =>
@@ -1303,7 +1308,9 @@ export default function App() {
                     (a.top10 || []).map((s) => ({
                       artist: a.name,
                       rank: s.rank,
-                      plays: s.pop,
+                      // 网易云 API 的 pop 是 0-100 热度分（顶歌全 100，无衰减），
+                      // 用 log10(评论数+1)*20 还原出有差异的"播放量"曲线
+                      plays: Math.log10((s.comments || 0) + 1) * 20,
                       name: s.name,
                     })),
                   )}
@@ -1372,24 +1379,13 @@ export default function App() {
               bodyClassName="panel-body-tall"
             >
               <div
+                className="compact-bar"
                 style={{
-                  marginBottom: "16px",
-                  padding: "12px",
-                  background: "var(--bg-secondary)",
-                  borderRadius: "8px",
-                  border: "1px solid var(--border-color)",
+                  marginBottom: "6px",
+                  flexShrink: 0,
+                  height: "30px",
                 }}
               >
-                <label
-                  style={{
-                    fontSize: "12px",
-                    color: "var(--text-muted)",
-                    marginBottom: "8px",
-                    display: "block",
-                  }}
-                >
-                  选择分析歌曲
-                </label>
                 <select
                   value={analysisSong?.id || ""}
                   onChange={(e) => {
@@ -1411,13 +1407,16 @@ export default function App() {
                   }}
                   style={{
                     width: "100%",
-                    padding: "10px 12px",
-                    background: "var(--bg-card)",
-                    border: "1px solid var(--border-light)",
-                    borderRadius: "6px",
+                    height: "30px",
+                    padding: "0 10px",
+                    lineHeight: 1,
+                    background: "var(--bg-secondary)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "4px",
                     color: "var(--text-primary)",
-                    fontSize: "13px",
+                    fontSize: "12px",
                     cursor: "pointer",
+                    boxSizing: "border-box",
                   }}
                 >
                   {selectedArtists.map((a) => {
@@ -1435,14 +1434,16 @@ export default function App() {
                   })}
                 </select>
               </div>
-              <SentimentAnalysisCard
-                songId={analysisSong?.id || ""}
-                songName={
-                  analysisSong
-                    ? `${analysisSong.name} - ${analysisSong.artist}`
-                    : ""
-                }
-              />
+              <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                <SentimentAnalysisCard
+                  songId={analysisSong?.id || ""}
+                  songName={
+                    analysisSong
+                      ? `${analysisSong.name} - ${analysisSong.artist}`
+                      : ""
+                  }
+                />
+              </div>
             </DraggablePanel>
 
             {/* 15. 评论主题聚类 */}
@@ -1451,24 +1452,13 @@ export default function App() {
               bodyClassName="panel-body-tall"
             >
               <div
+                className="compact-bar"
                 style={{
-                  marginBottom: "16px",
-                  padding: "12px",
-                  background: "var(--bg-secondary)",
-                  borderRadius: "8px",
-                  border: "1px solid var(--border-color)",
+                  marginBottom: "6px",
+                  flexShrink: 0,
+                  height: "30px",
                 }}
               >
-                <label
-                  style={{
-                    fontSize: "12px",
-                    color: "var(--text-muted)",
-                    marginBottom: "8px",
-                    display: "block",
-                  }}
-                >
-                  选择分析歌曲
-                </label>
                 <select
                   value={analysisSong?.id || ""}
                   onChange={(e) => {
@@ -1490,13 +1480,16 @@ export default function App() {
                   }}
                   style={{
                     width: "100%",
-                    padding: "10px 12px",
-                    background: "var(--bg-card)",
-                    border: "1px solid var(--border-light)",
-                    borderRadius: "6px",
+                    height: "30px",
+                    padding: "0 10px",
+                    lineHeight: 1,
+                    background: "var(--bg-secondary)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "4px",
                     color: "var(--text-primary)",
-                    fontSize: "13px",
+                    fontSize: "12px",
                     cursor: "pointer",
+                    boxSizing: "border-box",
                   }}
                 >
                   {selectedArtists.map((a) => {
@@ -1514,14 +1507,16 @@ export default function App() {
                   })}
                 </select>
               </div>
-              <TopicClusterCard
-                songId={analysisSong?.id || ""}
-                songName={
-                  analysisSong
-                    ? `${analysisSong.name} - ${analysisSong.artist}`
-                    : ""
-                }
-              />
+              <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                <TopicClusterCard
+                  songId={analysisSong?.id || ""}
+                  songName={
+                    analysisSong
+                      ? `${analysisSong.name} - ${analysisSong.artist}`
+                      : ""
+                  }
+                />
+              </div>
             </DraggablePanel>
 
             {/* 16. 歌曲互动度评分分布 */}

@@ -37,7 +37,7 @@ function MLPie({ data }) {
             itemStyle: {
               color: (p) =>
                 ["#ef4444", "#f59e0b", "#3b82f6", "#10b981", "#8b5cf6"][
-                  p.dataIndex
+                p.dataIndex
                 ],
             },
           },
@@ -62,8 +62,8 @@ function MLPie({ data }) {
         <div style={{ fontWeight: 600, color: "var(--text-primary)", marginBottom: 4 }}>
           ℹ️ ML评分分布说明
         </div>
-        通过机器学习模型对每条评论进行情感打分（1-5分），展示各分数段评论的占比情况。
-        分数越高代表评论情感越积极。
+        用 RandomForest 模型预测每首歌的「预期评论数」，再与实际评论数相除得到
+        <b>互动度评分（1~5分）</b>。分数越高代表评论区越活跃、粉丝粘性越强。
       </div>
       <div ref={ref} style={{ height: 280 }} />
     </div>

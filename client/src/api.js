@@ -59,6 +59,6 @@ export const getGroupedBar = (ids) =>
 export const getBubble = () => fetchApi("/chart/bubble");
 export const getRegionMap = () => fetchApi("/chart/region-map");
 export const getCommentWordcloudMulti = (ids) =>
-  fetchApi("/comments/wordcloud?ids=" + ids.join(","));
+  fetchApi("/lyrics/wordcloud?ids=" + ids.join(","));
 export const getInteractionAnalysis = () =>
   fetchApi("/analysis/interaction");

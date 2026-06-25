@@ -19,15 +19,6 @@ export default function ChartMenu({
 }) {
   return (
     <>
-      {/* 菜单切换按钮 */}
-      <button
-        onClick={onToggleMenu}
-        className="chart-menu-toggle"
-        title="图表管理"
-      >
-        📊
-      </button>
-
       {/* 侧边菜单 */}
       <div className={`chart-menu ${isMenuOpen ? 'open' : ''}`}>
         <div className="chart-menu-header">

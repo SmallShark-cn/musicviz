@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
-import ChartTip from "./ChartTip";
 
 export default function PieChart({ data }) {
   const { theme } = useTheme();
@@ -32,11 +31,17 @@ export default function PieChart({ data }) {
     // 智能判断图表含义：根据第一个数据项的字段名
     const isStyle = data[0]?.style !== undefined;
 
+    // 数据归一化：过滤无效值（count<=0），并按总和计算真实占比
+    const total = data.reduce((s, d) => s + (Number(d.count) || 0), 0);
+
     chartRef.current.setOption(
       {
         tooltip: {
           trigger: "item",
-          formatter: (p) => `<b>${p.name}</b><br/>数量: ${p.value}<br/>占比: ${p.percent}%`,
+          formatter: (p) => {
+            const pct = total > 0 ? ((p.value / total) * 100).toFixed(1) : 0;
+            return `<b>${p.name}</b><br/>数量: ${p.value}<br/>占比: ${pct}%`;
+          },
         },
         legend: {
           bottom: 0,
@@ -60,7 +65,10 @@ export default function PieChart({ data }) {
             label: {
               show: true,
               fontSize: 11,
-              formatter: "{b}\n{d}%",
+              formatter: (p) => {
+                const pct = total > 0 ? ((p.value / total) * 100).toFixed(1) : 0;
+                return `${p.name}\n${pct}%`;
+              },
               lineHeight: 14,
             },
             labelLine: {
@@ -90,11 +98,8 @@ export default function PieChart({ data }) {
     };
   }, [data, theme]);
 
-  const tipText = "南丁格尔玫瑰图：扇形面积代表该类别在总量中的占比。占比越大、扇形面积越大。";
-
   return (
     <div>
-      <ChartTip icon="🥧" text={tipText} />
       <div ref={ref} className="chart-container" />
     </div>
   );

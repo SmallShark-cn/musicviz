@@ -24,7 +24,7 @@ async function crawlAndSaveArtist(artistId) {
       await pool.execute(
         `ALTER TABLE artists ADD COLUMN album_size INT DEFAULT 0`,
       );
-    } catch { }
+    } catch {}
   }
   try {
     await pool.execute(
@@ -35,7 +35,7 @@ async function crawlAndSaveArtist(artistId) {
       await pool.execute(
         `ALTER TABLE artists ADD COLUMN music_size INT DEFAULT 0`,
       );
-    } catch { }
+    } catch {}
   }
 
   // 1. 抓取歌手详情
@@ -68,7 +68,7 @@ async function crawlAndSaveArtist(artistId) {
   // 2.1 获取歌曲评论数（只获取前20首的评论数，避免请求过多）
   if (songs.length > 0) {
     console.log(`[Scraper] 开始获取歌曲评论数...`);
-    const topSongIds = songs.slice(0, 20).map((s) => s.id);
+    const topSongIds = songs.map((s) => s.id);
     try {
       const commentCounts = await crawler.getBatchCommentCounts(topSongIds);
       for (const s of songs) {
@@ -92,7 +92,7 @@ async function crawlAndSaveArtist(artistId) {
           headers: { "User-Agent": "Mozilla/5.0 ... Chrome/120" },
           timeout: 5000,
         })
-        .catch(() => { });
+        .catch(() => {});
       const ck = r0?.headers?.["set-cookie"]
         ? r0.headers["set-cookie"].map((c) => c.split(";")[0]).join("; ")
         : "";
@@ -206,7 +206,34 @@ async function crawlAndSaveArtist(artistId) {
             al.size || al.songSize || 0,
             al.info?.commentCount || al.commentCount || 0,
           ]);
-        } catch { }
+        } catch {}
+      }
+    }
+
+    // 存风格标签
+    if (detail.identities && detail.identities.length > 0) {
+      await conn.execute("DELETE FROM artist_styles WHERE artist_id = ?", [
+        artistId,
+      ]);
+      for (const tag of detail.identities) {
+        try {
+          await conn.execute(
+            "INSERT IGNORE INTO styles (name, category) VALUES (?, ?)",
+            [tag, "网易云"],
+          );
+          const [[style]] = await conn.query(
+            "SELECT id FROM styles WHERE name = ?",
+            [tag],
+          );
+          if (style) {
+            await conn.execute(
+              "INSERT IGNORE INTO artist_styles (artist_id, style_id) VALUES (?, ?)",
+              [artistId, style.id],
+            );
+          }
+        } catch (e) {
+          console.log("[Scraper] 保存风格标签失败:", tag, e.message);
+        }
       }
     }
 
@@ -216,18 +243,17 @@ async function crawlAndSaveArtist(artistId) {
       for (const sim of similarArtists) {
         await conn.execute(
           `INSERT IGNORE INTO artists (id, name, avatar_url) VALUES (?, ?, ?)`,
-          [sim.id, sim.name || "", sim.avatar_url || ""]
+          [sim.id, sim.name || "", sim.avatar_url || ""],
         );
       }
       // 清除旧的相似歌手关系，插入新的
-      await conn.execute(
-        `DELETE FROM similar_artists WHERE artist_id = ?`,
-        [artistId]
-      );
+      await conn.execute(`DELETE FROM similar_artists WHERE artist_id = ?`, [
+        artistId,
+      ]);
       for (const sim of similarArtists) {
         await conn.execute(
           `INSERT IGNORE INTO similar_artists (artist_id, similar_artist_id, similarity_score) VALUES (?, ?, ?)`,
-          [artistId, sim.id, sim.similarity_score || 0]
+          [artistId, sim.id, sim.similarity_score || 0],
         );
       }
     }
@@ -248,12 +274,13 @@ async function crawlAndSaveArtist(artistId) {
     ...detail,
     songs_count: songs.length,
     // 计算平均热度和热度峰值（使用 plays 字段）
-    avg_pop: songs.length > 0
-      ? Math.round(songs.reduce((sum, s) => sum + (s.plays || 0), 0) / songs.length)
-      : 0,
-    max_pop: songs.length > 0
-      ? Math.max(...songs.map(s => s.plays || 0))
-      : 0,
+    avg_pop:
+      songs.length > 0
+        ? Math.round(
+            songs.reduce((sum, s) => sum + (s.plays || 0), 0) / songs.length,
+          )
+        : 0,
+    max_pop: songs.length > 0 ? Math.max(...songs.map((s) => s.plays || 0)) : 0,
   };
 }
 

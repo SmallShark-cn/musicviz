@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 export default function GroupedBarChart({ data }) {
   const { theme } = useTheme();
@@ -19,9 +20,19 @@ export default function GroupedBarChart({ data }) {
 
     chartRef.current.setOption(
       {
-        tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: { type: "shadow" },
+          formatter: (params) => {
+            let tip = `<b>${params[0].axisValue}</b><br/>`;
+            for (const p of params) {
+              tip += `${p.marker} ${p.seriesName}: ${p.value.toLocaleString()}<br/>`;
+            }
+            return tip;
+          },
+        },
         legend: {
-          data: ["歌曲数", "总播放量", "总评论数"],
+          data: ["平均热度", "最高热度"],
           bottom: 0,
           textStyle: { fontSize: 11 },
         },
@@ -44,22 +55,16 @@ export default function GroupedBarChart({ data }) {
         },
         series: [
           {
-            name: "歌曲数",
+            name: "平均热度",
             type: "bar",
-            data: data.map((d) => d.song_count),
+            data: data.map((d) => d.avg_pop),
             itemStyle: { color: "#3b82f6" },
           },
           {
-            name: "总播放量",
+            name: "最高热度",
             type: "bar",
-            data: data.map((d) => d.total_plays),
+            data: data.map((d) => d.max_pop),
             itemStyle: { color: "#ec4141" },
-          },
-          {
-            name: "总评论数",
-            type: "bar",
-            data: data.map((d) => d.total_comments),
-            itemStyle: { color: "#10b981" },
           },
         ],
       },
@@ -74,5 +79,13 @@ export default function GroupedBarChart({ data }) {
     };
   }, [data, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  return (
+    <div>
+      <ChartTip
+        icon="📊"
+        text="分组柱状图：蓝色=平均热度，红色=最高热度。差值越大代表该歌手作品质量参差不齐，差值越小代表水平稳定。"
+      />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 export default function BubbleChart({ data }) {
   const { theme } = useTheme();
@@ -19,35 +20,42 @@ export default function BubbleChart({ data }) {
       {
         tooltip: {
           trigger: "item",
-          formatter: (p) =>
-            `${p.value[3]}<br/>歌曲数: ${p.value[0].toFixed(0)}首<br/>总播放: ${(p.value[1] / 1e8).toFixed(1)}亿<br/>平均评论: ${p.value[2].toFixed(0)}`,
+          formatter: (p) => {
+            const name = p.value[3];
+            const songs = p.value[0].toFixed(0);
+            const avgComments = p.value[1].toFixed(0);
+            const totalSongs = p.value[2].toFixed(0);
+            return `<b>${name}</b><br/>` +
+              `歌曲数: ${songs}首<br/>` +
+              `平均评论数: ${avgComments}<br/>` +
+              `采样歌曲: ${totalSongs}首<br/>` +
+              `<span style="color:#888;font-size:10px">气泡大小代表采样歌曲数</span>`;
+          },
         },
-        grid: { left: 70, right: 30, top: 20, bottom: 50 },
+        grid: { left: 70, right: 30, top: 30, bottom: 50 },
         xAxis: {
-          type: "value",
-          name: "歌曲数",
-          axisLabel: { formatter: (v) => v.toFixed(0) + "首" },
+          type: "log",
+          name: "歌曲数(对数)",
+          nameTextStyle: { fontSize: 11, padding: [10, 0, 0, 0] },
+          axisLabel: { fontSize: 10 },
         },
         yAxis: {
-          type: "value",
-          name: "总播放量",
-          axisLabel: {
-            formatter: (v) =>
-              v >= 1e8
-                ? (v / 1e8).toFixed(1) + "亿"
-                : (v / 1e4).toFixed(0) + "万",
-          },
+          type: "log",
+          name: "平均评论数(对数)",
+          nameTextStyle: { fontSize: 11 },
+          axisLabel: { fontSize: 10 },
         },
         series: [
           {
             type: "scatter",
             data: data.map((d) => [
-              d.song_count,
-              d.total_plays,
-              d.avg_comments,
+              d.song_count || 1,
+              d.avg_comments || 1,
+              d.total_songs || 50,
               d.name,
             ]),
-            symbolSize: (val) => Math.min(Math.max(val[2] / 2, 8), 50),
+            symbolSize: (val) =>
+              Math.min(Math.max(val[2] * 1.2, 10), 60),
             itemStyle: {
               shadowBlur: 10,
               shadowColor: "rgba(0,0,0,0.3)",
@@ -71,5 +79,13 @@ export default function BubbleChart({ data }) {
     };
   }, [data, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  return (
+    <div>
+      <ChartTip
+        icon="🎯"
+        text="横轴=歌曲数量，纵轴=平均评论数。位于右上方的歌手代表作品多且互动高（质量+数量兼具）；气泡大小代表采样歌曲数。"
+      />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

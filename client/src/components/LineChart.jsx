@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 export default function LineChart({ data }) {
   const { theme } = useTheme();
@@ -72,5 +73,13 @@ export default function LineChart({ data }) {
     };
   }, [data, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  return (
+    <div>
+      <ChartTip
+        icon="📊"
+        text="单系列折线图：显示年代或排名维度的指标变化趋势。峰值表示该年代/排名段的指标最高值。"
+      />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

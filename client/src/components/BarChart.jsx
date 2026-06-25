@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 export default function BarChart({ data, horizontal }) {
   const { theme } = useTheme();
@@ -37,40 +38,40 @@ export default function BarChart({ data, horizontal }) {
           : { left: 60, right: 30, top: 10, bottom: 80 },
         xAxis: horizontal
           ? {
-              type: "value",
-              axisLabel: {
-                formatter: (v) =>
-                  v >= 1e8
-                    ? (v / 1e8).toFixed(1) + "亿"
-                    : v >= 1e4
-                      ? (v / 1e4).toFixed(0) + "万"
-                      : v,
-              },
-            }
-          : {
-              type: "category",
-              data: names,
-              axisLabel: { rotate: 45, fontSize: 11 },
-              axisTick: { show: false },
+            type: "value",
+            axisLabel: {
+              formatter: (v) =>
+                v >= 1e8
+                  ? (v / 1e8).toFixed(1) + "亿"
+                  : v >= 1e4
+                    ? (v / 1e4).toFixed(0) + "万"
+                    : v,
             },
+          }
+          : {
+            type: "category",
+            data: names,
+            axisLabel: { rotate: 45, fontSize: 11 },
+            axisTick: { show: false },
+          },
         yAxis: horizontal
           ? {
-              type: "category",
-              data: names,
-              axisLabel: { fontSize: 11 },
-              axisTick: { show: false },
-            }
+            type: "category",
+            data: names,
+            axisLabel: { fontSize: 11 },
+            axisTick: { show: false },
+          }
           : {
-              type: "value",
-              axisLabel: {
-                formatter: (v) =>
-                  v >= 1e8
-                    ? (v / 1e8).toFixed(1) + "亿"
-                    : v >= 1e4
-                      ? (v / 1e4).toFixed(0) + "万"
-                      : v,
-              },
+            type: "value",
+            axisLabel: {
+              formatter: (v) =>
+                v >= 1e8
+                  ? (v / 1e8).toFixed(1) + "亿"
+                  : v >= 1e4
+                    ? (v / 1e4).toFixed(0) + "万"
+                    : v,
             },
+          },
         series: [
           {
             type: "bar",
@@ -103,5 +104,13 @@ export default function BarChart({ data, horizontal }) {
     };
   }, [data, horizontal, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  return (
+    <div>
+      <ChartTip
+        icon="📊"
+        text="柱状图：柱形长度代表数值大小。横排模式更适合长名称，纵排模式适合横向对比。"
+      />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 const COUNTRY_MAP = {
   "中国": "China",
@@ -136,6 +137,10 @@ export default function MapChart({ artists, regionMap }) {
 
   return (
     <div className="map-wrap">
+      <ChartTip
+        icon="🗺️"
+        text="世界地图：颜色越深代表该国家的歌手数量越多。可滚动鼠标滚轮缩放，点击国家查看详情。"
+      />
       <div ref={ref} style={{ width: "100%", height: "400px" }} />
     </div>
   );

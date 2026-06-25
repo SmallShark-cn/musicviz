@@ -296,15 +296,16 @@ router.get("/chart/style-boxplot", async (req, res) => {
 router.get("/chart/scatter", async (req, res) => {
   try {
     const [rows] = await pool.execute(
-      `SELECT a.id, a.name, a.music_size as followers,
+      `SELECT a.id, a.name,
+        a.music_size as song_count,
         COALESCE(AVG(s.comments_count), 0) as avg_comments,
-        COUNT(s.id) as song_count
+        COUNT(s.id) as total_songs
        FROM artists a
        LEFT JOIN songs s ON a.id = s.artist_id
        GROUP BY a.id, a.name, a.music_size
-       HAVING song_count > 0 AND avg_comments > 0
-       ORDER BY followers DESC
-       LIMIT 50`,
+       HAVING total_songs > 0
+       ORDER BY song_count DESC
+       LIMIT 30`,
     );
     res.json({ code: 200, data: rows });
   } catch (err) {
@@ -1606,5 +1607,41 @@ router.get("/comments/wordcloud", async (req, res) => {
     res.status(500).json({ code: 500, msg: err.message });
   }
 });
+
+
+// ============================================================
+// ML 互动度分析
+// ============================================================
+const { execSync } = require("child_process");
+const fs_ml = require("fs");
+
+const ML_RESULT_PATH = path.join(__dirname, "..", "ml_result.json");
+const ML_SCRIPT_PATH = path.join(__dirname, "..", "ml_pipeline.py");
+
+router.get("/analysis/interaction", async (req, res) => {
+  try {
+    if (!fs_ml.existsSync(ML_RESULT_PATH)) {
+      console.log("[ML] 运行 ML 流水线...");
+      try {
+        execSync("python3 \"" + ML_SCRIPT_PATH + "\"", {
+          cwd: path.join(__dirname, ".."),
+          timeout: 180000,
+          encoding: "utf-8"
+        });
+      } catch (e) {
+        if (!fs_ml.existsSync(ML_RESULT_PATH)) {
+          return res.json({ code: 500, data: null, msg: "ML训练失败: " + e.message });
+        }
+      }
+    }
+    const raw = fs_ml.readFileSync(ML_RESULT_PATH, "utf-8");
+    const jsonData = JSON.parse(raw);
+    res.json({ code: 200, data: jsonData });
+  } catch (err) {
+    console.error("[ML] 失败:", err.message);
+    res.status(500).json({ code: 500, msg: err.message });
+  }
+});
+
 
 module.exports = router;

@@ -16,7 +16,6 @@ export default function RadarChart({ data }) {
     const initChart = () => {
       const { clientWidth, clientHeight } = ref.current;
       if (clientWidth === 0 || clientHeight === 0) {
-        // DOM尺寸无效，延迟重试
         timerRef.current = setTimeout(initChart, 100);
         return;
       }
@@ -36,11 +35,12 @@ export default function RadarChart({ data }) {
             formatter: (p) => {
               const d = data[p.dataIndex];
               const raw = d._raw || {};
-              return `${d.name}<br/>` +
-                `歌曲数: ${raw.song_count || d["歌曲数"]}<br/>` +
-                `专辑数: ${raw.album_size || d["专辑数"]}<br/>` +
-                `风格数: ${raw.style_count || d["风格数"]}<br/>` +
-                `评论数: ${(raw.total_comments || d["评论数"]).toLocaleString()}`;
+              return `<b>${d.name}</b><br/>` +
+                `歌曲数: ${raw.song_count || d["歌曲数"]} 首<br/>` +
+                `专辑数: ${raw.album_size || d["专辑数"]} 张<br/>` +
+                `风格数: ${raw.style_count || d["风格数"]} 种<br/>` +
+                `总评论: ${(raw.total_comments || d["评论数"]).toLocaleString()} 条<br/>` +
+                `<span style="color:#888;font-size:10px">数值为归一化后的分数 (0-100)</span>`;
             },
           },
           legend: {
@@ -49,12 +49,12 @@ export default function RadarChart({ data }) {
             textStyle: { fontSize: 11 },
           },
           radar: {
-            center: ["50%", "45%"],
-            radius: "65%",
+            center: ["50%", "48%"],
+            radius: "60%",
             indicator: DIMS.map((name) => ({ name, max: 100 })),
-            axisName: { fontSize: 11 },
+            axisName: { fontSize: 11, color: theme === "dark" ? "#cbd5e1" : "#334155" },
             splitLine: { lineStyle: { color: "rgba(0,0,0,0.1)" } },
-            splitArea: { show: true, areaStyle: { color: ["rgba(255,255,255,0.05)", "rgba(255,255,255,0.1)"] } },
+            splitArea: { show: true, areaStyle: { color: ["rgba(255,255,255,0.03)", "rgba(255,255,255,0.08)"] } },
           },
           series: [
             {

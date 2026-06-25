@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 /**
  * 堆叠柱状图组件 — 不同时期音乐风格演变
@@ -19,20 +20,17 @@ export default function StackedBarChart({ data }) {
       theme === "dark" ? "dark" : undefined,
     );
 
-    // 提取唯一的 era 列表（保持顺序）
     const eraOrder = ["2000年前", "2000-2009", "2010-2014", "2015-2019", "2020及以后"];
     const erasInData = [...new Set(data.map((d) => d.era))];
     const eras = eraOrder.filter((e) => erasInData.includes(e));
     if (eras.length === 0) eras.push(...erasInData);
 
-    // 提取所有风格并统计
     const styleMap = {};
     for (const d of data) {
       if (!styleMap[d.style]) styleMap[d.style] = {};
       styleMap[d.style][d.era] = (styleMap[d.style][d.era] || 0) + d.artist_count;
     }
 
-    // 按总出现次数排序取 Top8 风格
     const styleTotals = Object.entries(styleMap)
       .map(([style, eraData]) => ({
         style,
@@ -100,5 +98,13 @@ export default function StackedBarChart({ data }) {
     };
   }, [data, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  return (
+    <div>
+      <ChartTip
+        icon="📚"
+        text="堆叠柱状图：横轴=年代分组，纵轴=歌手数量。可看出每个年代流行的音乐风格变化趋势，柱子越高代表该年代总歌手数越多。"
+      />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

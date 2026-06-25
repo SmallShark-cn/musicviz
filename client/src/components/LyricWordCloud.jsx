@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
 import "echarts-wordcloud";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 export default function LyricWordCloud({ data }) {
   const { theme } = useTheme();
@@ -33,7 +34,7 @@ export default function LyricWordCloud({ data }) {
           tooltip: {
             show: true,
             formatter: (p) => {
-              return `${p.name}<br/>出现次数: ${p.value}`;
+              return `<b>${p.name}</b><br/>出现次数: ${p.value}`;
             },
             backgroundColor: "rgba(22, 28, 44, 0.95)",
             borderColor: "#1e2d45",
@@ -107,5 +108,13 @@ export default function LyricWordCloud({ data }) {
     };
   }, [data, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  return (
+    <div>
+      <ChartTip
+        icon="☁️"
+        text="基于Top10歌曲歌词的关键词词云。字号越大代表出现频次越高，位置无特定含义。可发现歌手创作中的高频意象和主题。"
+      />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

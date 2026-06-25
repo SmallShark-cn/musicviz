@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 export default function HeatmapChart({ data }) {
   const { theme } = useTheme();
@@ -35,14 +36,17 @@ export default function HeatmapChart({ data }) {
       {
         tooltip: {
           position: "top",
-          formatter: (p) =>
-            `${data[p.value[1]].style}<br/>${indicatorNames[p.value[0]]}: ${(p.value[2] || 0).toLocaleString()}`,
+          formatter: (p) => {
+            const style = data[p.value[1]].style;
+            const indName = indicatorNames[p.value[0]];
+            return `<b>${style}</b><br/>${indName}: ${(p.value[2] || 0).toLocaleString()}`;
+          },
         },
-        grid: { left: 100, right: 60, top: 20, bottom: 50 },
+        grid: { left: 100, right: 60, top: 20, bottom: 70 },
         xAxis: {
           type: "category",
           data: indicatorNames,
-          axisLabel: { fontSize: 11 },
+          axisLabel: { fontSize: 11, rotate: 0 },
           splitArea: { show: true },
         },
         yAxis: {
@@ -69,7 +73,16 @@ export default function HeatmapChart({ data }) {
           {
             type: "heatmap",
             data: heatData,
-            label: { show: false },
+            label: {
+              show: true,
+              fontSize: 10,
+              color: theme === "dark" ? "#fff" : "#333",
+              formatter: (p) => {
+                const v = p.value[2];
+                if (v >= 1e4) return (v / 1e4).toFixed(1) + "万";
+                return v;
+              },
+            },
             emphasis: {
               itemStyle: { shadowBlur: 10, shadowColor: "rgba(0,0,0,0.5)" },
             },
@@ -87,5 +100,13 @@ export default function HeatmapChart({ data }) {
     };
   }, [data, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  return (
+    <div>
+      <ChartTip
+        icon="🔥"
+        text="热力图：行=音乐风格，列=指标维度（粉丝数/歌手数等）。颜色越深=数值越大。可快速识别高粉丝聚集的风格类型。"
+      />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

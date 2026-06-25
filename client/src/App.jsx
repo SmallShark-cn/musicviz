@@ -12,6 +12,7 @@ import RankingChart from "./components/RankingChart";
 import TrendAnalysisChart from "./components/TrendAnalysisChart";
 import SentimentAnalysisCard from "./components/SentimentAnalysisCard";
 import TopicClusterCard from "./components/TopicClusterCard";
+import MLScoreCard from "./components/MLScoreCard";
 import LyricWordCloud from "./components/LyricWordCloud";
 import MultiLineChart from "./components/MultiLineChart";
 import StackedBarChart from "./components/StackedBarChart";
@@ -83,6 +84,7 @@ export default function App() {
 
   // 歌手评论数数据
   const [commentCounts, setCommentCounts] = useState({});
+  const [mlData, setMlData] = useState(null);
 
   // 热搜数据
   const [hotSearch, setHotSearch] = useState([]);
@@ -122,25 +124,25 @@ export default function App() {
 
   // 国家/地区映射表
   const COUNTRY_REGION_MAP = {
-    "中国": "北京",
-    "中国内地": "北京",
-    "中国大陆": "北京",
-    "台湾": "台湾",
-    "中国台湾": "台湾",
-    "香港": "香港",
-    "中国香港": "香港",
-    "澳门": "澳门",
-    "中国澳门": "澳门",
-    "美国": "美国",
-    "日本": "日本",
-    "韩国": "韩国",
-    "新加坡": "新加坡",
-    "马来西亚": "马来西亚",
-    "英国": "英国",
-    "法国": "法国",
-    "德国": "德国",
-    "加拿大": "加拿大",
-    "澳大利亚": "澳大利亚",
+    中国: "北京",
+    中国内地: "北京",
+    中国大陆: "北京",
+    台湾: "台湾",
+    中国台湾: "台湾",
+    香港: "香港",
+    中国香港: "香港",
+    澳门: "澳门",
+    中国澳门: "澳门",
+    美国: "美国",
+    日本: "日本",
+    韩国: "韩国",
+    新加坡: "新加坡",
+    马来西亚: "马来西亚",
+    英国: "英国",
+    法国: "法国",
+    德国: "德国",
+    加拿大: "加拿大",
+    澳大利亚: "澳大利亚",
   };
 
   const updateRegion = (artistId, region) => {
@@ -242,11 +244,14 @@ export default function App() {
     if (!entered || selectedArtists.length === 0) return;
     selectedArtists.forEach((a) => {
       if (!similarArtists[a.id]) {
-        api.getSimilarArtists(a.id).then((data) => {
-          if (data && data.length > 0) {
-            setSimilarArtists((prev) => ({ ...prev, [a.id]: data }));
-          }
-        }).catch(() => { });
+        api
+          .getSimilarArtists(a.id)
+          .then((data) => {
+            if (data && data.length > 0) {
+              setSimilarArtists((prev) => ({ ...prev, [a.id]: data }));
+            }
+          })
+          .catch(() => { });
       }
     });
   }, [entered, selectedArtists]);
@@ -257,34 +262,43 @@ export default function App() {
     selectedArtists.forEach((a) => {
       // 获取歌手描述
       if (!artistDescs[a.id]) {
-        api.getArtistDesc(a.id).then((data) => {
-          if (data) {
-            setArtistDescs((prev) => ({ ...prev, [a.id]: data }));
-          }
-        }).catch(() => { });
+        api
+          .getArtistDesc(a.id)
+          .then((data) => {
+            if (data) {
+              setArtistDescs((prev) => ({ ...prev, [a.id]: data }));
+            }
+          })
+          .catch(() => { });
       }
       // 获取热门歌曲和评论数
       if (!artistTopSongs[a.id]) {
-        api.getArtistTopSongs(a.id, 10).then((data) => {
-          if (data && data.length > 0) {
-            setArtistTopSongs((prev) => ({ ...prev, [a.id]: data }));
-            // 计算评论数
-            const totalComments = data.reduce((sum, song) => sum + (song.comments_count || 0), 0);
-            setCommentCounts((prev) => ({ ...prev, [a.id]: totalComments }));
-            // 自动选择第一首歌用于评论分析（如果没有选中歌曲）
-            setAnalysisSong((prev) => {
-              if (!prev && data.length > 0) {
-                const artist = selectedArtists.find(sa => sa.id === a.id);
-                return {
-                  id: data[0].id,
-                  name: data[0].name,
-                  artist: artist?.name || a.name
-                };
-              }
-              return prev;
-            });
-          }
-        }).catch(() => { });
+        api
+          .getArtistTopSongs(a.id, 10)
+          .then((data) => {
+            if (data && data.length > 0) {
+              setArtistTopSongs((prev) => ({ ...prev, [a.id]: data }));
+              // 计算评论数
+              const totalComments = data.reduce(
+                (sum, song) => sum + (song.comments_count || 0),
+                0,
+              );
+              setCommentCounts((prev) => ({ ...prev, [a.id]: totalComments }));
+              // 自动选择第一首歌用于评论分析（如果没有选中歌曲）
+              setAnalysisSong((prev) => {
+                if (!prev && data.length > 0) {
+                  const artist = selectedArtists.find((sa) => sa.id === a.id);
+                  return {
+                    id: data[0].id,
+                    name: data[0].name,
+                    artist: artist?.name || a.name,
+                  };
+                }
+                return prev;
+              });
+            }
+          })
+          .catch(() => { });
       }
     });
   }, [entered, selectedArtists]);
@@ -292,15 +306,27 @@ export default function App() {
   // 获取全局图表数据（风格分布、专辑、年代风格演变、散点）
   useEffect(() => {
     if (!entered) return;
-    api.getStylePie().then(setStylePieData).catch(() => { });
-    api.getStackedEra().then(setStackedEraData).catch(() => { });
-    api.getScatter().then(setGlobalScatterData).catch(() => { });
+    api
+      .getStylePie()
+      .then(setStylePieData)
+      .catch(() => { });
+    api
+      .getStackedEra()
+      .then(setStackedEraData)
+      .catch(() => { });
+    api
+      .getScatter()
+      .then(setGlobalScatterData)
+      .catch(() => { });
 
     // 根据用户搜索的歌手获取专辑数据
     if (selectedArtists.length > 0) {
       // 取第一个歌手作为筛选条件
       const artistId = selectedArtists[0].id;
-      api.getAlbumDonut(artistId).then(setAlbumDonutData).catch(() => { });
+      api
+        .getAlbumDonut(artistId)
+        .then(setAlbumDonutData)
+        .catch(() => { });
     } else {
       setAlbumDonutData(null);
     }
@@ -309,12 +335,22 @@ export default function App() {
   // 获取热搜数据
   useEffect(() => {
     if (!entered) return;
-    api.getHotSearch().then((data) => {
-      if (data && data.length > 0) {
-        setHotSearch(data);
-      }
-    }).catch(() => { });
+    api
+      .getHotSearch()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setHotSearch(data);
+        }
+      })
+      .catch(() => { });
   }, [entered]);
+
+  // 加载 ML 互动度分析
+  useEffect(() => {
+    if (entered && !isLanding && !showLoadingPage) {
+      api.getInteractionAnalysis().then(setMlData).catch(() => { });
+    }
+  }, [entered, isLanding, showLoadingPage]);
 
   // 处理进入可视化
   const handleEnterVisualization = async () => {
@@ -637,17 +673,22 @@ export default function App() {
   );
 
   // ==================== 面板封装（无拖拽）====================
-  const DraggablePanel = ({ panelType, className, bodyClassName, children }) => {
+  const DraggablePanel = ({
+    panelType,
+    className,
+    bodyClassName,
+    children,
+  }) => {
     const span = PANEL_CONFIG[panelType]?.span || 1;
-    const spanClass = span > 1 ? `panel-span-${span}` : '';
+    const spanClass = span > 1 ? `panel-span-${span}` : "";
     return (
-      <div className={`panel ${spanClass} ${className || ''}`}>
+      <div className={`panel ${spanClass} ${className || ""}`}>
         <div className="panel-header">
           <span className="panel-title">
             {PANEL_CONFIG[panelType]?.icon} {PANEL_CONFIG[panelType]?.title}
           </span>
         </div>
-        <div className={`panel-body ${bodyClassName || ''}`}>{children}</div>
+        <div className={`panel-body ${bodyClassName || ""}`}>{children}</div>
       </div>
     );
   };
@@ -902,12 +943,6 @@ export default function App() {
                   ),
                   1,
                 );
-                const maxFollowers = Math.max(
-                  ...selectedArtists.map(
-                    (x) => artistDetails[x.id]?.followers || 0,
-                  ),
-                  1,
-                );
                 return (
                   <div key={a.id} className="compare-card">
                     <div className="compare-card-header">
@@ -950,54 +985,51 @@ export default function App() {
                           />
                         </div>
                       </div>
-                      <div className="compare-metric">
-                        <span className="metric-label">👥 粉丝</span>
-                        <span className="metric-value">
-                          {(d.followers || 0).toLocaleString()}
-                        </span>
-                        <div className="metric-bar">
-                          <div
-                            className="metric-fill fill-orange"
-                            style={{
-                              width: `${((d.followers || 0) / maxFollowers) * 100}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
                     </div>
                     {/* 相似歌手 */}
                     {(similarArtists[a.id] || []).length > 0 && (
                       <div className="compare-similar">
                         <div className="compare-similar-label">相似歌手</div>
                         <div className="compare-similar-list">
-                          {(similarArtists[a.id] || []).slice(0, 6).map((sim) => (
-                            <a
-                              key={sim.similar_artist_id}
-                              href={`https://music.163.com/#/artist?id=${sim.similar_artist_id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="compare-similar-chip"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                if (selectedArtists.length < MAX_ARTISTS &&
-                                  !selectedArtists.find(x => x.id === sim.similar_artist_id)) {
-                                  selectArtist({
-                                    id: sim.similar_artist_id,
-                                    name: sim.name,
-                                    avatar_url: sim.avatar_url,
-                                  });
-                                }
-                              }}
-                              title={sim.name}
-                            >
-                              <img
-                                className="compare-similar-avatar"
-                                src={sim.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sim.name)}&background=666&color=fff&size=32`}
-                                alt=""
-                              />
-                              <span className="compare-similar-name">{sim.name}</span>
-                            </a>
-                          ))}
+                          {(similarArtists[a.id] || [])
+                            .slice(0, 6)
+                            .map((sim) => (
+                              <a
+                                key={sim.similar_artist_id}
+                                href={`https://music.163.com/#/artist?id=${sim.similar_artist_id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="compare-similar-chip"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (
+                                    selectedArtists.length < MAX_ARTISTS &&
+                                    !selectedArtists.find(
+                                      (x) => x.id === sim.similar_artist_id,
+                                    )
+                                  ) {
+                                    selectArtist({
+                                      id: sim.similar_artist_id,
+                                      name: sim.name,
+                                      avatar_url: sim.avatar_url,
+                                    });
+                                  }
+                                }}
+                                title={sim.name}
+                              >
+                                <img
+                                  className="compare-similar-avatar"
+                                  src={
+                                    sim.avatar_url ||
+                                    `https://ui-avatars.com/api/?name=${encodeURIComponent(sim.name)}&background=666&color=fff&size=32`
+                                  }
+                                  alt=""
+                                />
+                                <span className="compare-similar-name">
+                                  {sim.name}
+                                </span>
+                              </a>
+                            ))}
                         </div>
                       </div>
                     )}
@@ -1017,15 +1049,19 @@ export default function App() {
                   const topSongs = artistTopSongs[a.id] || [];
                   const d = artistDetails[a.id] || {};
                   const briefDesc = d.description || "";
-                  const isExpanded = expandedArtists[a.id] !== undefined ? expandedArtists[a.id] : true;
-                  const hasMore = (briefDesc && briefDesc.length > 100) ||
-                    (desc?.introduction?.length > 0) ||
+                  const isExpanded =
+                    expandedArtists[a.id] !== undefined
+                      ? expandedArtists[a.id]
+                      : true;
+                  const hasMore =
+                    (briefDesc && briefDesc.length > 100) ||
+                    desc?.introduction?.length > 0 ||
                     topSongs.length > 0;
 
                   const toggleExpand = () => {
                     setExpandedArtists((prev) => ({
                       ...prev,
-                      [a.id]: !prev[a.id]
+                      [a.id]: !prev[a.id],
                     }));
                   };
 
@@ -1034,7 +1070,10 @@ export default function App() {
                       <div className="artist-info-header">
                         <img
                           className="artist-info-avatar"
-                          src={d.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name)}&background=ec4141&color=fff&size=60`}
+                          src={
+                            d.avatar_url ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(d.name)}&background=ec4141&color=fff&size=60`
+                          }
                           alt={d.name}
                         />
                         <div className="artist-info-title">
@@ -1050,13 +1089,15 @@ export default function App() {
                             className="artist-info-toggle"
                             onClick={toggleExpand}
                           >
-                            {isExpanded ? '▼' : '▶'}
+                            {isExpanded ? "▼" : "▶"}
                           </button>
                         )}
                       </div>
 
                       {briefDesc && (
-                        <div className={`artist-brief ${isExpanded ? '' : 'collapsed'}`}>
+                        <div
+                          className={`artist-brief ${isExpanded ? "" : "collapsed"}`}
+                        >
                           <p>{briefDesc}</p>
                         </div>
                       )}
@@ -1065,16 +1106,28 @@ export default function App() {
                         <div className="artist-expanded-content">
                           {desc?.introduction?.length > 0 && (
                             <div className="artist-achievements">
-                              {desc.introduction.slice(0, 2).map((intro, idx) => (
-                                <div key={idx} className="achievement-item">
-                                  <div className="achievement-title">{intro.ti}</div>
-                                  <div className="achievement-content">
-                                    {intro.txt.split('\n').slice(0, 5).map((line, i) => (
-                                      <span key={i} className="achievement-line">{line}</span>
-                                    ))}
+                              {desc.introduction
+                                .slice(0, 2)
+                                .map((intro, idx) => (
+                                  <div key={idx} className="achievement-item">
+                                    <div className="achievement-title">
+                                      {intro.ti}
+                                    </div>
+                                    <div className="achievement-content">
+                                      {intro.txt
+                                        .split("\n")
+                                        .slice(0, 5)
+                                        .map((line, i) => (
+                                          <span
+                                            key={i}
+                                            className="achievement-line"
+                                          >
+                                            {line}
+                                          </span>
+                                        ))}
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
+                                ))}
                             </div>
                           )}
 
@@ -1084,9 +1137,15 @@ export default function App() {
                               <div className="top-songs-list">
                                 {topSongs.slice(0, 5).map((song, idx) => (
                                   <div key={song.id} className="top-song-item">
-                                    <span className="top-song-rank">{idx + 1}</span>
-                                    <span className="top-song-name">{song.name}</span>
-                                    <span className="top-song-pop">🔥 {song.popularity}</span>
+                                    <span className="top-song-rank">
+                                      {idx + 1}
+                                    </span>
+                                    <span className="top-song-name">
+                                      {song.name}
+                                    </span>
+                                    <span className="top-song-pop">
+                                      🔥 {song.popularity}
+                                    </span>
                                   </div>
                                 ))}
                               </div>
@@ -1105,16 +1164,26 @@ export default function App() {
               <div className="hot-search-grid">
                 {hotSearch.map((item, idx) => (
                   <div key={idx} className="hot-search-item">
-                    <span className={`hot-search-rank rank-${idx + 1}`}>{idx + 1}</span>
+                    <span className={`hot-search-rank rank-${idx + 1}`}>
+                      {idx + 1}
+                    </span>
                     <span className="hot-search-word">{item.searchWord}</span>
                     {item.score > 0 && (
                       <span className="hot-search-score">
-                        {item.score > 10000 ? `${(item.score / 10000).toFixed(1)}万` : item.score}
+                        {item.score > 10000
+                          ? `${(item.score / 10000).toFixed(1)}万`
+                          : item.score}
                       </span>
                     )}
-                    {item.iconType === 1 && <span className="hot-search-tag hot">热</span>}
-                    {item.iconType === 2 && <span className="hot-search-tag new">新</span>}
-                    {item.iconType === 3 && <span className="hot-search-tag recommend">荐</span>}
+                    {item.iconType === 1 && (
+                      <span className="hot-search-tag hot">热</span>
+                    )}
+                    {item.iconType === 2 && (
+                      <span className="hot-search-tag new">新</span>
+                    )}
+                    {item.iconType === 3 && (
+                      <span className="hot-search-tag recommend">荐</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1124,7 +1193,12 @@ export default function App() {
             <DraggablePanel panelType={PANEL_TYPES.RADAR}>
               {compareData?.radar?.length > 0 ? (
                 <RadarChart data={compareData.radar} />
-              ) : <div className="empty-state"><div className="empty-state-icon">📋</div><p>暂无数据</p></div>}
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">📋</div>
+                  <p>暂无数据</p>
+                </div>
+              )}
             </DraggablePanel>
 
             {/* 4. Top10 歌曲评论数排名 */}
@@ -1132,155 +1206,342 @@ export default function App() {
               {compareData?.all_top50?.length > 0 ? (
                 <RankingChart
                   data={compareData.all_top50.slice(0, 10).map((s, i) => ({
-                    rank: i + 1, name: s.name, plays: s.comments, comments: s.comments,
-                    artist_name: compareData.artists.find((a) => a.id === s.artist_id)?.name || "",
+                    rank: i + 1,
+                    name: s.name,
+                    plays: s.comments,
+                    comments: s.comments,
+                    artist_name:
+                      compareData.artists.find((a) => a.id === s.artist_id)
+                        ?.name || "",
                   }))}
                 />
-              ) : <div className="empty-state"><div className="empty-state-icon">🏆</div><p>暂无数据</p></div>}
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">🏆</div>
+                  <p>暂无数据</p>
+                </div>
+              )}
             </DraggablePanel>
 
-            {/* 3. 歌手核心指标分组对比 */}
+            {/* 3. 热度与影响力三维对比 */}
             <DraggablePanel panelType={PANEL_TYPES.GROUPED_BAR}>
-              {compareData?.artists?.length > 0 ? (
+              {compareData?.artists?.length > 0 ? (<>
+                <div style={{ marginBottom: 12, padding: 12, background: "var(--bg-secondary)", borderRadius: 8, border: "1px solid var(--border-color)", fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6 }}>
+                  对比不同歌手的整体热度水平和单曲上限。<br />
+                  平均热度 = 该歌手所有歌曲热度的平均分，反映整体实力；<br />
+                  热度峰值 = 该歌手单曲最高热度分，反映爆款天花板。
+                </div>
                 <GroupedBarChart
                   data={compareData.artists.map((a) => ({
-                    name: a.name, song_count: a.song_count, total_plays: a.avg_pop * (a.song_count || 1),
-                    total_comments: a.total_comments,
+                    name: a.name,
+                    avg_pop: a.avg_pop || 0,
+                    max_pop: a.max_pop || 0,
                   }))}
                 />
-              ) : <div className="empty-state"><div className="empty-state-icon">📊</div><p>暂无数据</p></div>}
+              </>) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">📊</div>
+                  <p>暂无数据</p>
+                </div>
+              )}
             </DraggablePanel>
 
             {/* 4. 各歌手年度产出趋势 */}
             <DraggablePanel panelType={PANEL_TYPES.YEARLY_TREND}>
-              {compareData?.artists?.some(a => a.yearly_trend?.length > 0) ? (
+              {compareData?.artists?.some((a) => a.yearly_trend?.length > 0) ? (
                 <MultiLineChart
-                  data={compareData.artists.flatMap(a =>
-                    (a.yearly_trend || []).map(y => ({ artist: a.name, year: y.year, count: y.count }))
+                  data={compareData.artists.flatMap((a) =>
+                    (a.yearly_trend || []).map((y) => ({
+                      artist: a.name,
+                      year: y.year,
+                      count: y.count,
+                    })),
                   )}
                 />
-              ) : <div className="empty-state"><div className="empty-state-icon">📈</div><p>暂无数据</p></div>}
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">📈</div>
+                  <p>暂无数据</p>
+                </div>
+              )}
             </DraggablePanel>
 
             {/* 5. 歌词词云 */}
             <DraggablePanel panelType={PANEL_TYPES.LYRIC_WORDCLOUD}>
               {lyricWordCloudData?.words?.length > 0 ? (
                 <LyricWordCloud data={lyricWordCloudData} />
-              ) : <div className="empty-state"><div className="empty-state-icon">☁️</div><p>暂无歌词数据</p></div>}
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">☁️</div>
+                  <p>暂无歌词数据</p>
+                </div>
+              )}
             </DraggablePanel>
 
             {/* 6. 歌曲年代分布占比 */}
             <DraggablePanel panelType={PANEL_TYPES.ERA_PIE}>
               {compareData?.era_pie?.length > 0 ? (
-                <PieChart data={compareData.era_pie.map(d => ({ name: d.name, count: d.value }))} />
-              ) : <div className="empty-state"><div className="empty-state-icon">🥧</div><p>暂无数据</p></div>}
+                <PieChart
+                  data={compareData.era_pie.map((d) => ({
+                    name: d.name,
+                    count: d.value,
+                  }))}
+                />
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">🥧</div>
+                  <p>暂无数据</p>
+                </div>
+              )}
             </DraggablePanel>
 
-            {/* 7. 播放量排名衰减曲线 */}
+            {/* 7. 各歌手Top10热度衰减对比 */}
             <DraggablePanel panelType={PANEL_TYPES.PLAYS_TREND}>
-              {compareData?.artists?.[0]?.top10?.length > 0 ? (
-                <LineChart
-                  data={compareData.artists.flatMap(a =>
-                    (a.top10 || []).map(s => ({
-                      ranking: s.rank, plays: s.pop, name: s.name,
-                    }))
+              {compareData?.artists?.some((a) => a.top10?.length > 0) ? (
+                <MultiLineChart
+                  data={compareData.artists.flatMap((a) =>
+                    (a.top10 || []).map((s) => ({
+                      artist: a.name,
+                      rank: s.rank,
+                      plays: s.pop,
+                      name: s.name,
+                    })),
                   )}
                 />
-              ) : <div className="empty-state"><div className="empty-state-icon">📉</div><p>暂无数据</p></div>}
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">📉</div>
+                  <p>暂无数据</p>
+                </div>
+              )}
             </DraggablePanel>
 
-            {/* 8. 粉丝数 vs 评论数散点图 */}
-            <DraggablePanel panelType={PANEL_TYPES.SCATTER}>
+            {/* 8. 作品量x热度x互动 气泡图 */}
+            <DraggablePanel
+              panelType={PANEL_TYPES.SCATTER}
+              className="grid-col-span-2"
+            >
               {globalScatterData?.length > 0 ? (
-                <ScatterChart data={globalScatterData} />
-              ) : <div className="empty-state"><div className="empty-state-icon">🎯</div><p>暂无数据</p></div>}
+                <BubbleChart data={globalScatterData} />
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">🫧</div>
+                  <p>暂无数据</p>
+                </div>
+              )}
             </DraggablePanel>
 
             {/* 9. 歌手归属地热力地图 */}
             <DraggablePanel panelType={PANEL_TYPES.MAP}>
               {selectedArtists.length > 0 ? (
                 <MapChart
-                  artists={compareData?.artists || selectedArtists.map(a => ({ ...a, avg_pop: 0, song_count: artistDetails[a.id]?.song_count || 0 }))}
+                  artists={
+                    compareData?.artists ||
+                    selectedArtists.map((a) => ({
+                      ...a,
+                      avg_pop: 0,
+                      song_count: artistDetails[a.id]?.song_count || 0,
+                    }))
+                  }
                   regionMap={regionMap}
                   onUpdateRegion={updateRegion}
                 />
-              ) : <div className="empty-state"><div className="empty-state-icon">🗺️</div><p>选择歌手后展示地区分布</p></div>}
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">🗺️</div>
+                  <p>选择歌手后展示地区分布</p>
+                </div>
+              )}
             </DraggablePanel>
 
             {/* 10. 风格标签分布占比 */}
             <DraggablePanel panelType={PANEL_TYPES.STYLE_PIE}>
               {stylePieData?.length > 0 ? (
                 <PieChart data={stylePieData} />
-              ) : <div className="empty-state"><div className="empty-state-icon">🎵</div><p>暂无数据</p></div>}
-            </DraggablePanel>
-
-            {/* 11. 热门专辑评论占比 */}
-            <DraggablePanel panelType={PANEL_TYPES.ALBUM_DONUT}>
-              {albumDonutData?.length > 0 ? (
-                <DonutChart data={albumDonutData} />
-              ) : <div className="empty-state"><div className="empty-state-icon">💿</div><p>暂无数据</p></div>}
-            </DraggablePanel>
-
-            {/* 13. 不同时期音乐风格演变 */}
-            <DraggablePanel panelType={PANEL_TYPES.STACKED_ERA}>
-              {stackedEraData?.length > 0 ? (
-                <StackedBarChart data={stackedEraData} />
-              ) : <div className="empty-state"><div className="empty-state-icon">📚</div><p>暂无数据</p></div>}
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state-icon">🎵</div>
+                  <p>暂无数据</p>
+                </div>
+              )}
             </DraggablePanel>
 
             {/* 14. 评论情感分析 */}
-            <DraggablePanel panelType={PANEL_TYPES.SENTIMENT} bodyClassName="panel-body-tall">
-              <div style={{ marginBottom: '16px', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                <label style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', display: 'block' }}>选择分析歌曲</label>
-                <select
-                  value={analysisSong?.id || ''}
-                  onChange={(e) => {
-                    const allSongs = selectedArtists.flatMap(a => (artistTopSongs[a.id] || []).map(s => ({ ...s, artistName: a.name })));
-                    const selected = allSongs.find(s => s.id === parseInt(e.target.value));
-                    if (selected) setAnalysisSong({ id: selected.id, name: selected.name, artist: selected.artistName });
+            <DraggablePanel
+              panelType={PANEL_TYPES.SENTIMENT}
+              bodyClassName="panel-body-tall"
+            >
+              <div
+                style={{
+                  marginBottom: "16px",
+                  padding: "12px",
+                  background: "var(--bg-secondary)",
+                  borderRadius: "8px",
+                  border: "1px solid var(--border-color)",
+                }}
+              >
+                <label
+                  style={{
+                    fontSize: "12px",
+                    color: "var(--text-muted)",
+                    marginBottom: "8px",
+                    display: "block",
                   }}
-                  style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '13px', cursor: 'pointer' }}
                 >
-                  {selectedArtists.map(a => {
+                  选择分析歌曲
+                </label>
+                <select
+                  value={analysisSong?.id || ""}
+                  onChange={(e) => {
+                    const allSongs = selectedArtists.flatMap((a) =>
+                      (artistTopSongs[a.id] || []).map((s) => ({
+                        ...s,
+                        artistName: a.name,
+                      })),
+                    );
+                    const selected = allSongs.find(
+                      (s) => s.id === parseInt(e.target.value),
+                    );
+                    if (selected)
+                      setAnalysisSong({
+                        id: selected.id,
+                        name: selected.name,
+                        artist: selected.artistName,
+                      });
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border-light)",
+                    borderRadius: "6px",
+                    color: "var(--text-primary)",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {selectedArtists.map((a) => {
                     const songs = artistTopSongs[a.id] || [];
                     if (songs.length === 0) return null;
                     return (
                       <optgroup key={a.id} label={`🎵 ${a.name} 的热门歌曲`}>
-                        {songs.slice(0, 5).map(song => <option key={song.id} value={song.id}>{song.name}</option>)}
+                        {songs.slice(0, 5).map((song) => (
+                          <option key={song.id} value={song.id}>
+                            {song.name}
+                          </option>
+                        ))}
                       </optgroup>
                     );
                   })}
                 </select>
               </div>
-              <SentimentAnalysisCard songId={analysisSong?.id || ''} songName={analysisSong ? `${analysisSong.name} - ${analysisSong.artist}` : ''} />
+              <SentimentAnalysisCard
+                songId={analysisSong?.id || ""}
+                songName={
+                  analysisSong
+                    ? `${analysisSong.name} - ${analysisSong.artist}`
+                    : ""
+                }
+              />
             </DraggablePanel>
 
             {/* 15. 评论主题聚类 */}
-            <DraggablePanel panelType={PANEL_TYPES.TOPIC} bodyClassName="panel-body-tall">
-              <div style={{ marginBottom: '16px', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                <label style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', display: 'block' }}>选择分析歌曲</label>
-                <select
-                  value={analysisSong?.id || ''}
-                  onChange={(e) => {
-                    const allSongs = selectedArtists.flatMap(a => (artistTopSongs[a.id] || []).map(s => ({ ...s, artistName: a.name })));
-                    const selected = allSongs.find(s => s.id === parseInt(e.target.value));
-                    if (selected) setAnalysisSong({ id: selected.id, name: selected.name, artist: selected.artistName });
+            <DraggablePanel
+              panelType={PANEL_TYPES.TOPIC}
+              bodyClassName="panel-body-tall"
+            >
+              <div
+                style={{
+                  marginBottom: "16px",
+                  padding: "12px",
+                  background: "var(--bg-secondary)",
+                  borderRadius: "8px",
+                  border: "1px solid var(--border-color)",
+                }}
+              >
+                <label
+                  style={{
+                    fontSize: "12px",
+                    color: "var(--text-muted)",
+                    marginBottom: "8px",
+                    display: "block",
                   }}
-                  style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '13px', cursor: 'pointer' }}
                 >
-                  {selectedArtists.map(a => {
+                  选择分析歌曲
+                </label>
+                <select
+                  value={analysisSong?.id || ""}
+                  onChange={(e) => {
+                    const allSongs = selectedArtists.flatMap((a) =>
+                      (artistTopSongs[a.id] || []).map((s) => ({
+                        ...s,
+                        artistName: a.name,
+                      })),
+                    );
+                    const selected = allSongs.find(
+                      (s) => s.id === parseInt(e.target.value),
+                    );
+                    if (selected)
+                      setAnalysisSong({
+                        id: selected.id,
+                        name: selected.name,
+                        artist: selected.artistName,
+                      });
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border-light)",
+                    borderRadius: "6px",
+                    color: "var(--text-primary)",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {selectedArtists.map((a) => {
                     const songs = artistTopSongs[a.id] || [];
                     if (songs.length === 0) return null;
                     return (
                       <optgroup key={a.id} label={`🎵 ${a.name} 的热门歌曲`}>
-                        {songs.slice(0, 5).map(song => <option key={song.id} value={song.id}>{song.name}</option>)}
+                        {songs.slice(0, 5).map((song) => (
+                          <option key={song.id} value={song.id}>
+                            {song.name}
+                          </option>
+                        ))}
                       </optgroup>
                     );
                   })}
                 </select>
               </div>
-              <TopicClusterCard songId={analysisSong?.id || ''} songName={analysisSong ? `${analysisSong.name} - ${analysisSong.artist}` : ''} />
+              <TopicClusterCard
+                songId={analysisSong?.id || ""}
+                songName={
+                  analysisSong
+                    ? `${analysisSong.name} - ${analysisSong.artist}`
+                    : ""
+                }
+              />
             </DraggablePanel>
+
+            {/* 16. 歌曲互动度评分分布 */}
+            <DraggablePanel panelType={PANEL_TYPES.GROUPED_BAR}>
+              {mlData ? (
+                <MLScoreCard data={mlData} chart="pie" />
+              ) : (
+                <div className="empty-state"><div className="empty-state-icon">ML</div><p>加载中...</p></div>
+              )}
+            </DraggablePanel>
+
+            {/* 17. 特征重要性 */}
+            <DraggablePanel panelType={PANEL_TYPES.STYLE_PIE}>
+              {mlData ? (
+                <MLScoreCard data={mlData} chart="bar" />
+              ) : (
+                <div className="empty-state"><div className="empty-state-icon">ML</div><p>加载中...</p></div>
+              )}
+            </DraggablePanel>
+
           </div>
 
           <footer className="footer">

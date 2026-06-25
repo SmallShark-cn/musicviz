@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 /**
  * 计算线性回归
@@ -68,11 +69,6 @@ export default function TrendAnalysisChart({ data }) {
       ? sortedData.map((d, i) => regression.slope * (i + 1) + regression.intercept)
       : [];
 
-    const avgValue = yData.reduce((a, b) => a + b, 0) / yData.length;
-    const volatility = Math.sqrt(
-      yData.reduce((sum, val) => sum + Math.pow(val - avgValue, 2), 0) / yData.length
-    );
-
     chartRef.current.setOption(
       {
         title: {
@@ -88,10 +84,15 @@ export default function TrendAnalysisChart({ data }) {
           formatter: (p) => {
             const idx = p[0].dataIndex;
             const d = sortedData[idx];
-            return `排名 #${d.rank}<br/>${d.name}<br/>热度值: ${d.value}`;
+            return `<b>排名 #${d.rank}</b><br/>${d.name}<br/>热度值: ${d.value}`;
           },
         },
-        grid: { left: 60, right: 30, top: 45, bottom: 45 },
+        legend: {
+          data: ["热度值", "趋势线", "移动平均"],
+          bottom: 0,
+          textStyle: { fontSize: 11 },
+        },
+        grid: { left: 60, right: 30, top: 50, bottom: 50 },
         xAxis: {
           type: "category",
           data: xData,
@@ -138,7 +139,6 @@ export default function TrendAnalysisChart({ data }) {
             type: "line",
             name: "移动平均",
             data: yData.map((_, i) => {
-              const windowSize = 3;
               let sum = 0, count = 0;
               for (let j = Math.max(0, i - 1); j <= Math.min(yData.length - 1, i + 1); j++) {
                 sum += yData[j];
@@ -172,5 +172,13 @@ export default function TrendAnalysisChart({ data }) {
     };
   }, [data, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  return (
+    <div>
+      <ChartTip
+        icon="📉"
+        text="展示TOP10歌曲热度随排名衰减的曲线。蓝色虚线=线性回归趋势，绿色实线=3点移动平均。R²越接近1说明衰减越有规律。"
+      />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

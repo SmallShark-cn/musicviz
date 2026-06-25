@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 export default function PieChart({ data }) {
   const { theme } = useTheme();
@@ -28,23 +29,46 @@ export default function PieChart({ data }) {
       "#14b8a6",
     ];
 
+    // 智能判断图表含义：根据第一个数据项的字段名
+    const isStyle = data[0]?.style !== undefined;
+
     chartRef.current.setOption(
       {
-        tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
+        tooltip: {
+          trigger: "item",
+          formatter: (p) => `<b>${p.name}</b><br/>数量: ${p.value}<br/>占比: ${p.percent}%`,
+        },
+        legend: {
+          bottom: 0,
+          left: "center",
+          textStyle: { fontSize: 11 },
+          itemWidth: 12,
+          itemHeight: 12,
+          type: "scroll",
+        },
         series: [
           {
             type: "pie",
-            radius: ["45%", "75%"],
-            center: ["50%", "50%"],
+            radius: ["38%", "68%"],
+            center: ["50%", "45%"],
             roseType: "area",
             itemStyle: {
               borderRadius: 6,
               borderColor: theme === "dark" ? "#161c2c" : "#fff",
               borderWidth: 3,
             },
-            label: { show: true, fontSize: 11 },
+            label: {
+              show: true,
+              fontSize: 11,
+              formatter: "{b}\n{d}%",
+              lineHeight: 14,
+            },
+            labelLine: {
+              length: 8,
+              length2: 10,
+            },
             emphasis: {
-              label: { fontSize: 16, fontWeight: "bold" },
+              label: { fontSize: 14, fontWeight: "bold" },
               scaleSize: 10,
             },
             data: data.map((d, i) => ({
@@ -66,5 +90,12 @@ export default function PieChart({ data }) {
     };
   }, [data, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  const tipText = "南丁格尔玫瑰图：扇形面积代表该类别在总量中的占比。占比越大、扇形面积越大。";
+
+  return (
+    <div>
+      <ChartTip icon="🥧" text={tipText} />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

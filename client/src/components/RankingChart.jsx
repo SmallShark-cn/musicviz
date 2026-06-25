@@ -28,7 +28,7 @@ export default function RankingChart({ data }) {
       const rankedData = [...data].sort((a, b) => b.plays - a.plays);
       const names = rankedData
         .map((d) => {
-          const song = d.name?.length > 10 ? d.name.slice(0, 10) + "..." : d.name;
+          const song = d.name?.length > 14 ? d.name.slice(0, 14) + "..." : d.name;
           const artist = d.artist_name || "";
           return [song, artist];
         })
@@ -52,11 +52,13 @@ export default function RankingChart({ data }) {
             formatter: (p) => {
               const idx = rankedData.length - 1 - p[0].dataIndex;
               const d = rankedData[idx];
-              return `#${idx + 1} ${d.artist_name || ""} - ${d.name}<br/>` +
+              return `<b>#${idx + 1} ${d.name}</b><br/>` +
+                `歌手: ${d.artist_name || "未知"}<br/>` +
+                `播放量: ${d.plays.toLocaleString()}<br/>` +
                 `评论数: ${(d.comments || 0).toLocaleString()}`;
             },
           },
-          grid: { left: 120, right: 60, top: 15, bottom: 35 },
+          grid: { left: 140, right: 80, top: 15, bottom: 35 },
           xAxis: {
             type: "value",
             max: maxValue * 1.1,
@@ -113,6 +115,13 @@ export default function RankingChart({ data }) {
                 },
               })),
               barWidth: "50%",
+              label: {
+                show: true,
+                position: "right",
+                formatter: (p) => formatNumber(p.value),
+                fontSize: 10,
+                color: theme === "dark" ? "#aaa" : "#666",
+              },
             },
           ],
         },

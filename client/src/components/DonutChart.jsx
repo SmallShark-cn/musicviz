@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import { useTheme } from "../ThemeContext";
+import ChartTip from "./ChartTip";
 
 export default function DonutChart({ data }) {
   const { theme } = useTheme();
@@ -19,7 +20,10 @@ export default function DonutChart({ data }) {
 
     chartRef.current.setOption(
       {
-        tooltip: { trigger: "item", formatter: "{b}<br/>评论: {c} ({d}%)" },
+        tooltip: {
+          trigger: "item",
+          formatter: (p) => `<b>${p.name}</b><br/>评论: ${p.value.toLocaleString()}<br/>占比: ${p.percent}%`,
+        },
         legend: {
           orient: "vertical",
           right: 10,
@@ -29,11 +33,18 @@ export default function DonutChart({ data }) {
         series: [
           {
             type: "pie",
-            radius: ["50%", "80%"],
-            center: ["40%", "50%"],
-            label: { show: false },
+            radius: ["45%", "75%"],
+            center: ["38%", "50%"],
+            label: {
+              show: true,
+              position: "outside",
+              formatter: "{b}\n{d}%",
+              fontSize: 11,
+            },
+            labelLine: { length: 8, length2: 8 },
             emphasis: {
               label: { show: true, fontSize: 14, fontWeight: "bold" },
+              scaleSize: 10,
             },
             itemStyle: {
               borderRadius: 4,
@@ -59,5 +70,13 @@ export default function DonutChart({ data }) {
     };
   }, [data, theme]);
 
-  return <div ref={ref} className="chart-container" />;
+  return (
+    <div>
+      <ChartTip
+        icon="💿"
+        text="展示TOP5热门专辑的评论数分布占比。环图面积代表评论数总量，扇形大小代表该专辑在Top5中的占比。"
+      />
+      <div ref={ref} className="chart-container" />
+    </div>
+  );
 }

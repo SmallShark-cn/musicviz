@@ -80,12 +80,12 @@ export default function GroupedBarChart({ data }) {
   }, [data, theme]);
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <ChartTip
         icon="📊"
         text="分组柱状图：蓝色=平均热度，红色=最高热度。差值越大代表该歌手作品质量参差不齐，差值越小代表水平稳定。"
       />
-      <div ref={ref} className="chart-container" />
+      <div ref={ref} style={{ flex: 1, minHeight: 0 }} />
     </div>
   );
 }

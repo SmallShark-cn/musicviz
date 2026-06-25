@@ -28,11 +28,12 @@ export default function PieChart({ data }) {
       "#14b8a6",
     ];
 
-    // 智能判断图表含义：根据第一个数据项的字段名
-    const isStyle = data[0]?.style !== undefined;
+    // 数据清洗：过滤无效值，确保 count 为数字
+    const cleanData = data
+      .filter((d) => d.count > 0)
+      .map((d) => ({ ...d, count: Number(d.count) || 0 }));
 
-    // 数据归一化：过滤无效值（count<=0），并按总和计算真实占比
-    const total = data.reduce((s, d) => s + (Number(d.count) || 0), 0);
+    const total = cleanData.reduce((s, d) => s + d.count, 0);
 
     chartRef.current.setOption(
       {
@@ -40,7 +41,7 @@ export default function PieChart({ data }) {
           trigger: "item",
           formatter: (p) => {
             const pct = total > 0 ? ((p.value / total) * 100).toFixed(1) : 0;
-            return `<b>${p.name}</b><br/>数量: ${p.value}<br/>占比: ${pct}%`;
+            return `<b>${p.name}</b><br/>数量: ${p.value.toLocaleString()}<br/>占比: ${pct}%`;
           },
         },
         legend: {
@@ -79,7 +80,7 @@ export default function PieChart({ data }) {
               label: { fontSize: 14, fontWeight: "bold" },
               scaleSize: 10,
             },
-            data: data.map((d, i) => ({
+            data: cleanData.map((d, i) => ({
               value: d.count,
               name: d.name,
               itemStyle: { color: colors[i % colors.length] },
@@ -99,8 +100,8 @@ export default function PieChart({ data }) {
   }, [data, theme]);
 
   return (
-    <div>
-      <div ref={ref} className="chart-container" />
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <div ref={ref} style={{ flex: 1, minHeight: 0 }} />
     </div>
   );
 }

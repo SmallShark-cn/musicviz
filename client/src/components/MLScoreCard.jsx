@@ -86,10 +86,10 @@ function MLBar({ data }) {
           trigger: "axis",
           formatter: (p) => {
             const d = fi[fi.length - 1 - p[0].dataIndex];
-            return `${d[0]}<br/>重要性: ${(d[1] * 100).toFixed(1)}%`;
+            return `${d[0]}<br/>重要性: ${d[1].toFixed(1)}%`;
           },
         },
-        grid: { left: 100, right: 30, top: 10, bottom: 30 },
+        grid: { left: 100, right: 60, top: 10, bottom: 30 },
         yAxis: {
           type: "category",
           data: fi.map((f) => f[0]).reverse(),
@@ -97,7 +97,7 @@ function MLBar({ data }) {
         },
         xAxis: {
           type: "value",
-          axisLabel: { formatter: (v) => (v * 100).toFixed(0) + "%" },
+          axisLabel: { formatter: (v) => v.toFixed(0) + "%" },
         },
         series: [
           {
@@ -108,7 +108,7 @@ function MLBar({ data }) {
             label: {
               show: true,
               position: "right",
-              formatter: (p) => (p.value * 100).toFixed(1) + "%",
+              formatter: (p) => p.value.toFixed(1) + "%",
               fontSize: 10,
             },
           },

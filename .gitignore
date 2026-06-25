@@ -37,3 +37,19 @@ build/
 
 # Keys
 *.pem
+
+# Generated files
+ml_result.json
+*.json.bak
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Vite
+.vite/
+
+# Database
+*.db
+*.sqlite

@@ -1,3 +1,0 @@
-include MusicLibrary/include/*.h
-include MusicLibrary/lib/*.dll
-include MusicLibrary/*.py

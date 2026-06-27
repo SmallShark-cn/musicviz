@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-互动度评分预测 — 分类模型
+歌曲潜力评分预测 — 分类模型 v2
 ==================================
-目标：预测歌曲互动评分(1-5分)
-模型：RandomForest + GradientBoosting + GridSearchCV 调参
+目标：识别"潜力歌曲" — 相对于播放量，评论互动是否超出预期
+核心思路：不直接预测评论数，而是预测"评论/播放比"的档位
+  - 播放量低但评论多 → 潜力股（死忠粉多，值得推广）
+  - 播放量高但评论少 → 被高估（曝光多但互动差）
+模型：RandomForest + GradientBoosting
 """
 
 import json
@@ -18,8 +21,8 @@ import pymysql
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from sklearn.model_selection import GridSearchCV, cross_val_score, train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.preprocessing import StandardScaler
 from sklearn.utils.class_weight import compute_class_weight
 
 warnings.filterwarnings("ignore")
@@ -36,12 +39,15 @@ OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "ml_result.json")
 TRAINING_CURVE_FILE = os.path.join(os.path.dirname(__file__), "training_curve.json")
 LOG = []
 
+
 def log(msg):
     LOG.append(msg)
     print(msg)
 
+
 def section(title):
     log(f"\n{'=' * 60}\n  {title}\n{'=' * 60}")
+
 
 # ============================================================
 # 1. 数据采集
@@ -63,9 +69,9 @@ conn.close()
 log(f"原始数据: {len(rows)} 条")
 
 # ============================================================
-# 2. 清洗 + 构造评分
+# 2. 清洗 + 构造潜力评分
 # ============================================================
-section("2. 数据清洗 & 评分构造")
+section("2. 数据清洗 & 潜力评分构造")
 
 valid = []
 for r in rows:
@@ -91,27 +97,43 @@ for r in rows:
         }
     )
 
-# 自定义5档评分（基于评论数的实际分布 — 65%数据评论为0）
+# 核心：计算"评论/播放比"，用分位数分档构造潜力评分
+# log_ratio 越大 = 相对于播放量，评论越多 = 潜力越高
+ratios = []
 for d in valid:
-    c = d["comments"]
-    if c == 0:         d["score"] = 1
-    elif c < 500:      d["score"] = 2
-    elif c < 5000:     d["score"] = 3
-    elif c < 30000:    d["score"] = 4
-    else:              d["score"] = 5
+    # 避免除零和 log(0)
+    ratio = d["comments"] / max(d["plays"], 1)
+    log_ratio = math.log(ratio + 1e-10)
+    ratios.append(log_ratio)
+    d["log_ratio"] = log_ratio
 
-scores = [d["score"] for d in valid]
-unique, counts = np.unique(scores, return_counts=True)
+# 用分位数切分为 3 档（低/中/高潜力，边界更清晰）
+percentiles = np.percentile(ratios, [33, 67])
+log(f"分位数阈值: {[round(p, 4) for p in percentiles]}")
+
+for d in valid:
+    lr = d["log_ratio"]
+    if lr < percentiles[0]:
+        d["potential"] = 1  # 低潜力（播放高但评论少 → 被高估）
+    elif lr < percentiles[1]:
+        d["potential"] = 2  # 中等潜力
+    else:
+        d["potential"] = 3  # 高潜力（播放低但评论多 → 潜力股）
+
+potentials = [d["potential"] for d in valid]
+unique, counts = np.unique(potentials, return_counts=True)
 log(f"清洗后: {len(valid)} 条")
-log(f"评分分布:")
+log(f"潜力评分分布 (分位数分档):")
 for u, c in zip(unique, counts):
-    log(f"  {u}分: {c} 条 ({c / len(valid) * 100:.1f}%)")
+    label = {1: "低潜力", 2: "较低", 3: "中等", 4: "较高", 5: "高潜力(潜力股)"}[u]
+    log(f"  {u}分 ({label}): {c} 条 ({c / len(valid) * 100:.1f}%)")
 
 # ============================================================
 # 3. 特征工程
 # ============================================================
 section("3. 特征工程")
 
+# 包含 plays 相关特征 — 模型需要学习"播放量与评论的关系"
 FEATURES = [
     "plays",
     "log_plays",
@@ -122,9 +144,9 @@ FEATURES = [
     "era_sqrt",
     "music_size",
     "album_size",
-    "productivity",  # music_size / max(era, 1) → 年均产量
-    "is_long_song",  # 是否长歌 (>5分钟)
-    "is_old_song",  # 是否老歌 (>10年)
+    "productivity",
+    "is_long_song",
+    "is_old_song",
 ]
 
 for d in valid:
@@ -141,17 +163,15 @@ log(f"特征列表: {FEATURES}")
 
 # 特征选择
 X = np.array([[d[f] for f in FEATURES] for d in valid])
-y = np.array([d["score"] for d in valid])
+y = np.array([d["potential"] for d in valid])
 
 selector = SelectKBest(f_classif, k=min(10, len(FEATURES)))
 selector.fit(X, y)
 selected_idx = selector.get_support()
 selected_features = [FEATURES[i] for i in range(len(FEATURES)) if selected_idx[i]]
 
-# 如果特征选择没有显著提升，使用全部特征
 if len(selected_features) < 5:
     selected_features = FEATURES
-    selected_idx = [True] * len(FEATURES)
 
 X = np.array([[d[f] for f in selected_features] for d in valid])
 log(f"特征选择后: {len(selected_features)} 个")
@@ -167,12 +187,9 @@ for i in sorted(range(len(FEATURES)), key=lambda i: scores_f[i], reverse=True):
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# 计算类别权重（评分多分类用 balanced）
+# 类别权重
 class_weights = compute_class_weight("balanced", classes=np.unique(y), y=y)
-weight_dict = {int(k): float(w) for k, w in zip(np.unique(y), class_weights)}
-log(
-    f"类别权重 (处理不均衡): {dict((k, round(float(v), 2)) for k, v in zip(np.unique(y), class_weights))}"
-)
+log(f"类别权重: {dict((int(k), round(float(v), 2)) for k, v in zip(np.unique(y), class_weights))}")
 
 # 分割
 X_tr, X_te, y_tr, y_te = train_test_split(
@@ -181,18 +198,17 @@ X_tr, X_te, y_tr, y_te = train_test_split(
 log(f"训练集: {len(X_tr)}, 测试集: {len(X_te)}")
 
 # ============================================================
-# 4. 调参 + 训练曲线记录
+# 4. 训练 + 调参
 # ============================================================
-section("4. GridSearchCV 调参 & 训练曲线")
+section("4. 模型训练 & 调参")
 
-# 记录训练曲线数据
 training_curves = {
     "rf": {"train_acc": [], "cv_acc": [], "n_estimators": []},
     "gb": {"train_acc": [], "cv_acc": [], "n_estimators": []},
 }
 
-# 模型 A: RandomForest — 记录不同 n_estimators 下的训练/验证准确率
-log("\n[模型 A] RandomForest Classifier — 训练曲线")
+# 模型 A: RandomForest
+log("\n[模型 A] RandomForest Classifier")
 rf_n_estim_list = [10, 30, 50, 80, 100, 150, 200, 250, 300]
 rf_best_params = None
 rf_best_cv = 0
@@ -202,10 +218,8 @@ for n_est in rf_n_estim_list:
         n_estimators=n_est, max_depth=10, min_samples_split=2,
         min_samples_leaf=1, random_state=42, class_weight="balanced"
     )
-    # 5折交叉验证
     cv_scores = cross_val_score(rf_tmp, X_tr, y_tr, cv=5, scoring="accuracy")
     cv_mean = cv_scores.mean()
-    # 全量训练集拟合，计算训练准确率
     rf_tmp.fit(X_tr, y_tr)
     train_acc = accuracy_score(y_tr, rf_tmp.predict(X_tr))
 
@@ -213,25 +227,21 @@ for n_est in rf_n_estim_list:
     training_curves["rf"]["train_acc"].append(round(train_acc * 100, 2))
     training_curves["rf"]["cv_acc"].append(round(cv_mean * 100, 2))
 
-    log(f"  n_estimators={n_est:4d} | 训练准确率={train_acc*100:.1f}% | CV准确率={cv_mean*100:.1f}%")
+    log(f"  n={n_est:4d} | 训练={train_acc*100:.1f}% | CV={cv_mean*100:.1f}%")
 
     if cv_mean > rf_best_cv:
         rf_best_cv = cv_mean
         rf_best_params = {"n_estimators": n_est, "max_depth": 10, "min_samples_split": 2, "min_samples_leaf": 1}
 
-log(f"\n  RF 最佳参数: {rf_best_params}")
-log(f"  RF 最佳CV准确率: {rf_best_cv * 100:.1f}%")
+log(f"\n  RF 最佳: n={rf_best_params['n_estimators']}, CV={rf_best_cv*100:.1f}%")
 
-# 用最佳参数做最终 RF
-rf_final = RandomForestClassifier(
-    random_state=42, class_weight="balanced", **rf_best_params
-)
+rf_final = RandomForestClassifier(random_state=42, class_weight="balanced", **rf_best_params)
 rf_final.fit(X_tr, y_tr)
 rf_acc = accuracy_score(y_te, rf_final.predict(X_te))
 log(f"  RF 测试集准确率: {rf_acc * 100:.1f}%")
 
-# 模型 B: GradientBoosting — 记录不同 n_estimators 下的训练/验证准确率
-log("\n[模型 B] GradientBoosting Classifier — 训练曲线")
+# 模型 B: GradientBoosting
+log("\n[模型 B] GradientBoosting Classifier")
 gb_n_estim_list = [20, 50, 80, 100, 150, 200]
 gb_best_params = None
 gb_best_cv = 0
@@ -249,19 +259,15 @@ for n_est in gb_n_estim_list:
     training_curves["gb"]["train_acc"].append(round(train_acc * 100, 2))
     training_curves["gb"]["cv_acc"].append(round(cv_mean * 100, 2))
 
-    log(f"  n_estimators={n_est:4d} | 训练准确率={train_acc*100:.1f}% | CV准确率={cv_mean*100:.1f}%")
+    log(f"  n={n_est:4d} | 训练={train_acc*100:.1f}% | CV={cv_mean*100:.1f}%")
 
     if cv_mean > gb_best_cv:
         gb_best_cv = cv_mean
         gb_best_params = {"n_estimators": n_est, "max_depth": 5, "learning_rate": 0.1}
 
-log(f"\n  GB 最佳参数: {gb_best_params}")
-log(f"  GB 最佳CV准确率: {gb_best_cv * 100:.1f}%")
+log(f"\n  GB 最佳: n={gb_best_params['n_estimators']}, CV={gb_best_cv*100:.1f}%")
 
-# 用最佳参数做最终 GB
-gb_final = GradientBoostingClassifier(
-    random_state=42, **gb_best_params
-)
+gb_final = GradientBoostingClassifier(random_state=42, **gb_best_params)
 gb_final.fit(X_tr, y_tr)
 gb_acc = accuracy_score(y_te, gb_final.predict(X_te))
 log(f"  GB 测试集准确率: {gb_acc * 100:.1f}%")
@@ -280,13 +286,13 @@ log(f"  ✅ 交叉验证准确率: {best_cv * 100:.1f}%")
 # 保存训练曲线
 with open(TRAINING_CURVE_FILE, "w", encoding="utf-8") as f:
     json.dump(training_curves, f, ensure_ascii=False, indent=2)
-log(f"\n  训练曲线已保存: {TRAINING_CURVE_FILE}")
 
 # ============================================================
 # 5. 特征重要性
 # ============================================================
 section("5. 特征重要性")
 
+ranked = []
 if hasattr(best_model, "feature_importances_"):
     imps = best_model.feature_importances_
     ranked = sorted(zip(selected_features, imps), key=lambda x: x[1], reverse=True)
@@ -299,22 +305,22 @@ if hasattr(best_model, "feature_importances_"):
 section("6. 混淆矩阵 & 误差分析")
 
 y_pred = best_model.predict(X_te)
-cm = confusion_matrix(y_te, y_pred, labels=list(range(1, 11)))
+cm = confusion_matrix(y_te, y_pred, labels=[1, 2, 3, 4, 5])
 log("混淆矩阵 (行=实际, 列=预测):")
-header = "      " + "".join([f" 预{i:2d}" for i in range(1, 11)])
-log(header)
+log("        预1   预2   预3   预4   预5")
 for i, row in enumerate(cm):
-    log(f"  实际{i + 1:2d}: " + "".join([f"{v:5d}" for v in row]))
+    log(f"  实际{i+1}: " + "".join([f"{v:5d}" for v in row]))
 
-# 允许 ±1 误差的准确率
+
 def acc_within_tolerance(y_true, y_pred, tol=0):
     return np.mean(np.abs(y_true - y_pred) <= tol)
+
 
 log(f"\n  严格准确率: {accuracy_score(y_te, y_pred) * 100:.1f}%")
 log(f"  ±1 容错准确率: {acc_within_tolerance(y_te, y_pred, 1) * 100:.1f}%")
 log(f"  ±2 容错准确率: {acc_within_tolerance(y_te, y_pred, 2) * 100:.1f}%")
 
-cr = classification_report(y_te, y_pred, labels=list(range(1, 11)), zero_division=0)
+cr = classification_report(y_te, y_pred, labels=[1, 2, 3, 4, 5], zero_division=0)
 log(f"\n分类报告:\n{cr}")
 
 # ============================================================
@@ -328,7 +334,7 @@ y_all_proba = best_model.predict_proba(X_scaled)
 results = []
 for i, d in enumerate(valid):
     proba = y_all_proba[i]
-    conf = float(max(proba))  # 最高概率作为置信度
+    conf = float(max(proba))
     results.append(
         {
             "id": int(d["id"]),
@@ -336,10 +342,10 @@ for i, d in enumerate(valid):
             "artist": str(d["artist_name"]),
             "plays": int(d["plays"]),
             "comments": int(d["comments"]),
-            "actual_score": int(d["score"]),
-            "predicted_score": int(y_all[i]),
+            "actual_potential": int(d["potential"]),
+            "predicted_potential": int(y_all[i]),
             "confidence": round(conf, 4),
-            "is_correct": int(y_all[i]) == int(d["score"]),
+            "is_correct": int(y_all[i]) == int(d["potential"]),
         }
     )
 
@@ -354,8 +360,9 @@ section("8. 保存结果")
 
 output = {
     "timestamp": datetime.now().isoformat(),
-    "mode": "classification",
-    "target": "interaction_score_1to10",
+    "mode": "potential_classification",
+    "target": "potential_score_1to5",
+    "target_description": "基于评论/播放比的潜力评分（1=低潜力, 5=高潜力/潜力股）",
     "samples": len(valid),
     "features_used": selected_features,
     "all_features": FEATURES,
@@ -377,4 +384,20 @@ with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     json.dump(output, f, ensure_ascii=False, indent=2)
 
 log(f"\n结果已保存: {OUTPUT_FILE}")
+
+# ============================================================
+# 9. 保存模型（供实时预测用）
+# ============================================================
+section("9. 保存模型文件")
+
+try:
+    import joblib
+    model_dir = os.path.dirname(__file__)
+    joblib.dump(best_model, os.path.join(model_dir, "ml_model.pkl"))
+    joblib.dump(scaler, os.path.join(model_dir, "ml_scaler.pkl"))
+    joblib.dump(selected_features, os.path.join(model_dir, "ml_features.pkl"))
+    log(f"模型已保存: ml_model.pkl, ml_scaler.pkl, ml_features.pkl")
+except ImportError:
+    log("⚠️ joblib 未安装，无法保存模型文件（pip install joblib）")
+
 log(f"✅ 完成!")

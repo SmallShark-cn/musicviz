@@ -132,6 +132,51 @@ router.get("/artist/:id", async (req, res) => {
 });
 
 // ============================================================
+//  ML 实时预测 API
+// ============================================================
+
+router.get("/ml/predict", async (req, res) => {
+  try {
+    const { artist_id } = req.query;
+    if (!artist_id) return res.json({ code: 400, msg: "需要 artist_id" });
+
+    // 获取该歌手的歌曲
+    const [songs] = await pool.execute(
+      `SELECT s.id, s.name, s.plays, s.comments_count, s.duration, s.publish_year,
+              a.music_size, a.album_size
+       FROM songs s JOIN artists a ON s.artist_id = a.id
+       WHERE s.artist_id = ? AND s.plays > 0`,
+      [parseInt(artist_id)],
+    );
+
+    if (songs.length === 0) {
+      return res.json({ code: 200, data: { predictions: [], message: "该歌手暂无可用歌曲数据" } });
+    }
+
+    // 用 Python 子进程做预测
+    const { execSync } = require("child_process");
+    const path = require("path");
+    const scriptPath = path.join(__dirname, "ml_predict.py");
+    const input = JSON.stringify(songs.map(s => ({
+      id: s.id, name: s.name, plays: s.plays,
+      comments: s.comments_count, duration: s.duration,
+      publish_year: s.publish_year, music_size: s.music_size,
+      album_size: s.album_size,
+    })));
+
+    const result = execSync(`python3 "${scriptPath}" '${input.replace(/'/g, "'\\''")}'`, {
+      encoding: "utf8", timeout: 30000,
+    });
+
+    const predictions = JSON.parse(result);
+    res.json({ code: 200, data: { predictions, count: predictions.length } });
+  } catch (err) {
+    console.error("ML 预测失败:", err.message);
+    res.json({ code: 500, msg: err.message });
+  }
+});
+
+// ============================================================
 // 📊 可视化数据 API
 // ============================================================
 
@@ -1658,5 +1703,25 @@ router.get("/analysis/interaction", async (req, res) => {
   }
 });
 
+
+
+// 实时互动度预测（仅当前选中歌手）
+router.get("/analysis/predict", async (req, res) => {
+  try {
+    const { ids } = req.query;
+    if (!ids) return res.json({ code: 400, data: null, msg: "no ids" });
+
+    const { execSync } = require("child_process");
+    const out = execSync(`python3 "${path.join(__dirname, '..', 'predict_artist.py')}" "${ids}"`, {
+      cwd: path.join(__dirname, ".."),
+      timeout: 30000,
+      encoding: "utf-8"
+    });
+    res.json({ code: 200, data: JSON.parse(out) });
+  } catch (e) {
+    console.error("[Predict] 失败:", e.message);
+    res.status(500).json({ code: 500, msg: e.message });
+  }
+});
 
 module.exports = router;

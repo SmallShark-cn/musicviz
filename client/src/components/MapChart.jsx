@@ -67,7 +67,8 @@ export default function MapChart({ artists, regionMap }) {
 
       const countryCounts = {};
       artists.forEach((a) => {
-        const region = regionMap[a.id] || "";
+        // 优先用用户手动设置的 regionMap，其次用歌手自带的 region
+        const region = regionMap[a.id] || a.region || "";
         const country = COUNTRY_MAP[region] || "";
         if (country) {
           countryCounts[country] = (countryCounts[country] || 0) + 1;

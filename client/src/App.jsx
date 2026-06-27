@@ -38,7 +38,7 @@ function loadState(key, fallback) {
 function saveState(key, val) {
   try {
     localStorage.setItem("mv_" + key, JSON.stringify(val));
-  } catch { }
+  } catch {}
 }
 
 export default function App() {
@@ -85,6 +85,8 @@ export default function App() {
   // 歌手评论数数据
   const [commentCounts, setCommentCounts] = useState({});
   const [mlData, setMlData] = useState(null);
+  const [mlPredictions, setMlPredictions] = useState(null);
+  const [mlLoading, setMlLoading] = useState(false);
 
   // 热搜数据
   const [hotSearch, setHotSearch] = useState([]);
@@ -217,7 +219,7 @@ export default function App() {
       } catch (e) {
         console.error("歌词词云加载失败:", e);
       }
-    } catch { }
+    } catch {}
     setIsLoading(false);
   }, [selectedArtists, showLoadingPage]);
 
@@ -251,7 +253,7 @@ export default function App() {
               setSimilarArtists((prev) => ({ ...prev, [a.id]: data }));
             }
           })
-          .catch(() => { });
+          .catch(() => {});
       }
     });
   }, [entered, selectedArtists]);
@@ -269,7 +271,7 @@ export default function App() {
               setArtistDescs((prev) => ({ ...prev, [a.id]: data }));
             }
           })
-          .catch(() => { });
+          .catch(() => {});
       }
       // 获取热门歌曲和评论数
       if (!artistTopSongs[a.id]) {
@@ -298,7 +300,7 @@ export default function App() {
               });
             }
           })
-          .catch(() => { });
+          .catch(() => {});
       }
     });
   }, [entered, selectedArtists]);
@@ -309,15 +311,15 @@ export default function App() {
     api
       .getStylePie()
       .then(setStylePieData)
-      .catch(() => { });
+      .catch(() => {});
     api
       .getStackedEra()
       .then(setStackedEraData)
-      .catch(() => { });
+      .catch(() => {});
     api
       .getScatter()
       .then(setGlobalScatterData)
-      .catch(() => { });
+      .catch(() => {});
 
     // 根据用户搜索的歌手获取专辑数据
     if (selectedArtists.length > 0) {
@@ -326,7 +328,7 @@ export default function App() {
       api
         .getAlbumDonut(artistId)
         .then(setAlbumDonutData)
-        .catch(() => { });
+        .catch(() => {});
     } else {
       setAlbumDonutData(null);
     }
@@ -342,15 +344,43 @@ export default function App() {
           setHotSearch(data);
         }
       })
-      .catch(() => { });
+      .catch(() => {});
   }, [entered]);
 
   // 加载 ML 互动度分析
   useEffect(() => {
     if (entered && !isLanding && !showLoadingPage) {
-      api.getInteractionAnalysis().then(setMlData).catch(() => { });
+      api
+        .getInteractionAnalysis(selectedArtists.map(a => a.id))
+        .then(setMlData)
+        .catch(() => {});
     }
-  }, [entered, isLanding, showLoadingPage]);
+  }, [entered, isLanding, showLoadingPage, selectedArtists]);
+
+  // 实时 ML 预测 — 当选中歌手时触发
+  useEffect(() => {
+    if (!entered || selectedArtists.length === 0) return;
+
+    const fetchPredictions = async () => {
+      setMlLoading(true);
+      try {
+        const artistId = selectedArtists[0].id;
+        const res = await fetch(
+          `http://localhost:3001/api/ml/predict?artist_id=${artistId}`,
+        );
+        const json = await res.json();
+        if (json.code === 200) {
+          setMlPredictions(json.data.predictions);
+        }
+      } catch (err) {
+        console.error("ML 预测失败:", err);
+      } finally {
+        setMlLoading(false);
+      }
+    };
+
+    fetchPredictions();
+  }, [entered, selectedArtists]);
 
   // 处理进入可视化
   const handleEnterVisualization = async () => {
@@ -567,7 +597,7 @@ export default function App() {
         if (detail.region) {
           updateRegion(artist.id, detail.region);
         }
-      } catch { }
+      } catch {}
     }
 
     // 加载热度数据
@@ -581,7 +611,7 @@ export default function App() {
           max_pop: pop.max_pop || prev[artist.id].max_pop,
         },
       }));
-    } catch { }
+    } catch {}
 
     // 如果在可视化页面，获取图表数据
     if (isInVisualization) {
@@ -1226,8 +1256,27 @@ export default function App() {
             {/* 3. 听众活跃度对比 */}
             <DraggablePanel panelType={PANEL_TYPES.GROUPED_BAR}>
               {compareData?.artists?.length > 0 ? (
-                <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
-                  <div style={{ marginBottom: 6, padding: "6px 8px", background: "var(--bg-secondary)", borderRadius: 4, border: "1px solid var(--border-color)", fontSize: 11, color: "var(--text-muted)", lineHeight: 1.5, flexShrink: 0 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    minHeight: 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      marginBottom: 6,
+                      padding: "6px 8px",
+                      background: "var(--bg-secondary)",
+                      borderRadius: 4,
+                      border: "1px solid var(--border-color)",
+                      fontSize: 11,
+                      color: "var(--text-muted)",
+                      lineHeight: 1.5,
+                      flexShrink: 0,
+                    }}
+                  >
                     对比不同歌手听众的活跃程度。平均热度=该歌手所有歌曲热度的平均分（整体活跃度），热度峰值=单曲最高热度分（爆款天花板）。
                   </div>
                   <div style={{ flex: 1, minHeight: 0 }}>
@@ -1434,7 +1483,15 @@ export default function App() {
                   })}
                 </select>
               </div>
-              <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+              <div
+                style={{
+                  flex: 1,
+                  minHeight: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                }}
+              >
                 <SentimentAnalysisCard
                   songId={analysisSong?.id || ""}
                   songName={
@@ -1507,7 +1564,15 @@ export default function App() {
                   })}
                 </select>
               </div>
-              <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+              <div
+                style={{
+                  flex: 1,
+                  minHeight: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                }}
+              >
                 <TopicClusterCard
                   songId={analysisSong?.id || ""}
                   songName={
@@ -1519,24 +1584,17 @@ export default function App() {
               </div>
             </DraggablePanel>
 
-            {/* 16. 歌曲互动度评分分布 */}
+            {/* 16. 歌手潜力评分 */}
             <DraggablePanel panelType={PANEL_TYPES.GROUPED_BAR}>
               {mlData ? (
-                <MLScoreCard data={mlData} chart="pie" />
+                <MLScoreCard data={mlData} chart="list" />
               ) : (
-                <div className="empty-state"><div className="empty-state-icon">ML</div><p>加载中...</p></div>
+                <div className="empty-state">
+                  <div className="empty-state-icon">ML</div>
+                  <p>加载中...</p>
+                </div>
               )}
             </DraggablePanel>
-
-            {/* 17. 特征重要性 */}
-            <DraggablePanel panelType={PANEL_TYPES.STYLE_PIE}>
-              {mlData ? (
-                <MLScoreCard data={mlData} chart="bar" />
-              ) : (
-                <div className="empty-state"><div className="empty-state-icon">ML</div><p>加载中...</p></div>
-              )}
-            </DraggablePanel>
-
           </div>
 
           <footer className="footer">

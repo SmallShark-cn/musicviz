@@ -675,3 +675,848 @@ ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data V
 [排行榜] original 爬取为空，保留旧数据
 [排行榜] 已存入 150 首到 hot_songs 表
 [Compare] 排行榜爬取完成
+[爬虫] similar artists: 44266
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=44266
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":92641,"name":"沧海一声笑","plays":100,"comments":6647,"duration":246230,"publish_year":1990,"music_size":456,"album_size":48},{"id":108366,"name":"永远的微笑 (Live)","plays":80,"comments":1657,"duration":146773,"publish_year":2005,"music_size":456,"album_size":48},{"id":108633,"name":"歌 (1995年Unplugged版)","plays":75,"comments":803,"duration":157583,"publish_year":1995,"music_size":456,"album_size":48},{"id":108641,"name":"你的样子","plays":100,"comments":2091,"duration":210026,"publish_year":1995,"music_size":456,"album_size":48},{"id":108653,"name":"东方之珠","plays":100,"comments":7436,"duration":261716,"publish_year":1995,"music_size":456,"album_size":48},{"id":108700,"name":"滚滚红尘","plays":95,"comments":1401,"duration":186466,"publish_year":1995,"music_size":456,"album_size":48},{"id":108837,"name":"东风","plays":80,"comments":491,"duration":209200,"publish_year":1994,"music_size":456,"album_size":48},{"id":108848,"name":"台北红玫瑰","plays":90,"comments":691,"duration":229493,"publish_year":1994,"music_size":456,"album_size":48},{"id":108852,"name":"天雨","plays":80,"comments":705,"duration":269173,"publish_year":1994,"music_size":456,"album_size":48},{"id":108860,"name":"恋曲2000","plays":90,"comments":1439,"duration":293600,"publish_year":1994,"music_size":456,"album_size":48},{"id":108930,"name":"大地的孩子","plays":85,"comments":634,"duration":231840,"publish_year":1993,"music_size":456,"album_size":48},{"id":109069,"name":"火车","plays":100,"comments":976,"duration":268493,"publish_year":1991,"music_size":456,"album_size":48},{"id":109077,"name":"青春舞曲2000","plays":95,"comments":754,"duration":264026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109079,"name":"原乡 II","plays":80,"comments":153,"duration":213640,"publish_year":1991,"music_size":456,"album_size":48},{"id":109094,"name":"长征","plays":95,"comments":1253,"duration":314026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109144,"name":"追梦人","plays":90,"comments":2490,"duration":230093,"publish_year":1991,"music_size":456,"album_size":48},{"id":109198,"name":"恋曲1990","plays":100,"comments":20733,"duration":315906,"publish_year":1990,"music_size":456,"album_size":48},{"id":109236,"name":"告别的年代","plays":85,"comments":1213,"duration":302693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109243,"name":"沉默的表示","plays":75,"comments":484,"duration":230693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109252,"name":"思念","plays":80,"comments":616,"duration":307933,"publish_year":1989,"music_size":456,"album_size":48},{"id":109260,"name":"野百合也有春天","plays":100,"comments":3452,"duration":279866,"publish_year":1989,"music_size":456,"album_size":48},{"id":109269,"name":"海上花","plays":95,"comments":2945,"duration":179493,"publish_year":1989,"music_size":456,"album_size":48},{"id":109275,"name":"闪亮的日子","plays":90,"comments":2042,"duration":230293,"publish_year":1989,"music_size":456,"album_size":48},{"id":109292,"name":"是否","plays":75,"comments":363,"duration":244600,"publish_year":1989,"music_size":456,"album_size":48},{"id":109366,"name":"暗恋","plays":70,"comments":200,"duration":220000,"publish_year":1989,"music_size":456,"album_size":48},{"id":109388,"name":"爱人同志","plays":90,"comments":1507,"duration":271040,"publish_year":1988,"music_size":456,"album_size":48},{"id":109429,"name":"现象I","plays":70,"comments":106,"duration":223866,"publish_year":1985,"music_size":456,"album_size":48},{"id":109458,"name":"穿过你的黑发的我的手","plays":85,"comments":474,"duration":216600,"publish_year":1984,"music_size":456,"album_size":48},{"id":109470,"name":"超级市民","plays":75,"comments":367,"duration":142666,"publish_year":1984,"music_size":456,"album_size":48},{"id":109489,"name":"诞生","plays":75,"comments":256,"duration":107782,"publish_year":1983,"music_size":456,"album_size":48},{"id":109495,"name":"现象七十二变","plays":90,"comments":2735,"duration":231622,"publish_year":1983,"music_size":456,"album_size":48},{"id":109498,"name":"牧童","plays":75,"comments":472,"duration":200840,"publish_year":1983,"music_size":456,"album_size":48},{"id":109502,"name":"未来的主人翁","plays":90,"comments":3265,"duration":450717,"publish_year":1983,"music_size":456,"album_size":48},{"id":109505,"name":"青春舞曲","plays":85,"comments":843,"duration":200346,"publish_year":1983,"music_size":456,"album_size":48},{"id":109508,"name":"爱的箴言","plays":95,"comments":5805,"duration":216315,"publish_year":1983,"music_size":456,"album_size":48},{"id":109516,"name":"稻草人","plays":75,"comments":840,"duration":401516,"publish_year":1983,"music_size":456,"album_size":48},{"id":109525,"name":"鹿港小镇","plays":100,"comments":5818,"duration":283866,"publish_year":1982,"music_size":456,"album_size":48},{"id":109528,"name":"恋曲1980","plays":100,"comments":3566,"duration":200893,"publish_year":1982,"music_size":456,"album_size":48},{"id":109530,"name":"童年","plays":100,"comments":18026,"duration":234973,"publish_year":1982,"music_size":456,"album_size":48},{"id":109532,"name":"错误","plays":85,"comments":1154,"duration":307000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109534,"name":"摇篮曲","plays":70,"comments":358,"duration":201000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109536,"name":"之乎者也","plays":95,"comments":2220,"duration":244000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109539,"name":"乡愁四韵","plays":90,"comments":2533,"duration":358000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109542,"name":"将进酒","plays":85,"comments":1270,"duration":263000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109545,"name":"光阴的故事","plays":100,"comments":5719,"duration":203840,"publish_year":1982,"music_size":456,"album_size":48},{"id":370389,"name":"风吹风吹","plays":80,"comments":823,"duration":253173,"publish_year":1996,"music_size":456,"album_size":48},{"id":29414839,"name":"只得一生","plays":80,"comments":3222,"duration":210624,"publish_year":2014,"music_size":456,"album_size":48},{"id":493042353,"name":"北西南风","plays":75,"comments":578,"duration":221546,"publish_year":2017,"music_size":456,"album_size":48},{"id":2060731831,"name":"长安三万里","plays":80,"comments":2009,"duration":264240,"publish_year":null,"music_size":456,"album_size":48}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] artist desc: 3686
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[爬虫] artist desc: 44266
+[爬虫] 获取歌手描述失败: 
+[爬虫] 获取歌手描述失败: 
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":92641,"name":"沧海一声笑","plays":100,"comments":6647,"duration":246230,"publish_year":1990,"music_size":456,"album_size":48},{"id":108366,"name":"永远的微笑 (Live)","plays":80,"comments":1657,"duration":146773,"publish_year":2005,"music_size":456,"album_size":48},{"id":108633,"name":"歌 (1995年Unplugged版)","plays":75,"comments":803,"duration":157583,"publish_year":1995,"music_size":456,"album_size":48},{"id":108641,"name":"你的样子","plays":100,"comments":2091,"duration":210026,"publish_year":1995,"music_size":456,"album_size":48},{"id":108653,"name":"东方之珠","plays":100,"comments":7436,"duration":261716,"publish_year":1995,"music_size":456,"album_size":48},{"id":108700,"name":"滚滚红尘","plays":95,"comments":1401,"duration":186466,"publish_year":1995,"music_size":456,"album_size":48},{"id":108837,"name":"东风","plays":80,"comments":491,"duration":209200,"publish_year":1994,"music_size":456,"album_size":48},{"id":108848,"name":"台北红玫瑰","plays":90,"comments":691,"duration":229493,"publish_year":1994,"music_size":456,"album_size":48},{"id":108852,"name":"天雨","plays":80,"comments":705,"duration":269173,"publish_year":1994,"music_size":456,"album_size":48},{"id":108860,"name":"恋曲2000","plays":90,"comments":1439,"duration":293600,"publish_year":1994,"music_size":456,"album_size":48},{"id":108930,"name":"大地的孩子","plays":85,"comments":634,"duration":231840,"publish_year":1993,"music_size":456,"album_size":48},{"id":109069,"name":"火车","plays":100,"comments":976,"duration":268493,"publish_year":1991,"music_size":456,"album_size":48},{"id":109077,"name":"青春舞曲2000","plays":95,"comments":754,"duration":264026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109079,"name":"原乡 II","plays":80,"comments":153,"duration":213640,"publish_year":1991,"music_size":456,"album_size":48},{"id":109094,"name":"长征","plays":95,"comments":1253,"duration":314026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109144,"name":"追梦人","plays":90,"comments":2490,"duration":230093,"publish_year":1991,"music_size":456,"album_size":48},{"id":109198,"name":"恋曲1990","plays":100,"comments":20733,"duration":315906,"publish_year":1990,"music_size":456,"album_size":48},{"id":109236,"name":"告别的年代","plays":85,"comments":1213,"duration":302693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109243,"name":"沉默的表示","plays":75,"comments":484,"duration":230693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109252,"name":"思念","plays":80,"comments":616,"duration":307933,"publish_year":1989,"music_size":456,"album_size":48},{"id":109260,"name":"野百合也有春天","plays":100,"comments":3452,"duration":279866,"publish_year":1989,"music_size":456,"album_size":48},{"id":109269,"name":"海上花","plays":95,"comments":2945,"duration":179493,"publish_year":1989,"music_size":456,"album_size":48},{"id":109275,"name":"闪亮的日子","plays":90,"comments":2042,"duration":230293,"publish_year":1989,"music_size":456,"album_size":48},{"id":109292,"name":"是否","plays":75,"comments":363,"duration":244600,"publish_year":1989,"music_size":456,"album_size":48},{"id":109366,"name":"暗恋","plays":70,"comments":200,"duration":220000,"publish_year":1989,"music_size":456,"album_size":48},{"id":109388,"name":"爱人同志","plays":90,"comments":1507,"duration":271040,"publish_year":1988,"music_size":456,"album_size":48},{"id":109429,"name":"现象I","plays":70,"comments":106,"duration":223866,"publish_year":1985,"music_size":456,"album_size":48},{"id":109458,"name":"穿过你的黑发的我的手","plays":85,"comments":474,"duration":216600,"publish_year":1984,"music_size":456,"album_size":48},{"id":109470,"name":"超级市民","plays":75,"comments":367,"duration":142666,"publish_year":1984,"music_size":456,"album_size":48},{"id":109489,"name":"诞生","plays":75,"comments":256,"duration":107782,"publish_year":1983,"music_size":456,"album_size":48},{"id":109495,"name":"现象七十二变","plays":90,"comments":2735,"duration":231622,"publish_year":1983,"music_size":456,"album_size":48},{"id":109498,"name":"牧童","plays":75,"comments":472,"duration":200840,"publish_year":1983,"music_size":456,"album_size":48},{"id":109502,"name":"未来的主人翁","plays":90,"comments":3265,"duration":450717,"publish_year":1983,"music_size":456,"album_size":48},{"id":109505,"name":"青春舞曲","plays":85,"comments":843,"duration":200346,"publish_year":1983,"music_size":456,"album_size":48},{"id":109508,"name":"爱的箴言","plays":95,"comments":5805,"duration":216315,"publish_year":1983,"music_size":456,"album_size":48},{"id":109516,"name":"稻草人","plays":75,"comments":840,"duration":401516,"publish_year":1983,"music_size":456,"album_size":48},{"id":109525,"name":"鹿港小镇","plays":100,"comments":5818,"duration":283866,"publish_year":1982,"music_size":456,"album_size":48},{"id":109528,"name":"恋曲1980","plays":100,"comments":3566,"duration":200893,"publish_year":1982,"music_size":456,"album_size":48},{"id":109530,"name":"童年","plays":100,"comments":18026,"duration":234973,"publish_year":1982,"music_size":456,"album_size":48},{"id":109532,"name":"错误","plays":85,"comments":1154,"duration":307000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109534,"name":"摇篮曲","plays":70,"comments":358,"duration":201000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109536,"name":"之乎者也","plays":95,"comments":2220,"duration":244000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109539,"name":"乡愁四韵","plays":90,"comments":2533,"duration":358000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109542,"name":"将进酒","plays":85,"comments":1270,"duration":263000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109545,"name":"光阴的故事","plays":100,"comments":5719,"duration":203840,"publish_year":1982,"music_size":456,"album_size":48},{"id":370389,"name":"风吹风吹","plays":80,"comments":823,"duration":253173,"publish_year":1996,"music_size":456,"album_size":48},{"id":29414839,"name":"只得一生","plays":80,"comments":3222,"duration":210624,"publish_year":2014,"music_size":456,"album_size":48},{"id":493042353,"name":"北西南风","plays":75,"comments":578,"duration":221546,"publish_year":2017,"music_size":456,"album_size":48},{"id":2060731831,"name":"长安三万里","plays":80,"comments":2009,"duration":264240,"publish_year":null,"music_size":456,"album_size":48}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":92641,"name":"沧海一声笑","plays":100,"comments":6647,"duration":246230,"publish_year":1990,"music_size":456,"album_size":48},{"id":108366,"name":"永远的微笑 (Live)","plays":80,"comments":1657,"duration":146773,"publish_year":2005,"music_size":456,"album_size":48},{"id":108633,"name":"歌 (1995年Unplugged版)","plays":75,"comments":803,"duration":157583,"publish_year":1995,"music_size":456,"album_size":48},{"id":108641,"name":"你的样子","plays":100,"comments":2091,"duration":210026,"publish_year":1995,"music_size":456,"album_size":48},{"id":108653,"name":"东方之珠","plays":100,"comments":7436,"duration":261716,"publish_year":1995,"music_size":456,"album_size":48},{"id":108700,"name":"滚滚红尘","plays":95,"comments":1401,"duration":186466,"publish_year":1995,"music_size":456,"album_size":48},{"id":108837,"name":"东风","plays":80,"comments":491,"duration":209200,"publish_year":1994,"music_size":456,"album_size":48},{"id":108848,"name":"台北红玫瑰","plays":90,"comments":691,"duration":229493,"publish_year":1994,"music_size":456,"album_size":48},{"id":108852,"name":"天雨","plays":80,"comments":705,"duration":269173,"publish_year":1994,"music_size":456,"album_size":48},{"id":108860,"name":"恋曲2000","plays":90,"comments":1439,"duration":293600,"publish_year":1994,"music_size":456,"album_size":48},{"id":108930,"name":"大地的孩子","plays":85,"comments":634,"duration":231840,"publish_year":1993,"music_size":456,"album_size":48},{"id":109069,"name":"火车","plays":100,"comments":976,"duration":268493,"publish_year":1991,"music_size":456,"album_size":48},{"id":109077,"name":"青春舞曲2000","plays":95,"comments":754,"duration":264026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109079,"name":"原乡 II","plays":80,"comments":153,"duration":213640,"publish_year":1991,"music_size":456,"album_size":48},{"id":109094,"name":"长征","plays":95,"comments":1253,"duration":314026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109144,"name":"追梦人","plays":90,"comments":2490,"duration":230093,"publish_year":1991,"music_size":456,"album_size":48},{"id":109198,"name":"恋曲1990","plays":100,"comments":20733,"duration":315906,"publish_year":1990,"music_size":456,"album_size":48},{"id":109236,"name":"告别的年代","plays":85,"comments":1213,"duration":302693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109243,"name":"沉默的表示","plays":75,"comments":484,"duration":230693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109252,"name":"思念","plays":80,"comments":616,"duration":307933,"publish_year":1989,"music_size":456,"album_size":48},{"id":109260,"name":"野百合也有春天","plays":100,"comments":3452,"duration":279866,"publish_year":1989,"music_size":456,"album_size":48},{"id":109269,"name":"海上花","plays":95,"comments":2945,"duration":179493,"publish_year":1989,"music_size":456,"album_size":48},{"id":109275,"name":"闪亮的日子","plays":90,"comments":2042,"duration":230293,"publish_year":1989,"music_size":456,"album_size":48},{"id":109292,"name":"是否","plays":75,"comments":363,"duration":244600,"publish_year":1989,"music_size":456,"album_size":48},{"id":109366,"name":"暗恋","plays":70,"comments":200,"duration":220000,"publish_year":1989,"music_size":456,"album_size":48},{"id":109388,"name":"爱人同志","plays":90,"comments":1507,"duration":271040,"publish_year":1988,"music_size":456,"album_size":48},{"id":109429,"name":"现象I","plays":70,"comments":106,"duration":223866,"publish_year":1985,"music_size":456,"album_size":48},{"id":109458,"name":"穿过你的黑发的我的手","plays":85,"comments":474,"duration":216600,"publish_year":1984,"music_size":456,"album_size":48},{"id":109470,"name":"超级市民","plays":75,"comments":367,"duration":142666,"publish_year":1984,"music_size":456,"album_size":48},{"id":109489,"name":"诞生","plays":75,"comments":256,"duration":107782,"publish_year":1983,"music_size":456,"album_size":48},{"id":109495,"name":"现象七十二变","plays":90,"comments":2735,"duration":231622,"publish_year":1983,"music_size":456,"album_size":48},{"id":109498,"name":"牧童","plays":75,"comments":472,"duration":200840,"publish_year":1983,"music_size":456,"album_size":48},{"id":109502,"name":"未来的主人翁","plays":90,"comments":3265,"duration":450717,"publish_year":1983,"music_size":456,"album_size":48},{"id":109505,"name":"青春舞曲","plays":85,"comments":843,"duration":200346,"publish_year":1983,"music_size":456,"album_size":48},{"id":109508,"name":"爱的箴言","plays":95,"comments":5805,"duration":216315,"publish_year":1983,"music_size":456,"album_size":48},{"id":109516,"name":"稻草人","plays":75,"comments":840,"duration":401516,"publish_year":1983,"music_size":456,"album_size":48},{"id":109525,"name":"鹿港小镇","plays":100,"comments":5818,"duration":283866,"publish_year":1982,"music_size":456,"album_size":48},{"id":109528,"name":"恋曲1980","plays":100,"comments":3566,"duration":200893,"publish_year":1982,"music_size":456,"album_size":48},{"id":109530,"name":"童年","plays":100,"comments":18026,"duration":234973,"publish_year":1982,"music_size":456,"album_size":48},{"id":109532,"name":"错误","plays":85,"comments":1154,"duration":307000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109534,"name":"摇篮曲","plays":70,"comments":358,"duration":201000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109536,"name":"之乎者也","plays":95,"comments":2220,"duration":244000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109539,"name":"乡愁四韵","plays":90,"comments":2533,"duration":358000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109542,"name":"将进酒","plays":85,"comments":1270,"duration":263000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109545,"name":"光阴的故事","plays":100,"comments":5719,"duration":203840,"publish_year":1982,"music_size":456,"album_size":48},{"id":370389,"name":"风吹风吹","plays":80,"comments":823,"duration":253173,"publish_year":1996,"music_size":456,"album_size":48},{"id":29414839,"name":"只得一生","plays":80,"comments":3222,"duration":210624,"publish_year":2014,"music_size":456,"album_size":48},{"id":493042353,"name":"北西南风","plays":75,"comments":578,"duration":221546,"publish_year":2017,"music_size":456,"album_size":48},{"id":2060731831,"name":"长安三万里","plays":80,"comments":2009,"duration":264240,"publish_year":null,"music_size":456,"album_size":48}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] similar artists: 44266
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=44266
+[Combined Analysis] stdout: {"sentiment": {"positive": 19, "neutral": 30, "negative": 1}, "topics": [{"topic_id": 0, "name": "未分类", "keywords": ["未分类"], "count": 20, "percentage": 40, "examples": ["出轨被抓的人的承诺和赌徒说以后不赌了有啥区别？信的人这辈子有...
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":2001472,"name":"Safe & Sound","plays":100,"comments":24054,"duration":242280,"publish_year":2011,"music_size":1855,"album_size":211},{"id":19292800,"name":"Red","plays":100,"comments":22710,"duration":223093,"publish_year":null,"music_size":1855,"album_size":211},{"id":19292804,"name":"22","plays":100,"comments":28619,"duration":232120,"publish_year":2013,"music_size":1855,"album_size":211},{"id":19292838,"name":"Sparks Fly","plays":100,"comments":14532,"duration":260946,"publish_year":2010,"music_size":1855,"album_size":211},{"id":19292852,"name":"Enchanted","plays":100,"comments":39414,"duration":352200,"publish_year":2010,"music_size":1855,"album_size":211},{"id":19292984,"name":"Love Story","plays":100,"comments":138443,"duration":236266,"publish_year":2008,"music_size":1855,"album_size":211},{"id":19292987,"name":"You Belong With Me","plays":100,"comments":24642,"duration":231140,"publish_year":2008,"music_size":1855,"album_size":211},{"id":19293014,"name":"Back To December","plays":100,"comments":12140,"duration":295106,"publish_year":2011,"music_size":1855,"album_size":211},{"id":25648017,"name":"I Knew You Were Trouble.","plays":100,"comments":33010,"duration":219720,"publish_year":2012,"music_size":1855,"album_size":211},{"id":25787222,"name":"We Are Never Ever Getting Back Together","plays":100,"comments":9917,"duration":193146,"publish_year":2012,"music_size":1855,"album_size":211},{"id":28111294,"name":"If This Was a Movie","plays":100,"comments":5754,"duration":234546,"publish_year":2010,"music_size":1855,"album_size":211},{"id":28953033,"name":"Shake It Off","plays":100,"comments":18842,"duration":219200,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29561031,"name":"Welcome To New York","plays":100,"comments":31822,"duration":212600,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29572501,"name":"Blank Space","plays":100,"comments":19097,"duration":231826,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29572502,"name":"Style","plays":100,"comments":24490,"duration":231000,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29572506,"name":"Wildest Dreams","plays":100,"comments":15203,"duration":220440,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29572513,"name":"New Romantics","plays":100,"comments":12820,"duration":230466,"publish_year":2014,"music_size":1855,"album_size":211},{"id":501133611,"name":"Look What You Made Me Do","plays":100,"comments":643021,"duration":211859,"publish_year":2017,"music_size":1855,"album_size":211},{"id":514235010,"name":"Gorgeous","plays":100,"comments":68134,"duration":208042,"publish_year":2017,"music_size":1855,"album_size":211},{"id":516776413,"name":"Call It What You Want","plays":100,"comments":50899,"duration":201555,"publish_year":2017,"music_size":1855,"album_size":211},{"id":516818336,"name":"Delicate","plays":100,"comments":20647,"duration":232251,"publish_year":2017,"music_size":1855,"album_size":211},{"id":516818337,"name":"Getaway Car","plays":100,"comments":17196,"duration":233626,"publish_year":2017,"music_size":1855,"album_size":211},{"id":516823324,"name":"End Game","plays":100,"comments":21641,"duration":244826,"publish_year":2017,"music_size":1855,"album_size":211},{"id":1382576173,"name":"Cruel Summer","plays":100,"comments":94304,"duration":178491,"publish_year":2019,"music_size":1855,"album_size":211},{"id":1382778514,"name":"Lover","plays":100,"comments":56570,"duration":221306,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382778878,"name":"Cornelia Street","plays":100,"comments":14921,"duration":287266,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382781100,"name":"The Man","plays":100,"comments":15523,"duration":190360,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382781502,"name":"False God","plays":100,"comments":10059,"duration":200306,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382781549,"name":"ME!","plays":100,"comments":17458,"duration":193000,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382781566,"name":"Daylight","plays":100,"comments":15024,"duration":293453,"publish_year":null,"music_size":1855,"album_size":211},{"id":1465111917,"name":"august","plays":100,"comments":26336,"duration":261922,"publish_year":2020,"music_size":1855,"album_size":211},{"id":1465114465,"name":"exile","plays":100,"comments":60535,"duration":285634,"publish_year":2020,"music_size":1855,"album_size":211},{"id":1803546393,"name":"champagne problems","plays":100,"comments":15620,"duration":244000,"publish_year":2021,"music_size":1855,"album_size":211},{"id":1803546869,"name":"willow","plays":100,"comments":15616,"duration":214706,"publish_year":2021,"music_size":1855,"album_size":211},{"id":1891456146,"name":"All Too Well (10 Minute Version) (Taylor'\''s Version) (From The Vault)","plays":100,"comments":28936,"duration":613000,"publish_year":2021,"music_size":1855,"album_size":211},{"id":1919029404,"name":"The Joker And The Queen (feat. Taylor Swift)","plays":100,"comments":18917,"duration":185422,"publish_year":2022,"music_size":1855,"album_size":211},{"id":1990191997,"name":"You'\''re On Your Own, Kid","plays":100,"comments":10773,"duration":194206,"publish_year":2022,"music_size":1855,"album_size":211},{"id":1990192689,"name":"Lavender Haze","plays":100,"comments":21065,"duration":202395,"publish_year":2022,"music_size":1855,"album_size":211},{"id":1990192694,"name":"Anti-Hero","plays":100,"comments":13174,"duration":200690,"publish_year":2022,"music_size":1855,"album_size":211},{"id":1990192705,"name":"Snow On The Beach","plays":100,"comments":13521,"duration":256124,"publish_year":2022,"music_size":1855,"album_size":211},{"id":2104074212,"name":"You'\''re Losing Me (From The Vault)","plays":100,"comments":8131,"duration":277831,"publish_year":2023,"music_size":1855,"album_size":211},{"id":2147408164,"name":"Fortnight","plays":100,"comments":25777,"duration":228965,"publish_year":2024,"music_size":1855,"album_size":211},{"id":2147408170,"name":"Guilty as Sin?","plays":100,"comments":5146,"duration":254365,"publish_year":2024,"music_size":1855,"album_size":211},{"id":2744399145,"name":"Father Figure","plays":100,"comments":4904,"duration":212777,"publish_year":null,"music_size":1855,"album_size":211},{"id":2744403174,"name":"The Fate of Ophelia","plays":100,"comments":29745,"duration":226073,"publish_year":null,"music_size":1855,"album_size":211},{"id":2744403189,"name":"Opalite","plays":100,"comments":8284,"duration":235356,"publish_year":null,"music_size":1855,"album_size":211},{"id":2744403423,"name":"CANCELLED!","plays":100,"comments":5173,"duration":211498,"publish_year":null,"music_size":1855,"album_size":211},{"id":2744403471,"name":"The Life of a Showgirl","plays":100,"comments":7712,"duration":241766,"publish_year":null,"music_size":1855,"album_size":211},{"id":3365277552,"name":"Elizabeth Taylor","plays":100,"comments":1052,"duration":208291,"publish_year":2026,"music_size":1855,"album_size":211},{"id":3390083812,"name":"I Knew It, I Knew You","plays":100,"comments":9107,"duration":178185,"publish_year":2026,"music_size":1855,"album_size":211}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] artist desc: 3686
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[爬虫] artist top songs: 3686
+[爬虫] artist desc: 44266
+[爬虫] 获取歌手描述失败: 
+[爬虫] artist desc: 3686
+[爬虫] 获取歌手描述失败: 
+[爬虫] 获取热搜列表（使用热歌榜数据）
+[爬虫] 获取热歌榜: 3778678
+[爬虫] artist top songs: 44266
+[爬虫] 获取歌手描述失败: 
+[爬虫] artist top songs: 44266
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 成功获取 0 位相似歌手
+[热歌榜] 获取到 0 个trackId (共undefined首)
+[飙升榜] 开始爬取...
+[热歌榜] 获取到 50 个trackId (共200首)
+[爬虫] 成功获取 10 条热搜数据
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[爬虫] search: "l d y" type=100 limit=10
+[Search] 爬虫: "l d y" → 10 条 (共 54)
+[飙升榜] 获取到 50 个trackId (共100首)
+[飙升榜] 获取到 0 个trackId (共undefined首)
+[新歌榜] 开始爬取...
+[飙升榜] 获取到 50 首歌曲
+[飙升榜] 排序完成: 50 首
+[新歌榜] 开始爬取...
+[爬虫] search: "罗大佑" type=100 limit=10
+[Search] 爬虫: "罗大佑" → 10 条 (共 15)
+[新歌榜] 获取到 50 个trackId (共100首)
+[新歌榜] 获取到 50 首歌曲
+[新歌榜] 排序完成: 50 首
+[原创榜] 开始爬取...
+[新歌榜] 获取到 50 个trackId (共100首)
+[原创榜] 获取到 50 个trackId (共100首)
+[新歌榜] 获取到 50 首歌曲
+[新歌榜] 排序完成: 50 首
+[原创榜] 开始爬取...
+[Scraper] 开始抓取歌手: 3686
+[爬虫] artist detail: 3686
+[原创榜] 获取到 50 首歌曲
+[原创榜] 排序完成: 50 首
+[排行榜] rising 爬取为空，保留旧数据
+[排行榜] 已存入 150 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[爬虫] 歌手无accountId映射: 3686
+[爬虫] 歌手无accountId映射: 3686
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 3686
+[原创榜] 获取到 0 个trackId (共undefined首)
+[排行榜] hot 爬取为空，保留旧数据
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[排行榜] original 爬取为空，保留旧数据
+[排行榜] 已存入 100 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 罗大佑 (3686) 入库完成，50 首歌曲
+[Scraper] 开始抓取歌手: 3686
+[爬虫] artist top songs: 3686
+[爬虫] artist detail: 3686
+[爬虫] 歌手无accountId映射: 3686
+[爬虫] 歌手无accountId映射: 3686
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 3686
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 罗大佑 (3686) 入库完成，50 首歌曲
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 0 个trackId (共undefined首)
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 0 个trackId (共undefined首)
+[排行榜] rising 爬取为空，保留旧数据
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] original 爬取为空，保留旧数据
+[排行榜] 已存入 50 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":92641,"name":"沧海一声笑","plays":100,"comments":6647,"duration":246230,"publish_year":1990,"music_size":456,"album_size":48},{"id":108366,"name":"永远的微笑 (Live)","plays":80,"comments":1657,"duration":146773,"publish_year":2005,"music_size":456,"album_size":48},{"id":108633,"name":"歌 (1995年Unplugged版)","plays":75,"comments":803,"duration":157583,"publish_year":1995,"music_size":456,"album_size":48},{"id":108641,"name":"你的样子","plays":100,"comments":2091,"duration":210026,"publish_year":1995,"music_size":456,"album_size":48},{"id":108653,"name":"东方之珠","plays":100,"comments":7436,"duration":261716,"publish_year":1995,"music_size":456,"album_size":48},{"id":108700,"name":"滚滚红尘","plays":95,"comments":1401,"duration":186466,"publish_year":1995,"music_size":456,"album_size":48},{"id":108837,"name":"东风","plays":80,"comments":491,"duration":209200,"publish_year":1994,"music_size":456,"album_size":48},{"id":108848,"name":"台北红玫瑰","plays":90,"comments":691,"duration":229493,"publish_year":1994,"music_size":456,"album_size":48},{"id":108852,"name":"天雨","plays":80,"comments":705,"duration":269173,"publish_year":1994,"music_size":456,"album_size":48},{"id":108860,"name":"恋曲2000","plays":90,"comments":1439,"duration":293600,"publish_year":1994,"music_size":456,"album_size":48},{"id":108930,"name":"大地的孩子","plays":85,"comments":634,"duration":231840,"publish_year":1993,"music_size":456,"album_size":48},{"id":109069,"name":"火车","plays":100,"comments":976,"duration":268493,"publish_year":1991,"music_size":456,"album_size":48},{"id":109077,"name":"青春舞曲2000","plays":95,"comments":754,"duration":264026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109079,"name":"原乡 II","plays":80,"comments":153,"duration":213640,"publish_year":1991,"music_size":456,"album_size":48},{"id":109094,"name":"长征","plays":95,"comments":1253,"duration":314026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109144,"name":"追梦人","plays":90,"comments":2490,"duration":230093,"publish_year":1991,"music_size":456,"album_size":48},{"id":109198,"name":"恋曲1990","plays":100,"comments":20733,"duration":315906,"publish_year":1990,"music_size":456,"album_size":48},{"id":109236,"name":"告别的年代","plays":85,"comments":1213,"duration":302693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109243,"name":"沉默的表示","plays":75,"comments":484,"duration":230693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109252,"name":"思念","plays":80,"comments":616,"duration":307933,"publish_year":1989,"music_size":456,"album_size":48},{"id":109260,"name":"野百合也有春天","plays":100,"comments":3452,"duration":279866,"publish_year":1989,"music_size":456,"album_size":48},{"id":109269,"name":"海上花","plays":95,"comments":2945,"duration":179493,"publish_year":1989,"music_size":456,"album_size":48},{"id":109275,"name":"闪亮的日子","plays":90,"comments":2042,"duration":230293,"publish_year":1989,"music_size":456,"album_size":48},{"id":109292,"name":"是否","plays":75,"comments":363,"duration":244600,"publish_year":1989,"music_size":456,"album_size":48},{"id":109366,"name":"暗恋","plays":70,"comments":200,"duration":220000,"publish_year":1989,"music_size":456,"album_size":48},{"id":109388,"name":"爱人同志","plays":90,"comments":1507,"duration":271040,"publish_year":1988,"music_size":456,"album_size":48},{"id":109429,"name":"现象I","plays":70,"comments":106,"duration":223866,"publish_year":1985,"music_size":456,"album_size":48},{"id":109458,"name":"穿过你的黑发的我的手","plays":85,"comments":474,"duration":216600,"publish_year":1984,"music_size":456,"album_size":48},{"id":109470,"name":"超级市民","plays":75,"comments":367,"duration":142666,"publish_year":1984,"music_size":456,"album_size":48},{"id":109489,"name":"诞生","plays":75,"comments":256,"duration":107782,"publish_year":1983,"music_size":456,"album_size":48},{"id":109495,"name":"现象七十二变","plays":90,"comments":2735,"duration":231622,"publish_year":1983,"music_size":456,"album_size":48},{"id":109498,"name":"牧童","plays":75,"comments":472,"duration":200840,"publish_year":1983,"music_size":456,"album_size":48},{"id":109502,"name":"未来的主人翁","plays":90,"comments":3265,"duration":450717,"publish_year":1983,"music_size":456,"album_size":48},{"id":109505,"name":"青春舞曲","plays":85,"comments":843,"duration":200346,"publish_year":1983,"music_size":456,"album_size":48},{"id":109508,"name":"爱的箴言","plays":95,"comments":5805,"duration":216315,"publish_year":1983,"music_size":456,"album_size":48},{"id":109516,"name":"稻草人","plays":75,"comments":840,"duration":401516,"publish_year":1983,"music_size":456,"album_size":48},{"id":109525,"name":"鹿港小镇","plays":100,"comments":5818,"duration":283866,"publish_year":1982,"music_size":456,"album_size":48},{"id":109528,"name":"恋曲1980","plays":100,"comments":3566,"duration":200893,"publish_year":1982,"music_size":456,"album_size":48},{"id":109530,"name":"童年","plays":100,"comments":18026,"duration":234973,"publish_year":1982,"music_size":456,"album_size":48},{"id":109532,"name":"错误","plays":85,"comments":1154,"duration":307000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109534,"name":"摇篮曲","plays":70,"comments":358,"duration":201000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109536,"name":"之乎者也","plays":95,"comments":2220,"duration":244000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109539,"name":"乡愁四韵","plays":90,"comments":2533,"duration":358000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109542,"name":"将进酒","plays":85,"comments":1270,"duration":263000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109545,"name":"光阴的故事","plays":100,"comments":5719,"duration":203840,"publish_year":1982,"music_size":456,"album_size":48},{"id":370389,"name":"风吹风吹","plays":80,"comments":823,"duration":253173,"publish_year":1996,"music_size":456,"album_size":48},{"id":29414839,"name":"只得一生","plays":80,"comments":3222,"duration":210624,"publish_year":2014,"music_size":456,"album_size":48},{"id":493042353,"name":"北西南风","plays":75,"comments":578,"duration":221546,"publish_year":2017,"music_size":456,"album_size":48},{"id":2060731831,"name":"长安三万里","plays":80,"comments":2009,"duration":264240,"publish_year":null,"music_size":456,"album_size":48}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+[爬虫] artist desc: 3686
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[爬虫] artist top songs: 3686
+[爬虫] 获取歌手描述失败: 
+[爬虫] 获取热搜列表（使用热歌榜数据）
+[爬虫] 获取热歌榜: 3778678
+[爬虫] 成功获取 10 条热搜数据
+[爬虫] 成功获取 0 位相似歌手
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 50 个trackId (共100首)
+[飙升榜] 获取到 50 首歌曲
+[飙升榜] 排序完成: 50 首
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 50 个trackId (共100首)
+[新歌榜] 获取到 50 首歌曲
+[新歌榜] 排序完成: 50 首
+[原创榜] 开始爬取...
+[原创榜] 获取到 50 个trackId (共100首)
+[原创榜] 获取到 50 首歌曲
+[原创榜] 排序完成: 50 首
+[排行榜] 已存入 200 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[Combined Analysis] stdout: {"sentiment": {"positive": 15, "neutral": 35, "negative": 0}, "topics": [{"topic_id": 0, "name": "未分类", "keywords": ["未分类"], "count": 25, "percentage": 50, "examples": ["祝你将来跑成大迫杰", "00我摸", "⠀\n⠀⠀\n⠀⠀...
+[爬虫] search: "张" type=100 limit=10
+[Search] 爬虫: "张" → 10 条 (共 504)
+[Scraper] 开始抓取歌手: 10562
+[爬虫] artist detail: 10562
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+[爬虫] artist desc: 3686
+[爬虫] similar artists: 10562
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=10562
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":92641,"name":"沧海一声笑","plays":100,"comments":6647,"duration":246230,"publish_year":1990,"music_size":456,"album_size":48},{"id":108366,"name":"永远的微笑 (Live)","plays":80,"comments":1657,"duration":146773,"publish_year":2005,"music_size":456,"album_size":48},{"id":108633,"name":"歌 (1995年Unplugged版)","plays":75,"comments":803,"duration":157583,"publish_year":1995,"music_size":456,"album_size":48},{"id":108641,"name":"你的样子","plays":100,"comments":2091,"duration":210026,"publish_year":1995,"music_size":456,"album_size":48},{"id":108653,"name":"东方之珠","plays":100,"comments":7436,"duration":261716,"publish_year":1995,"music_size":456,"album_size":48},{"id":108700,"name":"滚滚红尘","plays":95,"comments":1401,"duration":186466,"publish_year":1995,"music_size":456,"album_size":48},{"id":108837,"name":"东风","plays":80,"comments":491,"duration":209200,"publish_year":1994,"music_size":456,"album_size":48},{"id":108848,"name":"台北红玫瑰","plays":90,"comments":691,"duration":229493,"publish_year":1994,"music_size":456,"album_size":48},{"id":108852,"name":"天雨","plays":80,"comments":705,"duration":269173,"publish_year":1994,"music_size":456,"album_size":48},{"id":108860,"name":"恋曲2000","plays":90,"comments":1439,"duration":293600,"publish_year":1994,"music_size":456,"album_size":48},{"id":108930,"name":"大地的孩子","plays":85,"comments":634,"duration":231840,"publish_year":1993,"music_size":456,"album_size":48},{"id":109069,"name":"火车","plays":100,"comments":976,"duration":268493,"publish_year":1991,"music_size":456,"album_size":48},{"id":109077,"name":"青春舞曲2000","plays":95,"comments":754,"duration":264026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109079,"name":"原乡 II","plays":80,"comments":153,"duration":213640,"publish_year":1991,"music_size":456,"album_size":48},{"id":109094,"name":"长征","plays":95,"comments":1253,"duration":314026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109144,"name":"追梦人","plays":90,"comments":2490,"duration":230093,"publish_year":1991,"music_size":456,"album_size":48},{"id":109198,"name":"恋曲1990","plays":100,"comments":20733,"duration":315906,"publish_year":1990,"music_size":456,"album_size":48},{"id":109236,"name":"告别的年代","plays":85,"comments":1213,"duration":302693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109243,"name":"沉默的表示","plays":75,"comments":484,"duration":230693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109252,"name":"思念","plays":80,"comments":616,"duration":307933,"publish_year":1989,"music_size":456,"album_size":48},{"id":109260,"name":"野百合也有春天","plays":100,"comments":3452,"duration":279866,"publish_year":1989,"music_size":456,"album_size":48},{"id":109269,"name":"海上花","plays":95,"comments":2945,"duration":179493,"publish_year":1989,"music_size":456,"album_size":48},{"id":109275,"name":"闪亮的日子","plays":90,"comments":2042,"duration":230293,"publish_year":1989,"music_size":456,"album_size":48},{"id":109292,"name":"是否","plays":75,"comments":363,"duration":244600,"publish_year":1989,"music_size":456,"album_size":48},{"id":109366,"name":"暗恋","plays":70,"comments":200,"duration":220000,"publish_year":1989,"music_size":456,"album_size":48},{"id":109388,"name":"爱人同志","plays":90,"comments":1507,"duration":271040,"publish_year":1988,"music_size":456,"album_size":48},{"id":109429,"name":"现象I","plays":70,"comments":106,"duration":223866,"publish_year":1985,"music_size":456,"album_size":48},{"id":109458,"name":"穿过你的黑发的我的手","plays":85,"comments":474,"duration":216600,"publish_year":1984,"music_size":456,"album_size":48},{"id":109470,"name":"超级市民","plays":75,"comments":367,"duration":142666,"publish_year":1984,"music_size":456,"album_size":48},{"id":109489,"name":"诞生","plays":75,"comments":256,"duration":107782,"publish_year":1983,"music_size":456,"album_size":48},{"id":109495,"name":"现象七十二变","plays":90,"comments":2735,"duration":231622,"publish_year":1983,"music_size":456,"album_size":48},{"id":109498,"name":"牧童","plays":75,"comments":472,"duration":200840,"publish_year":1983,"music_size":456,"album_size":48},{"id":109502,"name":"未来的主人翁","plays":90,"comments":3265,"duration":450717,"publish_year":1983,"music_size":456,"album_size":48},{"id":109505,"name":"青春舞曲","plays":85,"comments":843,"duration":200346,"publish_year":1983,"music_size":456,"album_size":48},{"id":109508,"name":"爱的箴言","plays":95,"comments":5805,"duration":216315,"publish_year":1983,"music_size":456,"album_size":48},{"id":109516,"name":"稻草人","plays":75,"comments":840,"duration":401516,"publish_year":1983,"music_size":456,"album_size":48},{"id":109525,"name":"鹿港小镇","plays":100,"comments":5818,"duration":283866,"publish_year":1982,"music_size":456,"album_size":48},{"id":109528,"name":"恋曲1980","plays":100,"comments":3566,"duration":200893,"publish_year":1982,"music_size":456,"album_size":48},{"id":109530,"name":"童年","plays":100,"comments":18026,"duration":234973,"publish_year":1982,"music_size":456,"album_size":48},{"id":109532,"name":"错误","plays":85,"comments":1154,"duration":307000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109534,"name":"摇篮曲","plays":70,"comments":358,"duration":201000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109536,"name":"之乎者也","plays":95,"comments":2220,"duration":244000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109539,"name":"乡愁四韵","plays":90,"comments":2533,"duration":358000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109542,"name":"将进酒","plays":85,"comments":1270,"duration":263000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109545,"name":"光阴的故事","plays":100,"comments":5719,"duration":203840,"publish_year":1982,"music_size":456,"album_size":48},{"id":370389,"name":"风吹风吹","plays":80,"comments":823,"duration":253173,"publish_year":1996,"music_size":456,"album_size":48},{"id":29414839,"name":"只得一生","plays":80,"comments":3222,"duration":210624,"publish_year":2014,"music_size":456,"album_size":48},{"id":493042353,"name":"北西南风","plays":75,"comments":578,"duration":221546,"publish_year":2017,"music_size":456,"album_size":48},{"id":2060731831,"name":"长安三万里","plays":80,"comments":2009,"duration":264240,"publish_year":null,"music_size":456,"album_size":48}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] artist top songs: 10562
+[爬虫] 获取歌手描述失败: 
+[爬虫] artist desc: 10562
+[爬虫] 获取歌手描述失败: 
+[爬虫] 歌手无accountId映射: 10562
+[爬虫] 歌手无accountId映射: 10562
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 10562
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 10562
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=10562
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 张韶涵 (10562) 入库完成，50 首歌曲
+[爬虫] artist top songs: 10562
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 0 个trackId (共undefined首)
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 0 个trackId (共undefined首)
+[排行榜] rising 爬取为空，保留旧数据
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] original 爬取为空，保留旧数据
+[排行榜] 已存入 50 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[热歌榜] 获取到 0 个trackId (共undefined首)
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 0 个trackId (共undefined首)
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 0 个trackId (共undefined首)
+[排行榜] hot 爬取为空，保留旧数据
+[排行榜] rising 爬取为空，保留旧数据
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] original 爬取为空，保留旧数据
+[排行榜] 已存入 0 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+[爬虫] artist desc: 3686
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":92641,"name":"沧海一声笑","plays":100,"comments":6647,"duration":246230,"publish_year":1990,"music_size":456,"album_size":48},{"id":108366,"name":"永远的微笑 (Live)","plays":80,"comments":1657,"duration":146773,"publish_year":2005,"music_size":456,"album_size":48},{"id":108633,"name":"歌 (1995年Unplugged版)","plays":75,"comments":803,"duration":157583,"publish_year":1995,"music_size":456,"album_size":48},{"id":108641,"name":"你的样子","plays":100,"comments":2091,"duration":210026,"publish_year":1995,"music_size":456,"album_size":48},{"id":108653,"name":"东方之珠","plays":100,"comments":7436,"duration":261716,"publish_year":1995,"music_size":456,"album_size":48},{"id":108700,"name":"滚滚红尘","plays":95,"comments":1401,"duration":186466,"publish_year":1995,"music_size":456,"album_size":48},{"id":108837,"name":"东风","plays":80,"comments":491,"duration":209200,"publish_year":1994,"music_size":456,"album_size":48},{"id":108848,"name":"台北红玫瑰","plays":90,"comments":691,"duration":229493,"publish_year":1994,"music_size":456,"album_size":48},{"id":108852,"name":"天雨","plays":80,"comments":705,"duration":269173,"publish_year":1994,"music_size":456,"album_size":48},{"id":108860,"name":"恋曲2000","plays":90,"comments":1439,"duration":293600,"publish_year":1994,"music_size":456,"album_size":48},{"id":108930,"name":"大地的孩子","plays":85,"comments":634,"duration":231840,"publish_year":1993,"music_size":456,"album_size":48},{"id":109069,"name":"火车","plays":100,"comments":976,"duration":268493,"publish_year":1991,"music_size":456,"album_size":48},{"id":109077,"name":"青春舞曲2000","plays":95,"comments":754,"duration":264026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109079,"name":"原乡 II","plays":80,"comments":153,"duration":213640,"publish_year":1991,"music_size":456,"album_size":48},{"id":109094,"name":"长征","plays":95,"comments":1253,"duration":314026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109144,"name":"追梦人","plays":90,"comments":2490,"duration":230093,"publish_year":1991,"music_size":456,"album_size":48},{"id":109198,"name":"恋曲1990","plays":100,"comments":20733,"duration":315906,"publish_year":1990,"music_size":456,"album_size":48},{"id":109236,"name":"告别的年代","plays":85,"comments":1213,"duration":302693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109243,"name":"沉默的表示","plays":75,"comments":484,"duration":230693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109252,"name":"思念","plays":80,"comments":616,"duration":307933,"publish_year":1989,"music_size":456,"album_size":48},{"id":109260,"name":"野百合也有春天","plays":100,"comments":3452,"duration":279866,"publish_year":1989,"music_size":456,"album_size":48},{"id":109269,"name":"海上花","plays":95,"comments":2945,"duration":179493,"publish_year":1989,"music_size":456,"album_size":48},{"id":109275,"name":"闪亮的日子","plays":90,"comments":2042,"duration":230293,"publish_year":1989,"music_size":456,"album_size":48},{"id":109292,"name":"是否","plays":75,"comments":363,"duration":244600,"publish_year":1989,"music_size":456,"album_size":48},{"id":109366,"name":"暗恋","plays":70,"comments":200,"duration":220000,"publish_year":1989,"music_size":456,"album_size":48},{"id":109388,"name":"爱人同志","plays":90,"comments":1507,"duration":271040,"publish_year":1988,"music_size":456,"album_size":48},{"id":109429,"name":"现象I","plays":70,"comments":106,"duration":223866,"publish_year":1985,"music_size":456,"album_size":48},{"id":109458,"name":"穿过你的黑发的我的手","plays":85,"comments":474,"duration":216600,"publish_year":1984,"music_size":456,"album_size":48},{"id":109470,"name":"超级市民","plays":75,"comments":367,"duration":142666,"publish_year":1984,"music_size":456,"album_size":48},{"id":109489,"name":"诞生","plays":75,"comments":256,"duration":107782,"publish_year":1983,"music_size":456,"album_size":48},{"id":109495,"name":"现象七十二变","plays":90,"comments":2735,"duration":231622,"publish_year":1983,"music_size":456,"album_size":48},{"id":109498,"name":"牧童","plays":75,"comments":472,"duration":200840,"publish_year":1983,"music_size":456,"album_size":48},{"id":109502,"name":"未来的主人翁","plays":90,"comments":3265,"duration":450717,"publish_year":1983,"music_size":456,"album_size":48},{"id":109505,"name":"青春舞曲","plays":85,"comments":843,"duration":200346,"publish_year":1983,"music_size":456,"album_size":48},{"id":109508,"name":"爱的箴言","plays":95,"comments":5805,"duration":216315,"publish_year":1983,"music_size":456,"album_size":48},{"id":109516,"name":"稻草人","plays":75,"comments":840,"duration":401516,"publish_year":1983,"music_size":456,"album_size":48},{"id":109525,"name":"鹿港小镇","plays":100,"comments":5818,"duration":283866,"publish_year":1982,"music_size":456,"album_size":48},{"id":109528,"name":"恋曲1980","plays":100,"comments":3566,"duration":200893,"publish_year":1982,"music_size":456,"album_size":48},{"id":109530,"name":"童年","plays":100,"comments":18026,"duration":234973,"publish_year":1982,"music_size":456,"album_size":48},{"id":109532,"name":"错误","plays":85,"comments":1154,"duration":307000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109534,"name":"摇篮曲","plays":70,"comments":358,"duration":201000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109536,"name":"之乎者也","plays":95,"comments":2220,"duration":244000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109539,"name":"乡愁四韵","plays":90,"comments":2533,"duration":358000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109542,"name":"将进酒","plays":85,"comments":1270,"duration":263000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109545,"name":"光阴的故事","plays":100,"comments":5719,"duration":203840,"publish_year":1982,"music_size":456,"album_size":48},{"id":370389,"name":"风吹风吹","plays":80,"comments":823,"duration":253173,"publish_year":1996,"music_size":456,"album_size":48},{"id":29414839,"name":"只得一生","plays":80,"comments":3222,"duration":210624,"publish_year":2014,"music_size":456,"album_size":48},{"id":493042353,"name":"北西南风","plays":75,"comments":578,"duration":221546,"publish_year":2017,"music_size":456,"album_size":48},{"id":2060731831,"name":"长安三万里","plays":80,"comments":2009,"duration":264240,"publish_year":null,"music_size":456,"album_size":48}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] 获取歌手描述失败: 
+[爬虫] 成功获取 0 位相似歌手
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 0 个trackId (共undefined首)
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 0 个trackId (共undefined首)
+[排行榜] rising 爬取为空，保留旧数据
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] original 爬取为空，保留旧数据
+[排行榜] 已存入 50 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[爬虫] search: "9" type=100 limit=10
+[Search] 爬虫: "9" → 10 条 (共 505)
+[Scraper] 开始抓取歌手: 31511662
+[爬虫] artist detail: 31511662
+[爬虫] 歌手无accountId映射: 31511662
+[爬虫] 歌手无accountId映射: 31511662
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 31511662
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 31511662
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=31511662
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 99 God (31511662) 入库完成，50 首歌曲
+[Scraper] 开始抓取歌手: 31511662
+[爬虫] artist top songs: 31511662
+[爬虫] artist detail: 31511662
+[爬虫] 歌手无accountId映射: 31511662
+[爬虫] 歌手无accountId映射: 31511662
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 31511662
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 31511662
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=31511662
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 99 God (31511662) 入库完成，50 首歌曲
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[热歌榜] 获取到 0 个trackId (共undefined首)
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 0 个trackId (共undefined首)
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 50 个trackId (共100首)
+[原创榜] 获取到 50 首歌曲
+[原创榜] 排序完成: 50 首
+[排行榜] hot 爬取为空，保留旧数据
+[排行榜] rising 爬取为空，保留旧数据
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] 已存入 50 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":1357775302,"name":"UFO","plays":100,"comments":14241,"duration":175236,"publish_year":2019,"music_size":66,"album_size":41},{"id":1366433094,"name":"Sandwich","plays":65,"comments":1494,"duration":124753,"publish_year":null,"music_size":66,"album_size":41},{"id":1384482442,"name":"Beyotch","plays":65,"comments":1497,"duration":132421,"publish_year":null,"music_size":66,"album_size":41},{"id":1399757421,"name":"YAWN","plays":55,"comments":1308,"duration":144124,"publish_year":2019,"music_size":66,"album_size":41},{"id":1439034707,"name":"SCUM","plays":80,"comments":3669,"duration":138230,"publish_year":null,"music_size":66,"album_size":41},{"id":1447521944,"name":"RAW","plays":95,"comments":3962,"duration":120000,"publish_year":2020,"music_size":66,"album_size":41},{"id":1455101010,"name":"GALA","plays":95,"comments":6172,"duration":79514,"publish_year":null,"music_size":66,"album_size":41},{"id":1477039120,"name":"Nyquil","plays":70,"comments":1027,"duration":125172,"publish_year":null,"music_size":66,"album_size":41},{"id":1487685739,"name":"BLAST","plays":85,"comments":1925,"duration":121285,"publish_year":null,"music_size":66,"album_size":41},{"id":1806871905,"name":"MAP","plays":55,"comments":1102,"duration":75616,"publish_year":null,"music_size":66,"album_size":41},{"id":1806872523,"name":"ZZZZ","plays":95,"comments":7022,"duration":131538,"publish_year":null,"music_size":66,"album_size":41},{"id":1819356834,"name":"Chobani","plays":85,"comments":2193,"duration":150508,"publish_year":2021,"music_size":66,"album_size":41},{"id":1830036252,"name":"SHAWTY","plays":70,"comments":1713,"duration":86166,"publish_year":null,"music_size":66,"album_size":41},{"id":1830036291,"name":"ME","plays":60,"comments":1038,"duration":156083,"publish_year":null,"music_size":66,"album_size":41},{"id":1837719923,"name":"Bodega","plays":100,"comments":3892,"duration":165750,"publish_year":null,"music_size":66,"album_size":41},{"id":1839845257,"name":"1903FS","plays":50,"comments":995,"duration":110163,"publish_year":null,"music_size":66,"album_size":41},{"id":1851853304,"name":"3.5","plays":100,"comments":3046,"duration":158222,"publish_year":null,"music_size":66,"album_size":41},{"id":1853988796,"name":"FLIGHT MODE","plays":90,"comments":2258,"duration":158976,"publish_year":null,"music_size":66,"album_size":41},{"id":1856210438,"name":"STAR","plays":80,"comments":1404,"duration":122292,"publish_year":null,"music_size":66,"album_size":41},{"id":1869161122,"name":"all the suckers DIE (feat.99God)","plays":40,"comments":1206,"duration":207958,"publish_year":null,"music_size":66,"album_size":41},{"id":1907269589,"name":"\"CONDE\"","plays":35,"comments":852,"duration":132203,"publish_year":null,"music_size":66,"album_size":41},{"id":1934328032,"name":"PINK ZOOM","plays":50,"comments":1189,"duration":140682,"publish_year":null,"music_size":66,"album_size":41},{"id":1934328034,"name":"SPRING","plays":60,"comments":1035,"duration":128333,"publish_year":null,"music_size":66,"album_size":41},{"id":1934328039,"name":"DVD","plays":35,"comments":568,"duration":90639,"publish_year":null,"music_size":66,"album_size":41},{"id":1949025660,"name":"LanLan'\''s Boy","plays":100,"comments":2378,"duration":124444,"publish_year":null,"music_size":66,"album_size":41},{"id":1970803453,"name":"ENERGY","plays":70,"comments":1212,"duration":188000,"publish_year":null,"music_size":66,"album_size":41},{"id":2009179226,"name":"Xmas Freestyle","plays":75,"comments":796,"duration":100990,"publish_year":null,"music_size":66,"album_size":41},{"id":2018763902,"name":"lssey Miyake","plays":45,"comments":855,"duration":146493,"publish_year":2023,"music_size":66,"album_size":41},{"id":2033817699,"name":"A&A","plays":70,"comments":4483,"duration":163398,"publish_year":2023,"music_size":66,"album_size":41},{"id":2045432739,"name":"Swear To God（Prod. by 808Mafia）","plays":30,"comments":329,"duration":170944,"publish_year":2023,"music_size":66,"album_size":41},{"id":2092268861,"name":"Renegade 叛逆者","plays":100,"comments":2130,"duration":162797,"publish_year":null,"music_size":66,"album_size":41},{"id":2102417985,"name":"Airbnb","plays":60,"comments":799,"duration":209013,"publish_year":2023,"music_size":66,"album_size":41},{"id":2144721869,"name":"ITS UP","plays":40,"comments":298,"duration":111072,"publish_year":2024,"music_size":66,"album_size":41},{"id":2159522636,"name":"屁话2.0","plays":55,"comments":1102,"duration":142660,"publish_year":null,"music_size":66,"album_size":41},{"id":2163970984,"name":"九十九","plays":40,"comments":382,"duration":122553,"publish_year":null,"music_size":66,"album_size":41},{"id":2651572482,"name":"Martina","plays":95,"comments":751,"duration":223157,"publish_year":2024,"music_size":66,"album_size":41},{"id":2719471140,"name":"飞1999","plays":100,"comments":4761,"duration":98950,"publish_year":null,"music_size":66,"album_size":41},{"id":2719483512,"name":"Le Baron","plays":100,"comments":811,"duration":142000,"publish_year":null,"music_size":66,"album_size":41},{"id":2719491511,"name":"Pollen Allergy","plays":85,"comments":200,"duration":157380,"publish_year":null,"music_size":66,"album_size":41},{"id":2719496480,"name":"JOJO","plays":65,"comments":90,"duration":114344,"publish_year":null,"music_size":66,"album_size":41},{"id":2719497004,"name":"2223334445555","plays":100,"comments":757,"duration":138118,"publish_year":null,"music_size":66,"album_size":41},{"id":2719501793,"name":"WigWam","plays":95,"comments":409,"duration":112619,"publish_year":null,"music_size":66,"album_size":41},{"id":2719507750,"name":"BACK TOYOU","plays":95,"comments":229,"duration":158205,"publish_year":null,"music_size":66,"album_size":41},{"id":2719509582,"name":"一团火","plays":50,"comments":39,"duration":61875,"publish_year":null,"music_size":66,"album_size":41},{"id":2719831652,"name":"沪 Skit","plays":70,"comments":170,"duration":77769,"publish_year":null,"music_size":66,"album_size":41},{"id":2742316634,"name":"miffy cafe pt. 2","plays":75,"comments":151,"duration":93333,"publish_year":2025,"music_size":66,"album_size":41},{"id":3317670133,"name":"rain rain","plays":90,"comments":499,"duration":149268,"publish_year":null,"music_size":66,"album_size":41},{"id":3349475371,"name":"Is It Love","plays":90,"comments":1389,"duration":95000,"publish_year":null,"music_size":66,"album_size":41},{"id":3362411549,"name":"SWAG","plays":100,"comments":1754,"duration":127040,"publish_year":null,"music_size":66,"album_size":41},{"id":3394429242,"name":"Pineapple Express","plays":100,"comments":334,"duration":127272,"publish_year":null,"music_size":66,"album_size":41}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] similar artists: 31511662
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=31511662
+[爬虫] artist desc: 31511662
+[爬虫] artist top songs: 31511662
+[爬虫] 获取歌手描述失败: 
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 获取热搜列表（使用热歌榜数据）
+[爬虫] 获取热歌榜: 3778678
+[爬虫] 成功获取 10 条热搜数据
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 0 个trackId (共undefined首)
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 50 个trackId (共100首)
+[原创榜] 获取到 50 首歌曲
+[原创榜] 排序完成: 50 首
+[排行榜] rising 爬取为空，保留旧数据
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] 已存入 100 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[Combined Analysis] stdout: {"sentiment": {"positive": 0, "neutral": 0, "negative": 0}, "topics": [], "total_comments": 0}
+...
+[Combined Analysis] stdout: {"sentiment": {"positive": 0, "neutral": 0, "negative": 0}, "topics": [], "total_comments": 0}
+...
+[Combined Analysis] stdout: {"sentiment": {"positive": 10, "neutral": 40, "negative": 0}, "topics": [{"topic_id": 0, "name": "未分类", "keywords": ["未分类"], "count": 31, "percentage": 62, "examples": ["蓝调", "1410", "别逗我笑", "现在这种叫嘉豪"...
+[爬虫] search: "张" type=100 limit=10
+[Search] 爬虫: "张" → 10 条 (共 504)
+[爬虫] search: "zhang" type=100 limit=10
+[Search] 爬虫: "zhang" → 10 条 (共 500)
+[爬虫] search: "张" type=100 limit=10
+[Search] 爬虫: "张" → 10 条 (共 504)
+[爬虫] search: "d z q" type=100 limit=10
+[Search] 爬虫: "d z q" → 7 条 (共 7)
+[爬虫] search: "邓紫棋" type=100 limit=10
+[Search] 爬虫: "邓紫棋" → 10 条 (共 42)
+[Scraper] 开始抓取歌手: 7763
+[爬虫] artist detail: 7763
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=35740139
+[爬虫] 未找到粉丝数字段: 7763
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=35740139
+[爬虫] 未找到粉丝数字段: 7763
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 7763
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 7763
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=7763
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 G.E.M.邓紫棋 (7763) 入库完成，50 首歌曲
+[爬虫] artist top songs: 7763
+[爬虫] search: "luo da you" type=100 limit=10
+[Search] 爬虫: "luo da you" → 5 条 (共 5)
+[爬虫] search: "罗大佑" type=100 limit=10
+[Search] 爬虫: "罗大佑" → 10 条 (共 15)
+[Scraper] 开始抓取歌手: 3686
+[爬虫] artist detail: 3686
+[爬虫] 歌手无accountId映射: 3686
+[爬虫] 歌手无accountId映射: 3686
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 3686
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[爬虫] search: "tay" type=100 limit=10
+[Search] 爬虫: "tay" → 10 条 (共 507)
+[爬虫] search: "taylor" type=100 limit=10
+[Search] 爬虫: "taylor" → 10 条 (共 510)
+[Scraper] 开始抓取歌手: 44266
+[爬虫] artist detail: 44266
+[爬虫] 歌手无accountId映射: 44266
+[爬虫] 歌手无accountId映射: 44266
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 44266
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 罗大佑 (3686) 入库完成，50 首歌曲
+[爬虫] artist top songs: 3686
+[Scraper] 开始抓取歌手: 7763
+[爬虫] artist detail: 7763
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=35740139
+[爬虫] 未找到粉丝数字段: 7763
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=35740139
+[爬虫] 未找到粉丝数字段: 7763
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 7763
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 44266
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=44266
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 Taylor Swift (44266) 入库完成，50 首歌曲
+[爬虫] artist top songs: 44266
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 7763
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=7763
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 G.E.M.邓紫棋 (7763) 入库完成，50 首歌曲
+[Scraper] 开始抓取歌手: 3686
+[爬虫] artist detail: 3686
+[爬虫] 歌手无accountId映射: 3686
+[爬虫] 歌手无accountId映射: 3686
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 3686
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 罗大佑 (3686) 入库完成，50 首歌曲
+[Scraper] 开始抓取歌手: 44266
+[爬虫] artist detail: 44266
+[爬虫] 歌手无accountId映射: 44266
+[爬虫] 歌手无accountId映射: 44266
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 44266
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 44266
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=44266
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 Taylor Swift (44266) 入库完成，50 首歌曲
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[热歌榜] 获取到 0 个trackId (共undefined首)
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 0 个trackId (共undefined首)
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 0 个trackId (共undefined首)
+[排行榜] hot 爬取为空，保留旧数据
+[排行榜] rising 爬取为空，保留旧数据
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] original 爬取为空，保留旧数据
+[排行榜] 已存入 0 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":233931,"name":"泡沫","plays":100,"comments":87772,"duration":258866,"publish_year":2012,"music_size":420,"album_size":61},{"id":234014,"name":"写不完的温柔","plays":100,"comments":29875,"duration":238880,"publish_year":2010,"music_size":420,"album_size":61},{"id":234015,"name":"A.I.N.Y. 爱你","plays":100,"comments":32441,"duration":226800,"publish_year":2010,"music_size":420,"album_size":61},{"id":234064,"name":"Where Did U Go","plays":100,"comments":33386,"duration":235800,"publish_year":2008,"music_size":420,"album_size":61},{"id":26117675,"name":"我的秘密","plays":100,"comments":21905,"duration":252120,"publish_year":2010,"music_size":420,"album_size":61},{"id":26154890,"name":"A.I.N.Y.","plays":100,"comments":11431,"duration":224506,"publish_year":2009,"music_size":420,"album_size":61},{"id":26550057,"name":"你把我灌醉","plays":100,"comments":11395,"duration":285190,"publish_year":2013,"music_size":420,"album_size":61},{"id":28341146,"name":"你不是真正的快乐 (Live)","plays":100,"comments":53008,"duration":320056,"publish_year":2014,"music_size":420,"album_size":61},{"id":28427775,"name":"龙卷风 (Live)","plays":100,"comments":50851,"duration":271754,"publish_year":2014,"music_size":420,"album_size":61},{"id":28793502,"name":"后会无期","plays":100,"comments":54485,"duration":223015,"publish_year":2014,"music_size":420,"album_size":61},{"id":28949444,"name":"喜欢你","plays":100,"comments":149297,"duration":239010,"publish_year":2014,"music_size":420,"album_size":61},{"id":29848657,"name":"手心的蔷薇","plays":100,"comments":49372,"duration":280053,"publish_year":2014,"music_size":420,"album_size":61},{"id":30612793,"name":"多远都要在一起","plays":100,"comments":401904,"duration":216880,"publish_year":2015,"music_size":420,"album_size":61},{"id":33190007,"name":"新的心跳","plays":100,"comments":20071,"duration":216439,"publish_year":2015,"music_size":420,"album_size":61},{"id":36024806,"name":"再见（good bye）","plays":100,"comments":111062,"duration":206053,"publish_year":2015,"music_size":420,"album_size":61},{"id":36103237,"name":"一路逆风","plays":100,"comments":18859,"duration":225800,"publish_year":2015,"music_size":420,"album_size":61},{"id":36198060,"name":"于是","plays":100,"comments":20712,"duration":229880,"publish_year":2015,"music_size":420,"album_size":61},{"id":36270426,"name":"来自天堂的魔鬼","plays":100,"comments":99353,"duration":245493,"publish_year":2015,"music_size":420,"album_size":61},{"id":412911436,"name":"画 (Live Piano Session II)","plays":100,"comments":77514,"duration":168739,"publish_year":2016,"music_size":420,"album_size":61},{"id":420513158,"name":"红蔷薇白玫瑰","plays":100,"comments":62688,"duration":282924,"publish_year":2016,"music_size":420,"album_size":61},{"id":449818741,"name":"光年之外","plays":100,"comments":156748,"duration":235505,"publish_year":2016,"music_size":420,"album_size":61},{"id":480579393,"name":"桃花诺","plays":100,"comments":50949,"duration":219759,"publish_year":2017,"music_size":420,"album_size":61},{"id":1299550532,"name":"倒数","plays":100,"comments":149326,"duration":229333,"publish_year":2018,"music_size":420,"album_size":61},{"id":1304720983,"name":"泡沫 Bubble","plays":100,"comments":2449,"duration":258879,"publish_year":2013,"music_size":420,"album_size":61},{"id":1305366734,"name":"另一个童话","plays":100,"comments":12598,"duration":183426,"publish_year":2018,"music_size":420,"album_size":61},{"id":1313107926,"name":"攀登 (Live)","plays":100,"comments":27700,"duration":251410,"publish_year":2018,"music_size":420,"album_size":61},{"id":1331885158,"name":"Where Did You Go","plays":100,"comments":9996,"duration":234680,"publish_year":2014,"music_size":420,"album_size":61},{"id":1379444316,"name":"差不多姑娘","plays":100,"comments":25301,"duration":230042,"publish_year":2019,"music_size":420,"album_size":61},{"id":1398247728,"name":"Walk On Water","plays":100,"comments":26588,"duration":211509,"publish_year":2019,"music_size":420,"album_size":61},{"id":1405283464,"name":"句号","plays":100,"comments":205856,"duration":235632,"publish_year":2019,"music_size":420,"album_size":61},{"id":1409382131,"name":"摩天动物园","plays":100,"comments":123685,"duration":270676,"publish_year":2019,"music_size":420,"album_size":61},{"id":1412263970,"name":"很久以后","plays":100,"comments":44400,"duration":290264,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264550,"name":"透明","plays":100,"comments":55982,"duration":217263,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264712,"name":"别勉强","plays":100,"comments":16169,"duration":262597,"publish_year":null,"music_size":420,"album_size":61},{"id":1412266089,"name":"好想好想你","plays":100,"comments":23739,"duration":204140,"publish_year":null,"music_size":420,"album_size":61},{"id":1484967131,"name":"孤独","plays":100,"comments":58280,"duration":230830,"publish_year":null,"music_size":420,"album_size":61},{"id":1904192389,"name":"倒流时间","plays":100,"comments":28788,"duration":188453,"publish_year":2021,"music_size":420,"album_size":61},{"id":1970554402,"name":"HELL","plays":100,"comments":26676,"duration":248285,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559930,"name":"你不是第一个离开的人","plays":100,"comments":32342,"duration":200287,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559933,"name":"不想回家","plays":100,"comments":20340,"duration":246510,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559943,"name":"冰河时代","plays":100,"comments":24118,"duration":210785,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560257,"name":"FIND YOU","plays":100,"comments":13876,"duration":256112,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560262,"name":"夜的尽头","plays":100,"comments":19429,"duration":281795,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560265,"name":"天空没有极限","plays":100,"comments":27306,"duration":279704,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970568707,"name":"让世界暂停一分钟","plays":100,"comments":13873,"duration":232860,"publish_year":2022,"music_size":420,"album_size":61},{"id":2082700997,"name":"情人","plays":100,"comments":43295,"duration":293295,"publish_year":null,"music_size":420,"album_size":61},{"id":2083785152,"name":"唯一","plays":100,"comments":403185,"duration":253735,"publish_year":2023,"music_size":420,"album_size":61},{"id":2093526245,"name":"11","plays":100,"comments":72868,"duration":228851,"publish_year":2023,"music_size":420,"album_size":61},{"id":2102012051,"name":"海阔天空","plays":100,"comments":44062,"duration":266780,"publish_year":2023,"music_size":420,"album_size":61},{"id":2714278529,"name":"回忆的沙漏 (G.E.M.重生版)","plays":100,"comments":12090,"duration":232947,"publish_year":null,"music_size":420,"album_size":61}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] similar artists: 44266
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=44266
+[爬虫] artist desc: 44266
+[爬虫] artist top songs: 44266
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[爬虫] similar artists: 7763
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=7763
+[爬虫] 获取歌手描述失败: 
+[爬虫] artist desc: 7763
+[爬虫] 获取歌手描述失败: 
+[爬虫] artist top songs: 7763
+[爬虫] 成功获取 0 位相似歌手
+[热歌榜] 获取到 0 个trackId (共undefined首)
+[飙升榜] 开始爬取...
+[爬虫] artist desc: 3686
+[爬虫] 获取歌手描述失败: 
+[爬虫] artist top songs: 3686
+[爬虫] 获取热搜列表（使用热歌榜数据）
+[爬虫] 获取热歌榜: 3778678
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 成功获取 0 位相似歌手
+[飙升榜] 获取到 50 个trackId (共100首)
+[爬虫] 成功获取 10 条热搜数据
+[飙升榜] 获取到 50 首歌曲
+[飙升榜] 排序完成: 50 首
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 0 个trackId (共undefined首)
+[排行榜] hot 爬取为空，保留旧数据
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] original 爬取为空，保留旧数据
+[排行榜] 已存入 50 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[Combined Analysis] stdout: {"sentiment": {"positive": 7, "neutral": 43, "negative": 0}, "topics": [{"topic_id": 0, "name": "未分类", "keywords": ["未分类"], "count": 39, "percentage": 78, "examples": ["永远的神", "时间给了我机会成长 也教会了我在沉默中慢慢领悟...
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":92641,"name":"沧海一声笑","plays":100,"comments":6647,"duration":246230,"publish_year":1990,"music_size":456,"album_size":48},{"id":108366,"name":"永远的微笑 (Live)","plays":80,"comments":1657,"duration":146773,"publish_year":2005,"music_size":456,"album_size":48},{"id":108633,"name":"歌 (1995年Unplugged版)","plays":75,"comments":803,"duration":157583,"publish_year":1995,"music_size":456,"album_size":48},{"id":108641,"name":"你的样子","plays":100,"comments":2091,"duration":210026,"publish_year":1995,"music_size":456,"album_size":48},{"id":108653,"name":"东方之珠","plays":100,"comments":7436,"duration":261716,"publish_year":1995,"music_size":456,"album_size":48},{"id":108700,"name":"滚滚红尘","plays":95,"comments":1401,"duration":186466,"publish_year":1995,"music_size":456,"album_size":48},{"id":108837,"name":"东风","plays":80,"comments":491,"duration":209200,"publish_year":1994,"music_size":456,"album_size":48},{"id":108848,"name":"台北红玫瑰","plays":90,"comments":691,"duration":229493,"publish_year":1994,"music_size":456,"album_size":48},{"id":108852,"name":"天雨","plays":80,"comments":705,"duration":269173,"publish_year":1994,"music_size":456,"album_size":48},{"id":108860,"name":"恋曲2000","plays":90,"comments":1439,"duration":293600,"publish_year":1994,"music_size":456,"album_size":48},{"id":108930,"name":"大地的孩子","plays":85,"comments":634,"duration":231840,"publish_year":1993,"music_size":456,"album_size":48},{"id":109069,"name":"火车","plays":100,"comments":977,"duration":268493,"publish_year":1991,"music_size":456,"album_size":48},{"id":109077,"name":"青春舞曲2000","plays":95,"comments":754,"duration":264026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109079,"name":"原乡 II","plays":80,"comments":153,"duration":213640,"publish_year":1991,"music_size":456,"album_size":48},{"id":109094,"name":"长征","plays":95,"comments":1253,"duration":314026,"publish_year":1991,"music_size":456,"album_size":48},{"id":109144,"name":"追梦人","plays":90,"comments":2490,"duration":230093,"publish_year":1991,"music_size":456,"album_size":48},{"id":109198,"name":"恋曲1990","plays":100,"comments":20733,"duration":315906,"publish_year":1990,"music_size":456,"album_size":48},{"id":109236,"name":"告别的年代","plays":85,"comments":1213,"duration":302693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109243,"name":"沉默的表示","plays":75,"comments":484,"duration":230693,"publish_year":1989,"music_size":456,"album_size":48},{"id":109252,"name":"思念","plays":80,"comments":616,"duration":307933,"publish_year":1989,"music_size":456,"album_size":48},{"id":109260,"name":"野百合也有春天","plays":100,"comments":3452,"duration":279866,"publish_year":1989,"music_size":456,"album_size":48},{"id":109269,"name":"海上花","plays":95,"comments":2945,"duration":179493,"publish_year":1989,"music_size":456,"album_size":48},{"id":109275,"name":"闪亮的日子","plays":90,"comments":2042,"duration":230293,"publish_year":1989,"music_size":456,"album_size":48},{"id":109292,"name":"是否","plays":75,"comments":363,"duration":244600,"publish_year":1989,"music_size":456,"album_size":48},{"id":109366,"name":"暗恋","plays":70,"comments":200,"duration":220000,"publish_year":1989,"music_size":456,"album_size":48},{"id":109388,"name":"爱人同志","plays":90,"comments":1507,"duration":271040,"publish_year":1988,"music_size":456,"album_size":48},{"id":109429,"name":"现象I","plays":70,"comments":106,"duration":223866,"publish_year":1985,"music_size":456,"album_size":48},{"id":109458,"name":"穿过你的黑发的我的手","plays":85,"comments":474,"duration":216600,"publish_year":1984,"music_size":456,"album_size":48},{"id":109470,"name":"超级市民","plays":75,"comments":367,"duration":142666,"publish_year":1984,"music_size":456,"album_size":48},{"id":109489,"name":"诞生","plays":75,"comments":256,"duration":107782,"publish_year":1983,"music_size":456,"album_size":48},{"id":109495,"name":"现象七十二变","plays":90,"comments":2735,"duration":231622,"publish_year":1983,"music_size":456,"album_size":48},{"id":109498,"name":"牧童","plays":75,"comments":472,"duration":200840,"publish_year":1983,"music_size":456,"album_size":48},{"id":109502,"name":"未来的主人翁","plays":90,"comments":3265,"duration":450717,"publish_year":1983,"music_size":456,"album_size":48},{"id":109505,"name":"青春舞曲","plays":85,"comments":843,"duration":200346,"publish_year":1983,"music_size":456,"album_size":48},{"id":109508,"name":"爱的箴言","plays":95,"comments":5805,"duration":216315,"publish_year":1983,"music_size":456,"album_size":48},{"id":109516,"name":"稻草人","plays":75,"comments":840,"duration":401516,"publish_year":1983,"music_size":456,"album_size":48},{"id":109525,"name":"鹿港小镇","plays":100,"comments":5818,"duration":283866,"publish_year":1982,"music_size":456,"album_size":48},{"id":109528,"name":"恋曲1980","plays":100,"comments":3566,"duration":200893,"publish_year":1982,"music_size":456,"album_size":48},{"id":109530,"name":"童年","plays":100,"comments":18026,"duration":234973,"publish_year":1982,"music_size":456,"album_size":48},{"id":109532,"name":"错误","plays":85,"comments":1154,"duration":307000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109534,"name":"摇篮曲","plays":70,"comments":358,"duration":201000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109536,"name":"之乎者也","plays":95,"comments":2220,"duration":244000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109539,"name":"乡愁四韵","plays":90,"comments":2533,"duration":358000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109542,"name":"将进酒","plays":85,"comments":1270,"duration":263000,"publish_year":1982,"music_size":456,"album_size":48},{"id":109545,"name":"光阴的故事","plays":100,"comments":5719,"duration":203840,"publish_year":1982,"music_size":456,"album_size":48},{"id":370389,"name":"风吹风吹","plays":80,"comments":823,"duration":253173,"publish_year":1996,"music_size":456,"album_size":48},{"id":29414839,"name":"只得一生","plays":80,"comments":3222,"duration":210624,"publish_year":2014,"music_size":456,"album_size":48},{"id":493042353,"name":"北西南风","plays":75,"comments":578,"duration":221546,"publish_year":2017,"music_size":456,"album_size":48},{"id":2060731831,"name":"长安三万里","plays":80,"comments":2009,"duration":264240,"publish_year":null,"music_size":456,"album_size":48}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] similar artists: 3686
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=3686
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[爬虫] similar artists: 44266
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=44266
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":2001472,"name":"Safe & Sound","plays":100,"comments":24054,"duration":242280,"publish_year":2011,"music_size":1855,"album_size":211},{"id":19292800,"name":"Red","plays":100,"comments":22710,"duration":223093,"publish_year":null,"music_size":1855,"album_size":211},{"id":19292804,"name":"22","plays":100,"comments":28619,"duration":232120,"publish_year":2013,"music_size":1855,"album_size":211},{"id":19292838,"name":"Sparks Fly","plays":100,"comments":14532,"duration":260946,"publish_year":2010,"music_size":1855,"album_size":211},{"id":19292852,"name":"Enchanted","plays":100,"comments":39414,"duration":352200,"publish_year":2010,"music_size":1855,"album_size":211},{"id":19292984,"name":"Love Story","plays":100,"comments":138449,"duration":236266,"publish_year":2008,"music_size":1855,"album_size":211},{"id":19292987,"name":"You Belong With Me","plays":100,"comments":24642,"duration":231140,"publish_year":2008,"music_size":1855,"album_size":211},{"id":19293014,"name":"Back To December","plays":100,"comments":12140,"duration":295106,"publish_year":2011,"music_size":1855,"album_size":211},{"id":25648017,"name":"I Knew You Were Trouble.","plays":100,"comments":33010,"duration":219720,"publish_year":2012,"music_size":1855,"album_size":211},{"id":25787222,"name":"We Are Never Ever Getting Back Together","plays":100,"comments":9917,"duration":193146,"publish_year":2012,"music_size":1855,"album_size":211},{"id":28111294,"name":"If This Was a Movie","plays":100,"comments":5754,"duration":234546,"publish_year":2010,"music_size":1855,"album_size":211},{"id":28953033,"name":"Shake It Off","plays":100,"comments":18842,"duration":219200,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29561031,"name":"Welcome To New York","plays":100,"comments":31822,"duration":212600,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29572501,"name":"Blank Space","plays":100,"comments":19097,"duration":231826,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29572502,"name":"Style","plays":100,"comments":24490,"duration":231000,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29572506,"name":"Wildest Dreams","plays":100,"comments":15203,"duration":220440,"publish_year":2014,"music_size":1855,"album_size":211},{"id":29572513,"name":"New Romantics","plays":100,"comments":12820,"duration":230466,"publish_year":2014,"music_size":1855,"album_size":211},{"id":501133611,"name":"Look What You Made Me Do","plays":100,"comments":643021,"duration":211859,"publish_year":2017,"music_size":1855,"album_size":211},{"id":514235010,"name":"Gorgeous","plays":100,"comments":68134,"duration":208042,"publish_year":2017,"music_size":1855,"album_size":211},{"id":516776413,"name":"Call It What You Want","plays":100,"comments":50899,"duration":201555,"publish_year":2017,"music_size":1855,"album_size":211},{"id":516818336,"name":"Delicate","plays":100,"comments":20647,"duration":232251,"publish_year":2017,"music_size":1855,"album_size":211},{"id":516818337,"name":"Getaway Car","plays":100,"comments":17196,"duration":233626,"publish_year":2017,"music_size":1855,"album_size":211},{"id":516823324,"name":"End Game","plays":100,"comments":21641,"duration":244826,"publish_year":2017,"music_size":1855,"album_size":211},{"id":1382576173,"name":"Cruel Summer","plays":100,"comments":94312,"duration":178491,"publish_year":2019,"music_size":1855,"album_size":211},{"id":1382778514,"name":"Lover","plays":100,"comments":56570,"duration":221306,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382778878,"name":"Cornelia Street","plays":100,"comments":14921,"duration":287266,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382781100,"name":"The Man","plays":100,"comments":15523,"duration":190360,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382781502,"name":"False God","plays":100,"comments":10059,"duration":200306,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382781549,"name":"ME!","plays":100,"comments":17458,"duration":193000,"publish_year":null,"music_size":1855,"album_size":211},{"id":1382781566,"name":"Daylight","plays":100,"comments":15024,"duration":293453,"publish_year":null,"music_size":1855,"album_size":211},{"id":1465111917,"name":"august","plays":100,"comments":26336,"duration":261922,"publish_year":2020,"music_size":1855,"album_size":211},{"id":1465114465,"name":"exile","plays":100,"comments":60536,"duration":285634,"publish_year":2020,"music_size":1855,"album_size":211},{"id":1803546393,"name":"champagne problems","plays":100,"comments":15620,"duration":244000,"publish_year":2021,"music_size":1855,"album_size":211},{"id":1803546869,"name":"willow","plays":100,"comments":15616,"duration":214706,"publish_year":2021,"music_size":1855,"album_size":211},{"id":1891456146,"name":"All Too Well (10 Minute Version) (Taylor'\''s Version) (From The Vault)","plays":100,"comments":28936,"duration":613000,"publish_year":2021,"music_size":1855,"album_size":211},{"id":1919029404,"name":"The Joker And The Queen (feat. Taylor Swift)","plays":100,"comments":18917,"duration":185422,"publish_year":2022,"music_size":1855,"album_size":211},{"id":1990191997,"name":"You'\''re On Your Own, Kid","plays":100,"comments":10773,"duration":194206,"publish_year":2022,"music_size":1855,"album_size":211},{"id":1990192689,"name":"Lavender Haze","plays":100,"comments":21065,"duration":202395,"publish_year":2022,"music_size":1855,"album_size":211},{"id":1990192694,"name":"Anti-Hero","plays":100,"comments":13174,"duration":200690,"publish_year":2022,"music_size":1855,"album_size":211},{"id":1990192705,"name":"Snow On The Beach","plays":100,"comments":13521,"duration":256124,"publish_year":2022,"music_size":1855,"album_size":211},{"id":2104074212,"name":"You'\''re Losing Me (From The Vault)","plays":100,"comments":8131,"duration":277831,"publish_year":2023,"music_size":1855,"album_size":211},{"id":2147408164,"name":"Fortnight","plays":100,"comments":25778,"duration":228965,"publish_year":2024,"music_size":1855,"album_size":211},{"id":2147408170,"name":"Guilty as Sin?","plays":100,"comments":5146,"duration":254365,"publish_year":2024,"music_size":1855,"album_size":211},{"id":2744399145,"name":"Father Figure","plays":100,"comments":4904,"duration":212777,"publish_year":null,"music_size":1855,"album_size":211},{"id":2744403174,"name":"The Fate of Ophelia","plays":100,"comments":29745,"duration":226073,"publish_year":null,"music_size":1855,"album_size":211},{"id":2744403189,"name":"Opalite","plays":100,"comments":8284,"duration":235356,"publish_year":null,"music_size":1855,"album_size":211},{"id":2744403423,"name":"CANCELLED!","plays":100,"comments":5173,"duration":211498,"publish_year":null,"music_size":1855,"album_size":211},{"id":2744403471,"name":"The Life of a Showgirl","plays":100,"comments":7712,"duration":241766,"publish_year":null,"music_size":1855,"album_size":211},{"id":3365277552,"name":"Elizabeth Taylor","plays":100,"comments":1052,"duration":208291,"publish_year":2026,"music_size":1855,"album_size":211},{"id":3390083812,"name":"I Knew It, I Knew You","plays":100,"comments":9133,"duration":178185,"publish_year":2026,"music_size":1855,"album_size":211}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] artist desc: 3686
+[爬虫] 获取歌手描述失败: 
+[爬虫] similar artists: 44266
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=44266
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 成功获取 0 位相似歌手
+[热歌榜] 获取到 0 个trackId (共undefined首)
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 0 个trackId (共undefined首)
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 0 个trackId (共undefined首)
+[排行榜] hot 爬取为空，保留旧数据
+[排行榜] rising 爬取为空，保留旧数据
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] original 爬取为空，保留旧数据
+[排行榜] 已存入 0 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[Combined Analysis] stdout: {"sentiment": {"positive": 8, "neutral": 42, "negative": 0}, "topics": [{"topic_id": 0, "name": "未分类", "keywords": ["未分类"], "count": 38, "percentage": 76, "examples": ["永远的神", "时间给了我机会成长 也教会了我在沉默中慢慢领悟...
+[Combined Analysis] stdout: {"sentiment": {"positive": 8, "neutral": 42, "negative": 0}, "topics": [{"topic_id": 0, "name": "未分类", "keywords": ["未分类"], "count": 38, "percentage": 76, "examples": ["永远的神", "时间给了我机会成长 也教会了我在沉默中慢慢领悟...
+[爬虫] search: "dzq" type=100 limit=10
+[Search] 爬虫: "dzq" → 8 条 (共 8)
+[Scraper] 开始抓取歌手: 7763
+[爬虫] artist detail: 7763
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=35740139
+[爬虫] 未找到粉丝数字段: 7763
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=35740139
+[爬虫] 未找到粉丝数字段: 7763
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 7763
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 7763
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=7763
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 G.E.M.邓紫棋 (7763) 入库完成，50 首歌曲
+[Scraper] 开始抓取歌手: 7763
+[爬虫] artist top songs: 7763
+[爬虫] artist detail: 7763
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=35740139
+[爬虫] 未找到粉丝数字段: 7763
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=35740139
+[爬虫] 未找到粉丝数字段: 7763
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 7763
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 7763
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=7763
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 G.E.M.邓紫棋 (7763) 入库完成，50 首歌曲
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 50 个trackId (共100首)
+[飙升榜] 获取到 50 首歌曲
+[飙升榜] 排序完成: 50 首
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 50 个trackId (共100首)
+[新歌榜] 获取到 50 首歌曲
+[新歌榜] 排序完成: 50 首
+[原创榜] 开始爬取...
+[原创榜] 获取到 50 个trackId (共100首)
+[原创榜] 获取到 50 首歌曲
+[原创榜] 排序完成: 50 首
+[排行榜] 已存入 200 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":233931,"name":"泡沫","plays":100,"comments":87814,"duration":258866,"publish_year":2012,"music_size":420,"album_size":61},{"id":234014,"name":"写不完的温柔","plays":100,"comments":29892,"duration":238880,"publish_year":2010,"music_size":420,"album_size":61},{"id":234015,"name":"A.I.N.Y. 爱你","plays":100,"comments":32459,"duration":226800,"publish_year":2010,"music_size":420,"album_size":61},{"id":234064,"name":"Where Did U Go","plays":100,"comments":33416,"duration":235800,"publish_year":2008,"music_size":420,"album_size":61},{"id":26117675,"name":"我的秘密","plays":100,"comments":21911,"duration":252120,"publish_year":2010,"music_size":420,"album_size":61},{"id":26154890,"name":"A.I.N.Y.","plays":100,"comments":11439,"duration":224506,"publish_year":2009,"music_size":420,"album_size":61},{"id":26550057,"name":"你把我灌醉","plays":100,"comments":11395,"duration":285190,"publish_year":2013,"music_size":420,"album_size":61},{"id":28341146,"name":"你不是真正的快乐 (Live)","plays":100,"comments":53015,"duration":320056,"publish_year":2014,"music_size":420,"album_size":61},{"id":28427775,"name":"龙卷风 (Live)","plays":100,"comments":50856,"duration":271754,"publish_year":2014,"music_size":420,"album_size":61},{"id":28793502,"name":"后会无期","plays":100,"comments":54489,"duration":223015,"publish_year":2014,"music_size":420,"album_size":61},{"id":28949444,"name":"喜欢你","plays":100,"comments":149343,"duration":239010,"publish_year":2014,"music_size":420,"album_size":61},{"id":29848657,"name":"手心的蔷薇","plays":100,"comments":49392,"duration":280053,"publish_year":2014,"music_size":420,"album_size":61},{"id":30612793,"name":"多远都要在一起","plays":100,"comments":402041,"duration":216880,"publish_year":2015,"music_size":420,"album_size":61},{"id":33190007,"name":"新的心跳","plays":100,"comments":20086,"duration":216439,"publish_year":2015,"music_size":420,"album_size":61},{"id":36024806,"name":"再见（good bye）","plays":100,"comments":111097,"duration":206053,"publish_year":2015,"music_size":420,"album_size":61},{"id":36103237,"name":"一路逆风","plays":100,"comments":18865,"duration":225800,"publish_year":2015,"music_size":420,"album_size":61},{"id":36198060,"name":"于是","plays":100,"comments":20736,"duration":229880,"publish_year":2015,"music_size":420,"album_size":61},{"id":36270426,"name":"来自天堂的魔鬼","plays":100,"comments":99374,"duration":245493,"publish_year":2015,"music_size":420,"album_size":61},{"id":412911436,"name":"画 (Live Piano Session II)","plays":100,"comments":77518,"duration":168739,"publish_year":2016,"music_size":420,"album_size":61},{"id":420513158,"name":"红蔷薇白玫瑰","plays":100,"comments":62723,"duration":282924,"publish_year":2016,"music_size":420,"album_size":61},{"id":449818741,"name":"光年之外","plays":100,"comments":156774,"duration":235505,"publish_year":2016,"music_size":420,"album_size":61},{"id":480579393,"name":"桃花诺","plays":100,"comments":50958,"duration":219759,"publish_year":2017,"music_size":420,"album_size":61},{"id":1299550532,"name":"倒数","plays":100,"comments":149391,"duration":229333,"publish_year":2018,"music_size":420,"album_size":61},{"id":1304720983,"name":"泡沫 Bubble","plays":100,"comments":2471,"duration":258879,"publish_year":2013,"music_size":420,"album_size":61},{"id":1305366734,"name":"另一个童话","plays":100,"comments":12600,"duration":183426,"publish_year":2018,"music_size":420,"album_size":61},{"id":1313107926,"name":"攀登 (Live)","plays":100,"comments":27703,"duration":251410,"publish_year":2018,"music_size":420,"album_size":61},{"id":1331885158,"name":"Where Did You Go","plays":100,"comments":10001,"duration":234680,"publish_year":2014,"music_size":420,"album_size":61},{"id":1379444316,"name":"差不多姑娘","plays":100,"comments":25305,"duration":230042,"publish_year":2019,"music_size":420,"album_size":61},{"id":1398247728,"name":"Walk On Water","plays":100,"comments":26594,"duration":211509,"publish_year":2019,"music_size":420,"album_size":61},{"id":1405283464,"name":"句号","plays":100,"comments":205934,"duration":235632,"publish_year":2019,"music_size":420,"album_size":61},{"id":1409382131,"name":"摩天动物园","plays":100,"comments":123690,"duration":270676,"publish_year":2019,"music_size":420,"album_size":61},{"id":1412263970,"name":"很久以后","plays":100,"comments":44402,"duration":290264,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264550,"name":"透明","plays":100,"comments":55990,"duration":217263,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264712,"name":"别勉强","plays":100,"comments":16171,"duration":262597,"publish_year":null,"music_size":420,"album_size":61},{"id":1412266089,"name":"好想好想你","plays":100,"comments":23743,"duration":204140,"publish_year":null,"music_size":420,"album_size":61},{"id":1484967131,"name":"孤独","plays":100,"comments":58289,"duration":230830,"publish_year":null,"music_size":420,"album_size":61},{"id":1904192389,"name":"倒流时间","plays":100,"comments":28791,"duration":188453,"publish_year":2021,"music_size":420,"album_size":61},{"id":1970554402,"name":"HELL","plays":100,"comments":26685,"duration":248285,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559930,"name":"你不是第一个离开的人","plays":100,"comments":32345,"duration":200287,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559933,"name":"不想回家","plays":100,"comments":20346,"duration":246510,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559943,"name":"冰河时代","plays":100,"comments":24130,"duration":210785,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560257,"name":"FIND YOU","plays":100,"comments":13890,"duration":256112,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560262,"name":"夜的尽头","plays":100,"comments":19433,"duration":281795,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560265,"name":"天空没有极限","plays":100,"comments":27322,"duration":279704,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970568707,"name":"让世界暂停一分钟","plays":100,"comments":13885,"duration":232860,"publish_year":2022,"music_size":420,"album_size":61},{"id":2082700997,"name":"情人","plays":100,"comments":43296,"duration":293295,"publish_year":null,"music_size":420,"album_size":61},{"id":2083785152,"name":"唯一","plays":100,"comments":403311,"duration":253735,"publish_year":2023,"music_size":420,"album_size":61},{"id":2093526245,"name":"11","plays":100,"comments":72880,"duration":228851,"publish_year":2023,"music_size":420,"album_size":61},{"id":2102012051,"name":"海阔天空","plays":100,"comments":44069,"duration":266780,"publish_year":2023,"music_size":420,"album_size":61},{"id":2714278529,"name":"回忆的沙漏 (G.E.M.重生版)","plays":100,"comments":12094,"duration":232947,"publish_year":null,"music_size":420,"album_size":61}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[爬虫] similar artists: 7763
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=7763
+[爬虫] artist desc: 7763
+[爬虫] artist top songs: 7763
+[爬虫] 获取热搜列表（使用热歌榜数据）
+[爬虫] 获取热歌榜: 3778678
+[爬虫] 获取歌手描述失败: 
+Traceback (most recent call last):
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 176, in <module>
+    main()
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 112, in main
+    X_tr, X_te, y_tr, y_te = train_test_split(
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/utils/_param_validation.py", line 216, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2872, in train_test_split
+    train, test = next(cv.split(X=arrays[0], y=stratify))
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 1909, in split
+    for train, test in self._iter_indices(X, y, groups):
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2318, in _iter_indices
+    raise ValueError(
+ValueError: The least populated class in y has only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2.
+[Predict] 失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py" "7763"
+Traceback (most recent call last):
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 176, in <module>
+    main()
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 112, in main
+    X_tr, X_te, y_tr, y_te = train_test_split(
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/utils/_param_validation.py", line 216, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2872, in train_test_split
+    train, test = next(cv.split(X=arrays[0], y=stratify))
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 1909, in split
+    for train, test in self._iter_indices(X, y, groups):
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2318, in _iter_indices
+    raise ValueError(
+ValueError: The least populated class in y has only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2.
+
+[爬虫] 成功获取 10 条热搜数据
+[爬虫] 成功获取 0 位相似歌手
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 50 个trackId (共100首)
+[飙升榜] 获取到 50 首歌曲
+[飙升榜] 排序完成: 50 首
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 50 个trackId (共100首)
+[新歌榜] 获取到 50 首歌曲
+[新歌榜] 排序完成: 50 首
+[原创榜] 开始爬取...
+[原创榜] 获取到 50 个trackId (共100首)
+[原创榜] 获取到 50 首歌曲
+[原创榜] 排序完成: 50 首
+[排行榜] 已存入 200 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[Combined Analysis] stdout: {"sentiment": {"positive": 13, "neutral": 35, "negative": 2}, "topics": [{"topic_id": 0, "name": "未分类", "keywords": ["未分类"], "count": 30, "percentage": 60, "examples": ["对我最快乐！", "接", "爱了", "你说你把我当作偏爱...
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":233931,"name":"泡沫","plays":100,"comments":87814,"duration":258866,"publish_year":2012,"music_size":420,"album_size":61},{"id":234014,"name":"写不完的温柔","plays":100,"comments":29892,"duration":238880,"publish_year":2010,"music_size":420,"album_size":61},{"id":234015,"name":"A.I.N.Y. 爱你","plays":100,"comments":32459,"duration":226800,"publish_year":2010,"music_size":420,"album_size":61},{"id":234064,"name":"Where Did U Go","plays":100,"comments":33416,"duration":235800,"publish_year":2008,"music_size":420,"album_size":61},{"id":26117675,"name":"我的秘密","plays":100,"comments":21911,"duration":252120,"publish_year":2010,"music_size":420,"album_size":61},{"id":26154890,"name":"A.I.N.Y.","plays":100,"comments":11439,"duration":224506,"publish_year":2009,"music_size":420,"album_size":61},{"id":26550057,"name":"你把我灌醉","plays":100,"comments":11395,"duration":285190,"publish_year":2013,"music_size":420,"album_size":61},{"id":28341146,"name":"你不是真正的快乐 (Live)","plays":100,"comments":53015,"duration":320056,"publish_year":2014,"music_size":420,"album_size":61},{"id":28427775,"name":"龙卷风 (Live)","plays":100,"comments":50856,"duration":271754,"publish_year":2014,"music_size":420,"album_size":61},{"id":28793502,"name":"后会无期","plays":100,"comments":54489,"duration":223015,"publish_year":2014,"music_size":420,"album_size":61},{"id":28949444,"name":"喜欢你","plays":100,"comments":149343,"duration":239010,"publish_year":2014,"music_size":420,"album_size":61},{"id":29848657,"name":"手心的蔷薇","plays":100,"comments":49392,"duration":280053,"publish_year":2014,"music_size":420,"album_size":61},{"id":30612793,"name":"多远都要在一起","plays":100,"comments":402041,"duration":216880,"publish_year":2015,"music_size":420,"album_size":61},{"id":33190007,"name":"新的心跳","plays":100,"comments":20086,"duration":216439,"publish_year":2015,"music_size":420,"album_size":61},{"id":36024806,"name":"再见（good bye）","plays":100,"comments":111097,"duration":206053,"publish_year":2015,"music_size":420,"album_size":61},{"id":36103237,"name":"一路逆风","plays":100,"comments":18865,"duration":225800,"publish_year":2015,"music_size":420,"album_size":61},{"id":36198060,"name":"于是","plays":100,"comments":20736,"duration":229880,"publish_year":2015,"music_size":420,"album_size":61},{"id":36270426,"name":"来自天堂的魔鬼","plays":100,"comments":99374,"duration":245493,"publish_year":2015,"music_size":420,"album_size":61},{"id":412911436,"name":"画 (Live Piano Session II)","plays":100,"comments":77518,"duration":168739,"publish_year":2016,"music_size":420,"album_size":61},{"id":420513158,"name":"红蔷薇白玫瑰","plays":100,"comments":62723,"duration":282924,"publish_year":2016,"music_size":420,"album_size":61},{"id":449818741,"name":"光年之外","plays":100,"comments":156774,"duration":235505,"publish_year":2016,"music_size":420,"album_size":61},{"id":480579393,"name":"桃花诺","plays":100,"comments":50958,"duration":219759,"publish_year":2017,"music_size":420,"album_size":61},{"id":1299550532,"name":"倒数","plays":100,"comments":149391,"duration":229333,"publish_year":2018,"music_size":420,"album_size":61},{"id":1304720983,"name":"泡沫 Bubble","plays":100,"comments":2471,"duration":258879,"publish_year":2013,"music_size":420,"album_size":61},{"id":1305366734,"name":"另一个童话","plays":100,"comments":12600,"duration":183426,"publish_year":2018,"music_size":420,"album_size":61},{"id":1313107926,"name":"攀登 (Live)","plays":100,"comments":27703,"duration":251410,"publish_year":2018,"music_size":420,"album_size":61},{"id":1331885158,"name":"Where Did You Go","plays":100,"comments":10001,"duration":234680,"publish_year":2014,"music_size":420,"album_size":61},{"id":1379444316,"name":"差不多姑娘","plays":100,"comments":25305,"duration":230042,"publish_year":2019,"music_size":420,"album_size":61},{"id":1398247728,"name":"Walk On Water","plays":100,"comments":26594,"duration":211509,"publish_year":2019,"music_size":420,"album_size":61},{"id":1405283464,"name":"句号","plays":100,"comments":205934,"duration":235632,"publish_year":2019,"music_size":420,"album_size":61},{"id":1409382131,"name":"摩天动物园","plays":100,"comments":123690,"duration":270676,"publish_year":2019,"music_size":420,"album_size":61},{"id":1412263970,"name":"很久以后","plays":100,"comments":44402,"duration":290264,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264550,"name":"透明","plays":100,"comments":55990,"duration":217263,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264712,"name":"别勉强","plays":100,"comments":16171,"duration":262597,"publish_year":null,"music_size":420,"album_size":61},{"id":1412266089,"name":"好想好想你","plays":100,"comments":23743,"duration":204140,"publish_year":null,"music_size":420,"album_size":61},{"id":1484967131,"name":"孤独","plays":100,"comments":58289,"duration":230830,"publish_year":null,"music_size":420,"album_size":61},{"id":1904192389,"name":"倒流时间","plays":100,"comments":28791,"duration":188453,"publish_year":2021,"music_size":420,"album_size":61},{"id":1970554402,"name":"HELL","plays":100,"comments":26685,"duration":248285,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559930,"name":"你不是第一个离开的人","plays":100,"comments":32345,"duration":200287,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559933,"name":"不想回家","plays":100,"comments":20346,"duration":246510,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559943,"name":"冰河时代","plays":100,"comments":24130,"duration":210785,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560257,"name":"FIND YOU","plays":100,"comments":13890,"duration":256112,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560262,"name":"夜的尽头","plays":100,"comments":19433,"duration":281795,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560265,"name":"天空没有极限","plays":100,"comments":27322,"duration":279704,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970568707,"name":"让世界暂停一分钟","plays":100,"comments":13885,"duration":232860,"publish_year":2022,"music_size":420,"album_size":61},{"id":2082700997,"name":"情人","plays":100,"comments":43296,"duration":293295,"publish_year":null,"music_size":420,"album_size":61},{"id":2083785152,"name":"唯一","plays":100,"comments":403311,"duration":253735,"publish_year":2023,"music_size":420,"album_size":61},{"id":2093526245,"name":"11","plays":100,"comments":72880,"duration":228851,"publish_year":2023,"music_size":420,"album_size":61},{"id":2102012051,"name":"海阔天空","plays":100,"comments":44069,"duration":266780,"publish_year":2023,"music_size":420,"album_size":61},{"id":2714278529,"name":"回忆的沙漏 (G.E.M.重生版)","plays":100,"comments":12094,"duration":232947,"publish_year":null,"music_size":420,"album_size":61}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] similar artists: 7763
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=7763
+[爬虫] artist desc: 7763
+[爬虫] artist top songs: 7763
+[爬虫] 获取歌手描述失败: 
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":233931,"name":"泡沫","plays":100,"comments":87814,"duration":258866,"publish_year":2012,"music_size":420,"album_size":61},{"id":234014,"name":"写不完的温柔","plays":100,"comments":29892,"duration":238880,"publish_year":2010,"music_size":420,"album_size":61},{"id":234015,"name":"A.I.N.Y. 爱你","plays":100,"comments":32459,"duration":226800,"publish_year":2010,"music_size":420,"album_size":61},{"id":234064,"name":"Where Did U Go","plays":100,"comments":33416,"duration":235800,"publish_year":2008,"music_size":420,"album_size":61},{"id":26117675,"name":"我的秘密","plays":100,"comments":21911,"duration":252120,"publish_year":2010,"music_size":420,"album_size":61},{"id":26154890,"name":"A.I.N.Y.","plays":100,"comments":11439,"duration":224506,"publish_year":2009,"music_size":420,"album_size":61},{"id":26550057,"name":"你把我灌醉","plays":100,"comments":11395,"duration":285190,"publish_year":2013,"music_size":420,"album_size":61},{"id":28341146,"name":"你不是真正的快乐 (Live)","plays":100,"comments":53015,"duration":320056,"publish_year":2014,"music_size":420,"album_size":61},{"id":28427775,"name":"龙卷风 (Live)","plays":100,"comments":50856,"duration":271754,"publish_year":2014,"music_size":420,"album_size":61},{"id":28793502,"name":"后会无期","plays":100,"comments":54489,"duration":223015,"publish_year":2014,"music_size":420,"album_size":61},{"id":28949444,"name":"喜欢你","plays":100,"comments":149343,"duration":239010,"publish_year":2014,"music_size":420,"album_size":61},{"id":29848657,"name":"手心的蔷薇","plays":100,"comments":49392,"duration":280053,"publish_year":2014,"music_size":420,"album_size":61},{"id":30612793,"name":"多远都要在一起","plays":100,"comments":402041,"duration":216880,"publish_year":2015,"music_size":420,"album_size":61},{"id":33190007,"name":"新的心跳","plays":100,"comments":20086,"duration":216439,"publish_year":2015,"music_size":420,"album_size":61},{"id":36024806,"name":"再见（good bye）","plays":100,"comments":111097,"duration":206053,"publish_year":2015,"music_size":420,"album_size":61},{"id":36103237,"name":"一路逆风","plays":100,"comments":18865,"duration":225800,"publish_year":2015,"music_size":420,"album_size":61},{"id":36198060,"name":"于是","plays":100,"comments":20736,"duration":229880,"publish_year":2015,"music_size":420,"album_size":61},{"id":36270426,"name":"来自天堂的魔鬼","plays":100,"comments":99374,"duration":245493,"publish_year":2015,"music_size":420,"album_size":61},{"id":412911436,"name":"画 (Live Piano Session II)","plays":100,"comments":77518,"duration":168739,"publish_year":2016,"music_size":420,"album_size":61},{"id":420513158,"name":"红蔷薇白玫瑰","plays":100,"comments":62723,"duration":282924,"publish_year":2016,"music_size":420,"album_size":61},{"id":449818741,"name":"光年之外","plays":100,"comments":156774,"duration":235505,"publish_year":2016,"music_size":420,"album_size":61},{"id":480579393,"name":"桃花诺","plays":100,"comments":50958,"duration":219759,"publish_year":2017,"music_size":420,"album_size":61},{"id":1299550532,"name":"倒数","plays":100,"comments":149391,"duration":229333,"publish_year":2018,"music_size":420,"album_size":61},{"id":1304720983,"name":"泡沫 Bubble","plays":100,"comments":2471,"duration":258879,"publish_year":2013,"music_size":420,"album_size":61},{"id":1305366734,"name":"另一个童话","plays":100,"comments":12600,"duration":183426,"publish_year":2018,"music_size":420,"album_size":61},{"id":1313107926,"name":"攀登 (Live)","plays":100,"comments":27703,"duration":251410,"publish_year":2018,"music_size":420,"album_size":61},{"id":1331885158,"name":"Where Did You Go","plays":100,"comments":10001,"duration":234680,"publish_year":2014,"music_size":420,"album_size":61},{"id":1379444316,"name":"差不多姑娘","plays":100,"comments":25305,"duration":230042,"publish_year":2019,"music_size":420,"album_size":61},{"id":1398247728,"name":"Walk On Water","plays":100,"comments":26594,"duration":211509,"publish_year":2019,"music_size":420,"album_size":61},{"id":1405283464,"name":"句号","plays":100,"comments":205934,"duration":235632,"publish_year":2019,"music_size":420,"album_size":61},{"id":1409382131,"name":"摩天动物园","plays":100,"comments":123690,"duration":270676,"publish_year":2019,"music_size":420,"album_size":61},{"id":1412263970,"name":"很久以后","plays":100,"comments":44402,"duration":290264,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264550,"name":"透明","plays":100,"comments":55990,"duration":217263,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264712,"name":"别勉强","plays":100,"comments":16171,"duration":262597,"publish_year":null,"music_size":420,"album_size":61},{"id":1412266089,"name":"好想好想你","plays":100,"comments":23743,"duration":204140,"publish_year":null,"music_size":420,"album_size":61},{"id":1484967131,"name":"孤独","plays":100,"comments":58289,"duration":230830,"publish_year":null,"music_size":420,"album_size":61},{"id":1904192389,"name":"倒流时间","plays":100,"comments":28791,"duration":188453,"publish_year":2021,"music_size":420,"album_size":61},{"id":1970554402,"name":"HELL","plays":100,"comments":26685,"duration":248285,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559930,"name":"你不是第一个离开的人","plays":100,"comments":32345,"duration":200287,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559933,"name":"不想回家","plays":100,"comments":20346,"duration":246510,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559943,"name":"冰河时代","plays":100,"comments":24130,"duration":210785,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560257,"name":"FIND YOU","plays":100,"comments":13890,"duration":256112,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560262,"name":"夜的尽头","plays":100,"comments":19433,"duration":281795,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560265,"name":"天空没有极限","plays":100,"comments":27322,"duration":279704,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970568707,"name":"让世界暂停一分钟","plays":100,"comments":13885,"duration":232860,"publish_year":2022,"music_size":420,"album_size":61},{"id":2082700997,"name":"情人","plays":100,"comments":43296,"duration":293295,"publish_year":null,"music_size":420,"album_size":61},{"id":2083785152,"name":"唯一","plays":100,"comments":403311,"duration":253735,"publish_year":2023,"music_size":420,"album_size":61},{"id":2093526245,"name":"11","plays":100,"comments":72880,"duration":228851,"publish_year":2023,"music_size":420,"album_size":61},{"id":2102012051,"name":"海阔天空","plays":100,"comments":44069,"duration":266780,"publish_year":2023,"music_size":420,"album_size":61},{"id":2714278529,"name":"回忆的沙漏 (G.E.M.重生版)","plays":100,"comments":12094,"duration":232947,"publish_year":null,"music_size":420,"album_size":61}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+Traceback (most recent call last):
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 176, in <module>
+    main()
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 112, in main
+    X_tr, X_te, y_tr, y_te = train_test_split(
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/utils/_param_validation.py", line 216, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2872, in train_test_split
+    train, test = next(cv.split(X=arrays[0], y=stratify))
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 1909, in split
+    for train, test in self._iter_indices(X, y, groups):
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2318, in _iter_indices
+    raise ValueError(
+ValueError: The least populated class in y has only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2.
+[Predict] 失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py" "7763"
+Traceback (most recent call last):
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 176, in <module>
+    main()
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 112, in main
+    X_tr, X_te, y_tr, y_te = train_test_split(
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/utils/_param_validation.py", line 216, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2872, in train_test_split
+    train, test = next(cv.split(X=arrays[0], y=stratify))
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 1909, in split
+    for train, test in self._iter_indices(X, y, groups):
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2318, in _iter_indices
+    raise ValueError(
+ValueError: The least populated class in y has only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2.
+
+[爬虫] 获取热搜列表（使用热歌榜数据）
+[爬虫] 获取热歌榜: 3778678
+[爬虫] artist desc: 7763
+[爬虫] 获取歌手描述失败: 
+Traceback (most recent call last):
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 176, in <module>
+    main()
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 112, in main
+    X_tr, X_te, y_tr, y_te = train_test_split(
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/utils/_param_validation.py", line 216, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2872, in train_test_split
+    train, test = next(cv.split(X=arrays[0], y=stratify))
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 1909, in split
+    for train, test in self._iter_indices(X, y, groups):
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2318, in _iter_indices
+    raise ValueError(
+ValueError: The least populated class in y has only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2.
+[Predict] 失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py" "7763"
+Traceback (most recent call last):
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 176, in <module>
+    main()
+  File "/Users/smallshark/Desktop/works/Data Visualization/期末/server/predict_artist.py", line 112, in main
+    X_tr, X_te, y_tr, y_te = train_test_split(
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/utils/_param_validation.py", line 216, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2872, in train_test_split
+    train, test = next(cv.split(X=arrays[0], y=stratify))
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 1909, in split
+    for train, test in self._iter_indices(X, y, groups):
+  File "/Users/smallshark/Library/Python/3.9/lib/python/site-packages/sklearn/model_selection/_split.py", line 2318, in _iter_indices
+    raise ValueError(
+ValueError: The least populated class in y has only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2.
+
+[爬虫] artist top songs: 7763
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] similar artists: 7763
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=7763
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 成功获取 10 条热搜数据
+[爬虫] 获取热搜列表（使用热歌榜数据）
+[爬虫] 获取热歌榜: 3778678
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[爬虫] 成功获取 10 条热搜数据
+[飙升榜] 获取到 50 个trackId (共100首)
+[飙升榜] 获取到 50 首歌曲
+[飙升榜] 排序完成: 50 首
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 0 个trackId (共undefined首)
+[原创榜] 开始爬取...
+[原创榜] 获取到 50 个trackId (共100首)
+[原创榜] 获取到 50 首歌曲
+[原创榜] 排序完成: 50 首
+[排行榜] new 爬取为空，保留旧数据
+[排行榜] 已存入 150 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[爬虫] search: "wa" type=100 limit=10
+[Search] 爬虫: "wa" → 10 条 (共 504)
+[爬虫] search: "wang" type=100 limit=10
+[Search] 爬虫: "wang" → 10 条 (共 501)
+[爬虫] search: "王" type=100 limit=10
+[Search] 爬虫: "王" → 10 条 (共 502)
+[Scraper] 开始抓取歌手: 5346
+[爬虫] artist detail: 5346
+[爬虫] similar artists: 7763
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=7763
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+ML 预测失败: Command failed: python3 "/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py" '[{"id":233931,"name":"泡沫","plays":100,"comments":87814,"duration":258866,"publish_year":2012,"music_size":420,"album_size":61},{"id":234014,"name":"写不完的温柔","plays":100,"comments":29892,"duration":238880,"publish_year":2010,"music_size":420,"album_size":61},{"id":234015,"name":"A.I.N.Y. 爱你","plays":100,"comments":32459,"duration":226800,"publish_year":2010,"music_size":420,"album_size":61},{"id":234064,"name":"Where Did U Go","plays":100,"comments":33416,"duration":235800,"publish_year":2008,"music_size":420,"album_size":61},{"id":26117675,"name":"我的秘密","plays":100,"comments":21911,"duration":252120,"publish_year":2010,"music_size":420,"album_size":61},{"id":26154890,"name":"A.I.N.Y.","plays":100,"comments":11439,"duration":224506,"publish_year":2009,"music_size":420,"album_size":61},{"id":26550057,"name":"你把我灌醉","plays":100,"comments":11395,"duration":285190,"publish_year":2013,"music_size":420,"album_size":61},{"id":28341146,"name":"你不是真正的快乐 (Live)","plays":100,"comments":53015,"duration":320056,"publish_year":2014,"music_size":420,"album_size":61},{"id":28427775,"name":"龙卷风 (Live)","plays":100,"comments":50856,"duration":271754,"publish_year":2014,"music_size":420,"album_size":61},{"id":28793502,"name":"后会无期","plays":100,"comments":54489,"duration":223015,"publish_year":2014,"music_size":420,"album_size":61},{"id":28949444,"name":"喜欢你","plays":100,"comments":149343,"duration":239010,"publish_year":2014,"music_size":420,"album_size":61},{"id":29848657,"name":"手心的蔷薇","plays":100,"comments":49392,"duration":280053,"publish_year":2014,"music_size":420,"album_size":61},{"id":30612793,"name":"多远都要在一起","plays":100,"comments":402041,"duration":216880,"publish_year":2015,"music_size":420,"album_size":61},{"id":33190007,"name":"新的心跳","plays":100,"comments":20086,"duration":216439,"publish_year":2015,"music_size":420,"album_size":61},{"id":36024806,"name":"再见（good bye）","plays":100,"comments":111097,"duration":206053,"publish_year":2015,"music_size":420,"album_size":61},{"id":36103237,"name":"一路逆风","plays":100,"comments":18865,"duration":225800,"publish_year":2015,"music_size":420,"album_size":61},{"id":36198060,"name":"于是","plays":100,"comments":20736,"duration":229880,"publish_year":2015,"music_size":420,"album_size":61},{"id":36270426,"name":"来自天堂的魔鬼","plays":100,"comments":99374,"duration":245493,"publish_year":2015,"music_size":420,"album_size":61},{"id":412911436,"name":"画 (Live Piano Session II)","plays":100,"comments":77518,"duration":168739,"publish_year":2016,"music_size":420,"album_size":61},{"id":420513158,"name":"红蔷薇白玫瑰","plays":100,"comments":62723,"duration":282924,"publish_year":2016,"music_size":420,"album_size":61},{"id":449818741,"name":"光年之外","plays":100,"comments":156774,"duration":235505,"publish_year":2016,"music_size":420,"album_size":61},{"id":480579393,"name":"桃花诺","plays":100,"comments":50958,"duration":219759,"publish_year":2017,"music_size":420,"album_size":61},{"id":1299550532,"name":"倒数","plays":100,"comments":149391,"duration":229333,"publish_year":2018,"music_size":420,"album_size":61},{"id":1304720983,"name":"泡沫 Bubble","plays":100,"comments":2471,"duration":258879,"publish_year":2013,"music_size":420,"album_size":61},{"id":1305366734,"name":"另一个童话","plays":100,"comments":12600,"duration":183426,"publish_year":2018,"music_size":420,"album_size":61},{"id":1313107926,"name":"攀登 (Live)","plays":100,"comments":27703,"duration":251410,"publish_year":2018,"music_size":420,"album_size":61},{"id":1331885158,"name":"Where Did You Go","plays":100,"comments":10001,"duration":234680,"publish_year":2014,"music_size":420,"album_size":61},{"id":1379444316,"name":"差不多姑娘","plays":100,"comments":25305,"duration":230042,"publish_year":2019,"music_size":420,"album_size":61},{"id":1398247728,"name":"Walk On Water","plays":100,"comments":26594,"duration":211509,"publish_year":2019,"music_size":420,"album_size":61},{"id":1405283464,"name":"句号","plays":100,"comments":205934,"duration":235632,"publish_year":2019,"music_size":420,"album_size":61},{"id":1409382131,"name":"摩天动物园","plays":100,"comments":123690,"duration":270676,"publish_year":2019,"music_size":420,"album_size":61},{"id":1412263970,"name":"很久以后","plays":100,"comments":44402,"duration":290264,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264550,"name":"透明","plays":100,"comments":55990,"duration":217263,"publish_year":null,"music_size":420,"album_size":61},{"id":1412264712,"name":"别勉强","plays":100,"comments":16171,"duration":262597,"publish_year":null,"music_size":420,"album_size":61},{"id":1412266089,"name":"好想好想你","plays":100,"comments":23743,"duration":204140,"publish_year":null,"music_size":420,"album_size":61},{"id":1484967131,"name":"孤独","plays":100,"comments":58289,"duration":230830,"publish_year":null,"music_size":420,"album_size":61},{"id":1904192389,"name":"倒流时间","plays":100,"comments":28791,"duration":188453,"publish_year":2021,"music_size":420,"album_size":61},{"id":1970554402,"name":"HELL","plays":100,"comments":26685,"duration":248285,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559930,"name":"你不是第一个离开的人","plays":100,"comments":32345,"duration":200287,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559933,"name":"不想回家","plays":100,"comments":20346,"duration":246510,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970559943,"name":"冰河时代","plays":100,"comments":24130,"duration":210785,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560257,"name":"FIND YOU","plays":100,"comments":13890,"duration":256112,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560262,"name":"夜的尽头","plays":100,"comments":19433,"duration":281795,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970560265,"name":"天空没有极限","plays":100,"comments":27322,"duration":279704,"publish_year":2022,"music_size":420,"album_size":61},{"id":1970568707,"name":"让世界暂停一分钟","plays":100,"comments":13885,"duration":232860,"publish_year":2022,"music_size":420,"album_size":61},{"id":2082700997,"name":"情人","plays":100,"comments":43296,"duration":293295,"publish_year":null,"music_size":420,"album_size":61},{"id":2083785152,"name":"唯一","plays":100,"comments":403311,"duration":253735,"publish_year":2023,"music_size":420,"album_size":61},{"id":2093526245,"name":"11","plays":100,"comments":72880,"duration":228851,"publish_year":2023,"music_size":420,"album_size":61},{"id":2102012051,"name":"海阔天空","plays":100,"comments":44069,"duration":266780,"publish_year":2023,"music_size":420,"album_size":61},{"id":2714278529,"name":"回忆的沙漏 (G.E.M.重生版)","plays":100,"comments":12094,"duration":232947,"publish_year":null,"music_size":420,"album_size":61}]'
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/smallshark/Desktop/works/Data Visualization/期末/server/routes/ml_predict.py': [Errno 2] No such file or directory
+
+[爬虫] artist desc: 7763
+[爬虫] 获取歌手描述失败: 
+[爬虫] similar artists: 5346
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=5346
+[爬虫] artist desc: 5346
+[爬虫] 获取歌手描述失败: 
+[爬虫] artist top songs: 5346
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=12138950
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 成功获取 0 位相似歌手
+[爬虫] 成功获取粉丝数: 5346 -> 0
+[爬虫] 获取粉丝数: https://music.163.com/user/home?id=12138950
+[爬虫] 成功获取粉丝数: 5346 -> 0
+[Scraper] 获取到粉丝数: 0
+[爬虫] artist top songs: 5346
+[Scraper] 获取到 50 首歌曲
+[Scraper] 开始获取歌曲评论数...
+[Scraper] 评论数获取完成
+[Scraper] 获取到 20 张专辑
+[爬虫] similar artists: 5346
+[爬虫] 获取相似歌手: https://music.163.com/artist?id=5346
+[爬虫] 成功获取 0 位相似歌手
+[Scraper] 获取到 0 位相似歌手
+[Scraper] ✅ 歌手 王力宏 (5346) 入库完成，50 首歌曲
+[爬虫] artist top songs: 5346
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 50 个trackId (共100首)
+[飙升榜] 获取到 50 首歌曲
+[飙升榜] 排序完成: 50 首
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 50 个trackId (共100首)
+[新歌榜] 获取到 50 首歌曲
+[新歌榜] 排序完成: 50 首
+[原创榜] 开始爬取...
+[原创榜] 获取到 50 个trackId (共100首)
+[原创榜] 获取到 50 首歌曲
+[原创榜] 排序完成: 50 首
+[排行榜] 已存入 200 首到 hot_songs 表
+[Compare] 排行榜爬取完成
+[Compare] 开始爬取最新排行榜...
+[热歌榜] 开始爬取...
+[热歌榜] 获取到 50 个trackId (共200首)
+[热歌榜] 获取到 50 首歌曲
+[热歌榜] 排序完成: 50 首
+[飙升榜] 开始爬取...
+[飙升榜] 获取到 50 个trackId (共100首)
+[飙升榜] 获取到 50 首歌曲
+[飙升榜] 排序完成: 50 首
+[新歌榜] 开始爬取...
+[新歌榜] 获取到 50 个trackId (共100首)
+[新歌榜] 获取到 50 首歌曲
+[新歌榜] 排序完成: 50 首
+[原创榜] 开始爬取...
+[原创榜] 获取到 50 个trackId (共100首)
+[原创榜] 获取到 50 首歌曲
+[原创榜] 排序完成: 50 首
+[排行榜] 已存入 200 首到 hot_songs 表
+[Compare] 排行榜爬取完成
